@@ -1,11 +1,12 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtToken } from 'src/utils.common/utils.jwt-token.common/utils.jwt-token.common';
 import { JwtTokenInterFace } from 'src/utils.common/utils.jwt-token.common/utils.jwt-token.interface.common';
 import { UserDto } from 'src/v1/user/user.dto/user.dto';
 import { User } from 'src/v1/user/user.entity/user.entity';
 import { UserService } from 'src/v1/user/user.service';
-import { LoginDto } from './auth.dto/login-dto/login.dto';
+import { LoginDto } from './auth.dto/login.dto';
+import { ExceptionResponseDetail } from 'src/utils.common/utils.exception.common/utils.exception.common';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,13 @@ export class AuthService {
         /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
         const existingUser = await this.userService.findOneByEmail(registerDto.email);
         if (existingUser) {
-            throw new ConflictException('Tên tài khoản đã tồn tại.');
+            throw new HttpException(
+                new ExceptionResponseDetail(
+                    HttpStatus.BAD_REQUEST,
+                    'Tên tài khoản đã tồn tại.'
+                ),
+                HttpStatus.OK
+            );
         }
 
         /** Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu */
@@ -31,7 +38,13 @@ export class AuthService {
     async login(loginDto: LoginDto) {
         const user: User = await this.userService.findOneByEmail(loginDto.email);
         if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
-            throw new UnauthorizedException('Tên đăng nhập hoặc mật khẩu không chính xác.');
+            throw new HttpException(
+                new ExceptionResponseDetail(
+                    HttpStatus.BAD_REQUEST,
+                    'Tên đăng nhập hoặc mật khẩu không chính xác.'
+                ),
+                HttpStatus.OK
+            );
         }
 
         /** Tạo Access Token */
@@ -56,7 +69,13 @@ export class AuthService {
         const decodedAccessToken: JwtTokenInterFace = await new JwtToken().decodeToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
 
         if (!decodedAccessToken || !decodedAccessToken.user_id) {
-            throw new UnauthorizedException('Access token không hợp lệ.');
+            throw new HttpException(
+                new ExceptionResponseDetail(
+                    HttpStatus.BAD_REQUEST,
+                    'Access token không hợp lệ.'
+                ),
+                HttpStatus.OK
+            );
         }
 
         /** Kiểm tra tính hợp lệ của Refresh Token (so sánh với dữ liệu trong cơ sở dữ liệu) */
@@ -65,18 +84,24 @@ export class AuthService {
         const existingUser: User = await this.userService.findOne(decodeRefreshToken.user_id);
 
         if (decodeRefreshToken.jwt_token !== existingUser.refresh_token) {
-            throw new UnauthorizedException('Refresh token không hợp lệ.');
+            throw new HttpException(
+                new ExceptionResponseDetail(
+                    HttpStatus.BAD_REQUEST,
+                    'Refresh token không hợp lệ.'
+                ),
+                HttpStatus.OK
+            );
         }
 
         /** Tạo Access Token mới */
-        const newAccessToken = await new JwtToken().generateToken({ user_id: existingUser.id }, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_LIFE);
+        const newAccessToken = await new JwtToken().generateToken({ user_id: existingUser.id }, process.env.ACCESS_TOKEN_SECRET, process.env.REFRESH_TOKEN_LIFE);
 
         existingUser.access_token = newAccessToken;
 
         await this.userService.update(existingUser.id, existingUser);
 
         return {
-            accessToken: newAccessToken,
+            access_token: newAccessToken,
         };
     }
 }

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, UnauthorizedException } from "@nestjs/common";
+import { HttpException, HttpStatus } from "@nestjs/common";
 import { ExceptionResponseDetail } from "../utils.exception.common/utils.exception.common";
 import { JwtTokenInterFace } from "./utils.jwt-token.interface.common";
 import * as jwt from "jsonwebtoken";
@@ -38,6 +38,9 @@ export class JwtToken {
 
         let token: string = await this.splitBearerToken(bearerToken);
         decodeBearerTokenInterFace = Object(await jwt.verify(token, secretSignature));
+        if (!decodeBearerTokenInterFace) {
+            this.showMessage();
+        }
         decodeBearerTokenInterFace.jwt_token = token;
 
         return decodeBearerTokenInterFace;
@@ -74,28 +77,25 @@ export class JwtToken {
         let splitToken: string;
 
         if (!token || token === "") {
-            throw new HttpException(
-                new ExceptionResponseDetail(
-                    HttpStatus.BAD_REQUEST,
-                    "Token không hợp lệ!"
-                ),
-                HttpStatus.OK
-            );
-        } else {
-            splitToken = token.split(" ")[1];
+            this.showMessage();
+        }
 
+        splitToken = token.split(" ")[1];
 
-            if (!splitToken || splitToken === "") {
-                throw new HttpException(
-                    new ExceptionResponseDetail(
-                        HttpStatus.BAD_REQUEST,
-                        "Token không hợp lệ!"
-                    ),
-                    HttpStatus.OK
-                );
-            }
+        if (!splitToken || splitToken === "") {
+            this.showMessage();
         }
 
         return splitToken;
     };
+
+    private showMessage() {
+        throw new HttpException(
+            new ExceptionResponseDetail(
+                HttpStatus.BAD_REQUEST,
+                "Token không hợp lệ!"
+            ),
+            HttpStatus.OK
+        );
+    }
 }

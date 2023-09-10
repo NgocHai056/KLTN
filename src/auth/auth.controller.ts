@@ -1,4 +1,4 @@
-import { Body, Controller, HttpException, HttpStatus, Post, Req, Res, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Req, Res, UsePipes, ValidationPipe } from '@nestjs/common';
 import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
 import { AuthService } from './auth.service';
 import { UserDto } from 'src/v1/user/user.dto/user.dto';
@@ -8,7 +8,7 @@ import { User } from 'src/v1/user/user.entity/user.entity';
 import { ApiOkResponse, ApiOperation, getSchemaPath } from "@nestjs/swagger";
 import { UserResponse } from 'src/v1/user/user.response/user-response/user.response';
 import { SwaggerResponse } from 'src/utils.common/utils.swagger.common/utils.swagger.response';
-import { LoginDto } from './auth.dto/login-dto/login.dto';
+import { LoginDto } from './auth.dto/login.dto';
 
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth' })
@@ -77,6 +77,22 @@ export class AuthController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @ApiOkResponse({
+        schema: {
+            allOf: [
+                { $ref: getSchemaPath(SwaggerResponse) },
+                {
+                    properties: {
+                        data: {
+                            $ref: getSchemaPath(
+                                UserResponse
+                            ),
+                        },
+                    },
+                },
+            ],
+        },
+    })
     @Post('refresh-token')
     @ApiOperation({ summary: "Refresh token" })
     @UsePipes(new ValidationPipe({ transform: true }))
@@ -84,9 +100,7 @@ export class AuthController {
 
         let response: ResponseData = new ResponseData();
 
-        let result = this.authService.refreshToken(req.body.refreshToken, req.headers.Authorization);
-
-        response.setData(result);
+        response.setData(await this.authService.refreshToken(req.body.refresh_token, req.headers.authorization));
         return res.status(HttpStatus.OK).send(response);
 
     }
