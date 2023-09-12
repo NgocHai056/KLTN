@@ -6,6 +6,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './v1/user/user.module';
+import { TheaterModule } from './v1/theater/theater.module';
+import { RoomModule } from './v1/room/room.module';
 
 
 @Module({
@@ -30,7 +32,9 @@ import { UserModule } from './v1/user/user.module';
             dateStrings: true,
         }),
         UserModule,
-        AuthModule
+        AuthModule,
+        TheaterModule,
+        RoomModule
     ],
     providers: [
         {

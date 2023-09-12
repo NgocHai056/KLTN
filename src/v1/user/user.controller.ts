@@ -16,6 +16,8 @@ import { UserService } from './user.service';
 import { VersionEnum } from "src/utils.common/utils.enum/utils.version.enum";
 import { SwaggerResponse } from "src/utils.common/utils.swagger.common/utils.swagger.response";
 import { UserDto } from "./user.dto/user.dto";
+import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
+import { UserResponse } from "./user.response/user.response";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'user' })
 export class UserController {
@@ -44,9 +46,9 @@ export class UserController {
         @Param("id", ParseIntPipe) id: number,
         @Res() res: Response
     ): Promise<any> {
-        return res.status(HttpStatus.OK).send(await this.userService.findOne(id));
+        let response: ResponseData = new ResponseData();
+
+        response.setData(new UserResponse(await this.userService.findOne(id)));
+        return res.status(HttpStatus.OK).send(response);
     }
-
-
-
 }

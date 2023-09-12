@@ -6,7 +6,7 @@ import { ResponseData } from 'src/utils.common/utils.response.common/utils.respo
 import { Response } from "express";
 import { User } from 'src/v1/user/user.entity/user.entity';
 import { ApiOkResponse, ApiOperation, getSchemaPath } from "@nestjs/swagger";
-import { UserResponse } from 'src/v1/user/user.response/user-response/user.response';
+import { UserResponse } from 'src/v1/user/user.response/user.response';
 import { SwaggerResponse } from 'src/utils.common/utils.swagger.common/utils.swagger.response';
 import { LoginDto } from './auth.dto/login.dto';
 
