@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './v1/user/user.module';
 import { TheaterModule } from './v1/theater/theater.module';
 import { RoomModule } from './v1/room/room.module';
+import { SeatModule } from './v1/seat/seat.module';
 
 
 @Module({
@@ -34,7 +35,8 @@ import { RoomModule } from './v1/room/room.module';
         UserModule,
         AuthModule,
         TheaterModule,
-        RoomModule
+        RoomModule,
+        SeatModule
     ],
     providers: [
         {
@@ -49,7 +51,8 @@ export class AppModule implements NestModule {
             .apply(AuthenticationMiddleware)
             .exclude(
                 { path: '/v1/auth/register', method: RequestMethod.POST },
-                { path: '/v1/auth/login', method: RequestMethod.POST })
+                { path: '/v1/auth/login', method: RequestMethod.POST },
+                { path: '/v1/auth/refresh-token', method: RequestMethod.POST })
             .forRoutes({ path: "*", method: RequestMethod.ALL });
     }
 }

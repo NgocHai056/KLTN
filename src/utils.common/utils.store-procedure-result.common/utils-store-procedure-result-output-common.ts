@@ -35,12 +35,12 @@ export class StoreProcedureResultOutput<T> {
   public getResultOutputList(data: any) {
 
     if (
-      data.length < 3 &&
-      (parseInt(data[0][0].status) === StoreProcedureStatusEnum.ERROR ||
-        parseInt(data[0][0].status) === StoreProcedureStatusEnum.FAIL_LOGIC)
+      data.length < 3 ||
+      (parseInt(data[2][0].status_code) === StoreProcedureStatusEnum.ERROR ||
+        parseInt(data[2][0].status_code) === StoreProcedureStatusEnum.FAIL_LOGIC)
     ) {
       throw new HttpException(
-        new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, data[0][0].message),
+        new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, data[2][0].message_error),
         HttpStatus.OK
       );
     }

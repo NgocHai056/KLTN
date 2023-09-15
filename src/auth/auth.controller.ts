@@ -100,7 +100,7 @@ export class AuthController {
 
         let response: ResponseData = new ResponseData();
 
-        response.setData(await this.authService.refreshToken(req.body.refresh_token, req.headers.authorization));
+        response.setData(await this.authService.refreshToken(req.body.refresh_token, req.body.authorization));
         return res.status(HttpStatus.OK).send(response);
 
     }
