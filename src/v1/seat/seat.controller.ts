@@ -54,7 +54,7 @@ export class SeatController {
         let response: ResponseData = new ResponseData();
 
         let seats: StoreProcedureOutputResultInterface<Seat, any> = await this.seatService.callStoredProcedure(
-            "CALL sp_get_list_of_the_seat_status_base_on_showtime(?,?,@status,@message);"
+            "CALL sp_g_list_of_the_seat_status_base_on_showtime(?,?,@status,@message);"
             + "SELECT @status AS status_code, @message AS message_error",
             [showtimeDto.showtime, showtimeDto.time]);
 

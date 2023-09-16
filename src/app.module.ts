@@ -9,6 +9,8 @@ import { UserModule } from './v1/user/user.module';
 import { TheaterModule } from './v1/theater/theater.module';
 import { RoomModule } from './v1/room/room.module';
 import { SeatModule } from './v1/seat/seat.module';
+import { MovieModule } from './v1/movie/movie.module';
+import { GenreModule } from './v1/genre/genre.module';
 
 
 @Module({
@@ -36,7 +38,9 @@ import { SeatModule } from './v1/seat/seat.module';
         AuthModule,
         TheaterModule,
         RoomModule,
-        SeatModule
+        SeatModule,
+        MovieModule,
+        GenreModule
     ],
     providers: [
         {

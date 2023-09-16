@@ -8,6 +8,7 @@ import { JwtToken } from "../utils.jwt-token.common/utils.jwt-token.common";
 import { ExceptionStoreProcedure } from "../utils.exception.common/utils.store-procedure-exception.common";
 import { UserService } from "src/v1/user/user.service";
 import { User } from "src/v1/user/user.entity/user.entity";
+import { UtilsExceptionMessageCommon } from "../utils.exception.common/utils.exception.message.common";
 
 @Injectable()
 export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
@@ -37,13 +38,7 @@ export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
         let bearerToken: string = req.headers.authorization;
 
         if (!bearerToken || bearerToken === "") {
-            throw new HttpException(
-                new ExceptionResponseDetail(
-                    HttpStatus.BAD_REQUEST,
-                    "Kiểm tra lại xem bạn đã truyền token vào chưa!"
-                ),
-                HttpStatus.OK
-            );
+            UtilsExceptionMessageCommon.showMessageError("Kiểm tra lại xem bạn đã truyền token vào chưa!");
         }
 
         let decodeBearerTokenInterFace: JwtTokenInterFace = await new JwtToken().verifyBearerToken(bearerToken, process.env.ACCESS_TOKEN_SECRET);
@@ -55,13 +50,7 @@ export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
         ExceptionStoreProcedure.validate(user);
 
         if (user.access_token !== decodeBearerTokenInterFace.jwt_token) {
-            throw new HttpException(
-                new ExceptionResponseDetail(
-                    HttpStatus.UNAUTHORIZED,
-                    "Không có quyền truy cập"
-                ),
-                HttpStatus.UNAUTHORIZED
-            );
+            UtilsExceptionMessageCommon.showMessageError("Không có quyền truy cập");
         }
 
         next();

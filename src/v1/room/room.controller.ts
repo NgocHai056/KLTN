@@ -12,7 +12,8 @@ import {
 } from "@nestjs/common";
 
 import { Response } from "express";
-import { ApiOkResponse, getSchemaPath, ApiOperation } from '@nestjs/swagger'; import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
+import { ApiOkResponse, getSchemaPath, ApiOperation } from '@nestjs/swagger';
+import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
 import { RoomService } from './room.service';
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
 import { RoomResponse } from "./room.response/room.response";
