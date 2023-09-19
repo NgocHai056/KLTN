@@ -24,20 +24,6 @@ import { TheaterResponse } from "./theater.response/theater.response";
 export class TheaterController {
     constructor(private theaterService: TheaterService) { }
 
-
-    @Get("/:id")
-    @ApiOperation({ summary: "API get theater by id" })
-    @UsePipes(new ValidationPipe({ transform: true }))
-    async findOne(
-        @Param("id", ParseIntPipe) id: number,
-        @Res() res: Response
-    ): Promise<any> {
-        let response: ResponseData = new ResponseData();
-
-        response.setData(new TheaterResponse(await this.theaterService.findOne(id)));
-        return res.status(HttpStatus.OK).send(response);
-    }
-
     @ApiOkResponse({
         schema: {
             allOf: [
@@ -64,6 +50,19 @@ export class TheaterController {
         let response: ResponseData = new ResponseData();
 
         response.setData(new TheaterResponse(await this.theaterService.create(theaterDto)));
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Get("/:id")
+    @ApiOperation({ summary: "API get theater by id" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async findOne(
+        @Param("id", ParseIntPipe) id: number,
+        @Res() res: Response
+    ): Promise<any> {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(new TheaterResponse(await this.theaterService.findOne(id)));
         return res.status(HttpStatus.OK).send(response);
     }
 }

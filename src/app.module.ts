@@ -11,6 +11,7 @@ import { RoomModule } from './v1/room/room.module';
 import { SeatModule } from './v1/seat/seat.module';
 import { MovieModule } from './v1/movie/movie.module';
 import { GenreModule } from './v1/genre/genre.module';
+import { BookingModule } from './v1/booking/booking.module';
 
 
 @Module({
@@ -40,7 +41,8 @@ import { GenreModule } from './v1/genre/genre.module';
         RoomModule,
         SeatModule,
         MovieModule,
-        GenreModule
+        GenreModule,
+        BookingModule
     ],
     providers: [
         {

@@ -24,20 +24,6 @@ import { RoomDto } from "./room.dto/room.dto";
 export class RoomController {
     constructor(private roomService: RoomService) { }
 
-
-    @Get("/:id")
-    @ApiOperation({ summary: "API get room by id" })
-    @UsePipes(new ValidationPipe({ transform: true }))
-    async findOne(
-        @Param("id", ParseIntPipe) id: number,
-        @Res() res: Response
-    ): Promise<any> {
-        let response: ResponseData = new ResponseData();
-
-        response.setData(new RoomResponse(await this.roomService.findOne(id)));
-        return res.status(HttpStatus.OK).send(response);
-    }
-
     @ApiOkResponse({
         schema: {
             allOf: [
@@ -64,6 +50,19 @@ export class RoomController {
         let response: ResponseData = new ResponseData();
 
         response.setData(new RoomResponse(await this.roomService.create(roomDto)));
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Get("/:id")
+    @ApiOperation({ summary: "API get room by id" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async findOne(
+        @Param("id", ParseIntPipe) id: number,
+        @Res() res: Response
+    ): Promise<any> {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(new RoomResponse(await this.roomService.findOne(id)));
         return res.status(HttpStatus.OK).send(response);
     }
 }

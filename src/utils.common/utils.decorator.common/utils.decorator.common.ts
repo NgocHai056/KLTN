@@ -146,7 +146,7 @@ export function Min(validationOptions?: ValidationOptions) {
       options: validationOptions,
       validator: {
         validate: (value: any): boolean =>
-          !isNaN(value) || Number.isInteger(value) || !(value < 1),
+          (!isNaN(value) || Number.isInteger(value)) && (value > 0),
         defaultMessage: (validationArguments?: ValidationArguments): string => {
           throw new HttpException(
             new ExceptionResponseDetail(
