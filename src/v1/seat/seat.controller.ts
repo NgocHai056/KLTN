@@ -72,19 +72,8 @@ export class SeatController {
         let response: ResponseData = new ResponseData();
 
         let seat: Seat = await this.seatService.findOne(id);
-        const seatArray = JSON.parse(seat.showtimes);
-        const seatShowTimes: SeatShowtime[] = [];
 
-        for (const seatData of seatArray) {
-            const seatShowtime = new SeatShowtime();
-            seatShowtime.status = seatData.status;
-            seatShowtime.time = new Date(seatData.time);
-
-            seatShowTimes.push(seatShowtime);
-        }
-
-
-        response.setData(seatShowTimes);
+        response.setData(seat);
         return res.status(HttpStatus.OK).send(response);
     }
 }

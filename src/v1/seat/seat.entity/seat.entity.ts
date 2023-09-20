@@ -9,7 +9,7 @@ export class Seat extends BaseEntity {
     room_id: number;
 
     @Column()
-    seat_number: string;
+    seat_number: number;
 
     @Column()
     type: number;

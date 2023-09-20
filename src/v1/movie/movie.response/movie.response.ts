@@ -10,10 +10,10 @@ export class MovieResponse {
     name: string;
 
     @ApiProperty({
-        example: 0,
+        example: "Horror",
         description: "Thể loại phim"
     })
-    genre_id: number;
+    genre_name: string;
 
     @ApiProperty({
         example: "",
@@ -57,9 +57,8 @@ export class MovieResponse {
     })
     rating: number;
 
-    constructor(entity?: Movie) {
+    constructor(entity: Movie) {
         this.name = entity ? entity.name : "";
-        this.genre_id = entity ? +entity.genre_id : 0;
         this.title = entity ? entity.title : "";
         this.release = entity ? entity.release : new Date();
         this.duration = entity ? entity.duration : "";
@@ -67,6 +66,13 @@ export class MovieResponse {
         this.performer = entity ? entity.performer : "";
         this.description = entity ? entity.description : "";
         this.rating = entity ? +entity.rating : 0;
+    }
 
+    public mapToList(entities: Movie[]): MovieResponse[] {
+        let data: MovieResponse[] = [];
+        entities.forEach(e => {
+            data.push(new MovieResponse(e))
+        });
+        return data;
     }
 }

@@ -12,7 +12,7 @@ export class SeatResponse {
         example: "",
         description: ""
     })
-    seat_number: string;
+    seat_number: number;
 
     @ApiProperty({
         example: "",
@@ -28,7 +28,7 @@ export class SeatResponse {
 
     constructor(entity?: Seat) {
         this.room_id = entity ? +entity.room_id : 0;
-        this.seat_number = entity ? entity.seat_number : "";
+        this.seat_number = entity ? entity.seat_number : 0;
         this.type = entity ? +entity.type : 0;
         this.time = entity ? entity.time : new Date();
     }

@@ -33,6 +33,9 @@ export class Movie extends BaseEntity {
     @Column()
     rating: number;
 
+    @Column()
+    status: number;
+
     @CreateDateColumn({
         default: `now()`,
         nullable: true,

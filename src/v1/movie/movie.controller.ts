@@ -24,6 +24,7 @@ import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.co
 import { StoreProcedureOutputResultInterface } from "src/utils.common/utils.store-procedure-result.common/utils.store-procedure-output-result.interface.common";
 import { Movie } from "./movie.entity/movie.entity";
 import { GetMoviesDto } from "./movie.dto/get.movies.dto";
+import { MovieStatus } from "src/utils.common/utils.enum/movie-status.enum";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'movie' })
 export class MovieController {
@@ -46,7 +47,9 @@ export class MovieController {
             + "SELECT @status AS status_code, @message AS message_error",
             [movieDto.genre_id, movieDto.status, movieDto.key_search]);
 
-        response.setData(movies);
+        movies.list = movies.list.filter(movie => movie.status !== MovieStatus.STOP_SHOWING);
+
+        response.setData(movies.list);
 
         return res.status(HttpStatus.OK).send(response);
     }
@@ -78,7 +81,16 @@ export class MovieController {
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        response.setData(new MovieResponse(await this.movieService.findOne(id)));
+        let movie = await this.movieService.findOne(id);
+
+        if (movie.status === MovieStatus.STOP_SHOWING || !movie) {
+            UtilsExceptionMessageCommon.showMessageError("Phim không tồn tại");
+        }
+
+        let result = new MovieResponse(movie);
+        result.genre_name = (await this.genreService.findOne(movie.genre_id)).name;
+
+        response.setData(result);
         return res.status(HttpStatus.OK).send(response);
     }
 }
