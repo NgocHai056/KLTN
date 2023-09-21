@@ -1,24 +1,15 @@
 import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity({ name: "bookings" })
-export class Booking extends BaseEntity {
+@Entity({ name: "ticket_prices" })
+export class TicketPrice extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
-    user_id: number;
+    price: number;
 
     @Column()
-    seat_id: number;
-
-    @Column()
-    time: Date;
-
-    @Column()
-    payment_status: number;
-
-    @Column()
-    total_amount: number;
+    type: number;
 
     @CreateDateColumn({
         default: `now()`,

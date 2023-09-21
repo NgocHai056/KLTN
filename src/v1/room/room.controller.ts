@@ -19,27 +19,16 @@ import { ResponseData } from "src/utils.common/utils.response.common/utils.respo
 import { RoomResponse } from "./room.response/room.response";
 import { SwaggerResponse } from "src/utils.common/utils.swagger.common/utils.swagger.response";
 import { RoomDto } from "./room.dto/room.dto";
+import { TheaterService } from "../theater/theater.service";
+import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'room' })
 export class RoomController {
-    constructor(private roomService: RoomService) { }
+    constructor(
+        private readonly roomService: RoomService,
+        private readonly theaterService: TheaterService
+    ) { }
 
-    @ApiOkResponse({
-        schema: {
-            allOf: [
-                { $ref: getSchemaPath(SwaggerResponse) },
-                {
-                    properties: {
-                        data: {
-                            $ref: getSchemaPath(
-                                RoomDto
-                            ),
-                        },
-                    },
-                },
-            ],
-        },
-    })
     @Post()
     @ApiOperation({ summary: "API create room" })
     @UsePipes(new ValidationPipe({ transform: true }))
@@ -48,6 +37,10 @@ export class RoomController {
         @Res() res: Response
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
+
+        if (!await this.theaterService.findOne(roomDto.theater_id)) {
+            new UtilsExceptionMessageCommon.showMessageError("Rạp chiếu phim không tồn tại");
+        }
 
         response.setData(new RoomResponse(await this.roomService.create(roomDto)));
         return res.status(HttpStatus.OK).send(response);

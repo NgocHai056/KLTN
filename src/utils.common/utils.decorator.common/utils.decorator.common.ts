@@ -13,6 +13,22 @@ import {
 } from "class-validator";
 import { ExceptionResponseDetail } from "../utils.exception.common/utils.exception.common";
 
+export const GetUser = createParamDecorator(
+  async (data: unknown, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest();
+    if (!request.user) {
+      throw new HttpException(
+        new ExceptionResponseDetail(
+          HttpStatus.UNAUTHORIZED,
+          "Token không hợp lệ!"
+        ),
+        HttpStatus.OK
+      );
+    }
+
+    return request.user;
+  }
+);
 
 export function IsNotEmptyString(validationOptions?: ValidationOptions) {
   return (object: unknown, propertyName: string) => {

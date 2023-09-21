@@ -52,6 +52,18 @@ export class MovieResponse {
     description: string;
 
     @ApiProperty({
+        example: "",
+        description: "Ảnh thu nhỏ của phim"
+    })
+    thumbnail: string;
+
+    @ApiProperty({
+        example: "",
+        description: "Video ngắn giới thiệu phim."
+    })
+    trailer: string;
+
+    @ApiProperty({
         example: 4.5,
         description: "Đánh giá phim"
     })
@@ -65,6 +77,8 @@ export class MovieResponse {
         this.director = entity ? entity.director : "";
         this.performer = entity ? entity.performer : "";
         this.description = entity ? entity.description : "";
+        this.thumbnail = entity ? entity.thumbnail : "";
+        this.trailer = entity ? entity.trailer : "";
         this.rating = entity ? +entity.rating : 0;
     }
 

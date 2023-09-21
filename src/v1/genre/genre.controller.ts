@@ -42,6 +42,25 @@ export class GenreController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @Post("/:id/update")
+    @ApiOperation({ summary: "API create genre" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async update(
+        @Param("id", ParseIntPipe) id: number,
+        @Body() genreDto: GenreDto,
+        @Res() res: Response
+    ): Promise<any> {
+        let response: ResponseData = new ResponseData();
+
+        if ((await this.genreService.findBy({ name: genreDto.name })).length > 0) {
+            UtilsExceptionMessageCommon.showMessageError("Tên thể loại đã tồn tại!");
+        }
+
+        response.setData(await this.genreService.update(id, genreDto))
+
+        return res.status(HttpStatus.OK).send(response);
+    }
+
     @Get("/:id")
     @ApiOperation({ summary: "API get genre by id" })
     @UsePipes(new ValidationPipe({ transform: true }))

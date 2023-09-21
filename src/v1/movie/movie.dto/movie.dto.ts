@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDateString } from "class-validator";
+import { IsDateString, IsString } from "class-validator";
 import { IsInt, IsNotEmptyString } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 
 export class MovieDto {
@@ -57,4 +57,18 @@ export class MovieDto {
     })
     @IsNotEmptyString()
     description: string;
+
+    @ApiProperty({
+        example: "",
+        description: "Ảnh thu nhỏ của phim"
+    })
+    @IsString()
+    thumbnail: string;
+
+    @ApiProperty({
+        example: "",
+        description: "Video ngắn giới thiệu phim."
+    })
+    @IsString()
+    trailer: string;
 }

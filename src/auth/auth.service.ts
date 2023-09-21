@@ -18,7 +18,7 @@ export class AuthService {
         /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
         const existingUser = await this.userService.findBy({ email: registerDto.email });
 
-        if (existingUser) {
+        if (existingUser.length !== 0) {
             throw new HttpException(
                 new ExceptionResponseDetail(
                     HttpStatus.BAD_REQUEST,
@@ -36,11 +36,12 @@ export class AuthService {
         return await this.userService.create(registerDto);
     }
 
-    async login(loginDto: LoginDto) {
-        const users: User[] = await this.userService.findBy({ email: loginDto.email });
+    async login(loginDto: LoginDto): Promise<any> {
+
+        const users: any[] = await this.userService.findBy({ email: loginDto.email });
         const user: User = users.pop();
 
-        if (!user || users.length > 0 || !(await bcrypt.compare(loginDto.password, user.password))) {
+        if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
             throw new HttpException(
                 new ExceptionResponseDetail(
                     HttpStatus.BAD_REQUEST,

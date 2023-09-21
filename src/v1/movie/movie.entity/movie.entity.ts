@@ -31,6 +31,12 @@ export class Movie extends BaseEntity {
     description: string;
 
     @Column()
+    thumbnail: string;
+
+    @Column()
+    trailer: string;
+
+    @Column()
     rating: number;
 
     @Column()

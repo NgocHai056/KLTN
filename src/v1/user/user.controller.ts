@@ -23,22 +23,6 @@ import { UserResponse } from "./user.response/user.response";
 export class UserController {
     constructor(private userService: UserService) { }
 
-    @ApiOkResponse({
-        schema: {
-            allOf: [
-                { $ref: getSchemaPath(SwaggerResponse) },
-                {
-                    properties: {
-                        data: {
-                            $ref: getSchemaPath(
-                                UserDto
-                            ),
-                        },
-                    },
-                },
-            ],
-        },
-    })
     @Get("/:id")
     @ApiOperation({ summary: "API get user by id" })
     @UsePipes(new ValidationPipe({ transform: true }))

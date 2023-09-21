@@ -22,6 +22,9 @@ export class User extends BaseEntity {
     password: string;
 
     @Column()
+    role: number;
+
+    @Column()
     access_token: string;
 
     @Column()

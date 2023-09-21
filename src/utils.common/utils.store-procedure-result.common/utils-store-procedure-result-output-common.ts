@@ -34,8 +34,19 @@ export class StoreProcedureResultOutput<T> {
 
   public getResultOutputList(data: any) {
 
-    if (
-      data.length < 3 ||
+    if (data.length < 3) {
+      if (
+        (parseInt(data[1][0].status_code) === StoreProcedureStatusEnum.ERROR ||
+          parseInt(data[1][0].status_code) === StoreProcedureStatusEnum.FAIL_LOGIC)
+      ) {
+        throw new HttpException(
+          new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, data[1][0].message_error),
+          HttpStatus.OK
+        );
+      }
+    }
+    else if (
+      data.length == 3 &&
       (parseInt(data[2][0].status_code) === StoreProcedureStatusEnum.ERROR ||
         parseInt(data[2][0].status_code) === StoreProcedureStatusEnum.FAIL_LOGIC)
     ) {

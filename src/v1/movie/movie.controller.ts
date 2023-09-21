@@ -47,6 +47,7 @@ export class MovieController {
             + "SELECT @status AS status_code, @message AS message_error",
             [movieDto.genre_id, movieDto.status, movieDto.key_search]);
 
+        /** Lấy danh sách phim trừ những phim đã ngừng chiếu(status = 0) */
         movies.list = movies.list.filter(movie => movie.status !== MovieStatus.STOP_SHOWING);
 
         response.setData(movies.list);
@@ -68,6 +69,25 @@ export class MovieController {
         }
 
         response.setData(await this.movieService.create(movieDto));
+
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Post("/:id/update")
+    @ApiOperation({ summary: "API update movie" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async update(
+        @Param("id", ParseIntPipe) id: number,
+        @Body() movieDto: MovieDto,
+        @Res() res: Response
+    ): Promise<any> {
+        let response: ResponseData = new ResponseData();
+
+        if (!await this.genreService.findOne(movieDto.genre_id)) {
+            UtilsExceptionMessageCommon.showMessageError("Thể loại phim không tồn tại");
+        }
+
+        response.setData(await this.movieService.update(id, movieDto));
 
         return res.status(HttpStatus.OK).send(response);
     }

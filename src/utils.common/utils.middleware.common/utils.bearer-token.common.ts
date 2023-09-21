@@ -2,13 +2,13 @@ import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable, N
 import { Reflector } from "@nestjs/core";
 import { ROLES_KEY, Role } from "../utils.enum/role.enum";
 import { NextFunction, Request, Response } from "express";
-import { ExceptionResponseDetail } from "../utils.exception.common/utils.exception.common";
 import { JwtTokenInterFace } from "../utils.jwt-token.common/utils.jwt-token.interface.common";
 import { JwtToken } from "../utils.jwt-token.common/utils.jwt-token.common";
 import { ExceptionStoreProcedure } from "../utils.exception.common/utils.store-procedure-exception.common";
 import { UserService } from "src/v1/user/user.service";
 import { User } from "src/v1/user/user.entity/user.entity";
 import { UtilsExceptionMessageCommon } from "../utils.exception.common/utils.exception.message.common";
+import { UserModel } from "src/v1/user/user.entity/user.model";
 
 @Injectable()
 export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
@@ -31,6 +31,16 @@ export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
         }
         const { user } = context.switchToHttp().getRequest();
 
+        if (user instanceof UserModel) {
+            const privilege: number = user.role;
+
+            if (privilege === Role.Admin) {
+                return true;
+            } else if (!requiredRoles.some((role) => privilege === role)) {
+                UtilsExceptionMessageCommon.showMessageError("Bạn không có quyền truy cập vào chức năng này!");
+            }
+        }
+
         return true;
     }
 
@@ -52,6 +62,8 @@ export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
         if (user.access_token !== decodeBearerTokenInterFace.jwt_token) {
             UtilsExceptionMessageCommon.showMessageError("Không có quyền truy cập");
         }
+
+        req.user = new UserModel(user);
 
         next();
     }
