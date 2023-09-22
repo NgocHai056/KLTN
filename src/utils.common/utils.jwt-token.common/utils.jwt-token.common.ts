@@ -38,7 +38,11 @@ export class JwtToken {
         let decodeBearerTokenInterFace: JwtTokenInterFace;
 
         let token: string = await this.splitBearerToken(bearerToken);
-        decodeBearerTokenInterFace = Object(await jwt.verify(token, secretSignature));
+        try {
+            decodeBearerTokenInterFace = Object(await jwt.verify(token, secretSignature));
+        } catch (error) {
+            UtilsExceptionMessageCommon.showMessageError(error.message);
+        }
         if (!decodeBearerTokenInterFace) {
             UtilsExceptionMessageCommon.showMessageError("Token không hợp lệ!");
         }
@@ -63,7 +67,12 @@ export class JwtToken {
         let decodeBearerTokenInterFace: JwtTokenInterFace;
 
         let token: string = await this.splitBearerToken(bearerToken);
-        decodeBearerTokenInterFace = Object(await jwt.verify(token, secretSignature, { ignoreExpiration: true }));
+        try {
+            decodeBearerTokenInterFace = Object(await jwt.verify(token, secretSignature, { ignoreExpiration: true }));
+        } catch (error) {
+            UtilsExceptionMessageCommon.showMessageError(error.message);
+        }
+
         decodeBearerTokenInterFace.jwt_token = token;
 
         return decodeBearerTokenInterFace;

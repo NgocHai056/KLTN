@@ -6,7 +6,8 @@ import {
     UsePipes,
     ValidationPipe,
     Post,
-    Body
+    Body,
+    Query
 } from "@nestjs/common";
 
 import { Response } from "express";
@@ -19,6 +20,7 @@ import { ShowtimeService } from './showtime.service';
 import { Showtime } from "./showtime.entity/showtime.entity";
 import { ShowtimeDto } from "./showtime.dto/showtime.dto";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
+import { GetTimeDto } from "./showtime.dto/get-time.dto";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'showtime' })
 export class ShowtimeController {
@@ -42,6 +44,17 @@ export class ShowtimeController {
             [showtimeDto.theater_id, showtimeDto.room_id, showtimeDto.movie_id, showtimeDto.time, showtimeDto.showtime]);
 
         response.setData(showtimes.list);
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Get('/times')
+    async getTimesByMovieId(
+        @Query() getTimeDto: GetTimeDto,
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(await this.showtimeService.getTimesByMovieId(+getTimeDto.theater_id, +getTimeDto.movie_id));
         return res.status(HttpStatus.OK).send(response);
     }
 }

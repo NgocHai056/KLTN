@@ -12,7 +12,7 @@ export class Showtime extends BaseEntity {
     time: Date;
 
     @Column()
-    status: string;
+    movie_time: string;
 
     @CreateDateColumn({
         default: `now()`,

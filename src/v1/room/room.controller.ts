@@ -39,7 +39,7 @@ export class RoomController {
         let response: ResponseData = new ResponseData();
 
         if (!await this.theaterService.findOne(roomDto.theater_id)) {
-            new UtilsExceptionMessageCommon.showMessageError("Rạp chiếu phim không tồn tại");
+            UtilsExceptionMessageCommon.showMessageError("Rạp chiếu phim không tồn tại");
         }
 
         response.setData(new RoomResponse(await this.roomService.create(roomDto)));
