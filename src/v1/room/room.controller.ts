@@ -21,6 +21,7 @@ import { SwaggerResponse } from "src/utils.common/utils.swagger.common/utils.swa
 import { RoomDto } from "./room.dto/room.dto";
 import { TheaterService } from "../theater/theater.service";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
+import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'room' })
 export class RoomController {
@@ -30,6 +31,7 @@ export class RoomController {
     ) { }
 
     @Post()
+    @Roles(Role.Admin)
     @ApiOperation({ summary: "API create room" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async create(

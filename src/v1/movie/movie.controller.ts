@@ -25,6 +25,7 @@ import { StoreProcedureOutputResultInterface } from "src/utils.common/utils.stor
 import { Movie } from "./movie.entity/movie.entity";
 import { GetMoviesDto } from "./movie.dto/get.movies.dto";
 import { MovieStatus } from "src/utils.common/utils.enum/movie-status.enum";
+import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'movie' })
 export class MovieController {
@@ -56,6 +57,7 @@ export class MovieController {
     }
 
     @Post()
+    @Roles(Role.Admin)
     @ApiOperation({ summary: "API create movie" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async create(
@@ -74,6 +76,7 @@ export class MovieController {
     }
 
     @Post("/:id/update")
+    @Roles(Role.Admin)
     @ApiOperation({ summary: "API update movie" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async update(

@@ -36,7 +36,7 @@ export class Movie extends BaseEntity {
     @Column()
     trailer: string;
 
-    @Column()
+    @Column({ type: 'decimal', precision: 4, scale: 2 })
     rating: number;
 
     @Column()

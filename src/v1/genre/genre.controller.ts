@@ -18,6 +18,7 @@ import { ResponseData } from "src/utils.common/utils.response.common/utils.respo
 import { GenreService } from "./genre.service";
 import { GenreDto } from "./genre.dto/genre.dto";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
+import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'genre' })
@@ -25,6 +26,7 @@ export class GenreController {
     constructor(private genreService: GenreService) { }
 
     @Post()
+    @Roles(Role.Admin)
     @ApiOperation({ summary: "API create genre" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async create(
@@ -43,6 +45,7 @@ export class GenreController {
     }
 
     @Post("/:id/update")
+    @Roles(Role.Admin)
     @ApiOperation({ summary: "API create genre" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async update(
@@ -52,11 +55,18 @@ export class GenreController {
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        if ((await this.genreService.findBy({ name: genreDto.name })).length > 0) {
+        let genre = await this.genreService.findOne(id);
+        if (!genre) {
+            UtilsExceptionMessageCommon.showMessageError("Thể loại không tồn tại!");
+        }
+
+        if (genre.name === genreDto.name) {
             UtilsExceptionMessageCommon.showMessageError("Tên thể loại đã tồn tại!");
         }
 
-        response.setData(await this.genreService.update(id, genreDto))
+        genre.name = genreDto.name;
+
+        response.setData(await this.genreService.update(id, genre))
 
         return res.status(HttpStatus.OK).send(response);
     }

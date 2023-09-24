@@ -1,30 +1,21 @@
 import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity({ name: "bookings" })
-export class Booking extends BaseEntity {
+@Entity({ name: "movie_reviews" })
+export class Review extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
-
-    @Column()
-    user_id: number;
 
     @Column()
     movie_id: number;
 
     @Column()
-    room_id: number;
+    user_id: number;
+
+    @Column({ type: 'decimal', precision: 4, scale: 2 })
+    rating: number;
 
     @Column()
-    seat_id: number;
-
-    @Column()
-    time: Date;
-
-    @Column()
-    payment_status: number;
-
-    @Column({ type: 'decimal', precision: 20, scale: 2 })
-    total_amount: number;
+    review: string;
 
     @CreateDateColumn({
         default: `now()`,
@@ -37,4 +28,12 @@ export class Booking extends BaseEntity {
         nullable: true,
     })
     updated_at: Date;
+
+    constructor(movieId: number, userId: number, rating: number, review: string) {
+        super();
+        this.movie_id = movieId;
+        this.user_id = userId;
+        this.rating = rating;
+        this.review = review;
+    }
 }

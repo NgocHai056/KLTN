@@ -13,6 +13,7 @@ import { TicketPriceModule } from '../ticket-price/ticket-price.module';
     TicketPriceModule
   ],
   controllers: [BookingController],
-  providers: [BookingService]
+  providers: [BookingService],
+  exports: [BookingService]
 })
 export class BookingModule { }

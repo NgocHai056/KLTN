@@ -5,7 +5,7 @@ export class TicketPrice extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({ type: 'decimal', precision: 20, scale: 2 })
     price: number;
 
     @Column()

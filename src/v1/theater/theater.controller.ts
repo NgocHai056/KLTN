@@ -19,6 +19,7 @@ import { SwaggerResponse } from 'src/utils.common/utils.swagger.common/utils.swa
 import { TheaterDto } from "./theater.dto/theater.dto";
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
 import { TheaterResponse } from "./theater.response/theater.response";
+import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'theater' })
 export class TheaterController {
@@ -41,6 +42,7 @@ export class TheaterController {
         },
     })
     @Post()
+    @Roles(Role.Admin)
     @ApiOperation({ summary: "API create theater" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async create(

@@ -24,6 +24,7 @@ import { RoomService } from "../room/room.service";
 import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { UserModel } from "../user/user.entity/user.model";
 import { TicketPriceService } from "../ticket-price/ticket-price.service";
+import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'booking' })
 export class BookingController {
@@ -35,6 +36,7 @@ export class BookingController {
     ) { }
 
     @Post("")
+    @Roles(Role.User)
     @ApiOperation({ summary: "API booking vé theo suất chiếu" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async create(
@@ -50,7 +52,7 @@ export class BookingController {
         let bookings: StoreProcedureOutputResultInterface<Booking, any> = await this.bookingService.callStoredProcedure(
             "CALL sp_u_create_booking(?,?,?,?,?,?,?,?,?,?,@status,@message);"
             + "SELECT @status AS status_code, @message AS message_error",
-            [`[${String(roomIds)}]`, user.id, bookingDto.movie_id, bookingDto.seat_id, bookingDto.seat_number, bookingDto.time, bookingDto.showtime, bookingDto.payment_method, 1, await this.ticketPriceService.findBy({ type: 1 })]);
+            [`[${String(roomIds)}]`, user.id, bookingDto.movie_id, bookingDto.seat_id, bookingDto.seat_number, bookingDto.time, bookingDto.showtime, bookingDto.payment_method, 1, (await this.ticketPriceService.findBy({ type: 1 })).pop().price]);
 
         response.setData(bookings.list);
         return res.status(HttpStatus.OK).send(response);
