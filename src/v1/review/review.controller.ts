@@ -27,13 +27,17 @@ import { ReviewDto } from "./review.dto/review.dto";
 import { Review } from "./review.entity/review.entity";
 import { BookingService } from "../booking/booking.service";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
+import { UserService } from "../user/user.service";
+import { User } from "../user/user.entity/user.entity";
+import { ReviewResponse } from "./review.response/review.response";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'review' })
 export class ReviewController {
     constructor(
         private readonly reviewService: ReviewService,
         private readonly movieService: MovieService,
-        private readonly bookingService: BookingService
+        private readonly bookingService: BookingService,
+        private readonly userService: UserService
     ) { }
 
     @Post("")
@@ -80,7 +84,24 @@ export class ReviewController {
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        response.setData(await this.reviewService.findBy({ movie_id: id }));
+        let reviews = new ReviewResponse().mapToList(await this.reviewService.findBy({ movie_id: id }));
+
+        /** Get list id of user and then map user_name to reviews base on user_id of review */
+        let userIds = reviews.map(review => review.user_id);
+        let users = await this.userService.findByIds(userIds);
+
+        const usersMap: { [userId: number]: User } = {};
+
+        users.map(user => usersMap[user.id] = user);
+
+        reviews.map(
+            review => {
+                const user = usersMap[review.user_id];
+                review.user_name = user.name
+            }
+        )
+
+        response.setData(reviews);
         return res.status(HttpStatus.OK).send(response);
     }
 }

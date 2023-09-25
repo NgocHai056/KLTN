@@ -25,6 +25,7 @@ import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator
 import { UserModel } from "../user/user.entity/user.model";
 import { TicketPriceService } from "../ticket-price/ticket-price.service";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
+import { BookingResponse } from "./booking.response/booking.response";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'booking' })
 export class BookingController {
@@ -67,7 +68,7 @@ export class BookingController {
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        response.setData(await this.bookingService.findOne(id));
+        response.setData(new BookingResponse(await this.bookingService.findOne(id)));
         return res.status(HttpStatus.OK).send(response);
     }
 }

@@ -8,26 +8,30 @@ export class BaseService<T extends BaseEntity> implements IBaseService<T> {
 
     constructor(private readonly repository: Repository<T>) { }
 
-    async findAll(opts?): Promise<T[]> {
-        return this.repository.find(opts);
-    }
-
-    async create(data: any): Promise<T> {
-        return this.repository.save(data)
-    }
-
     async findOne(id: EntityId): Promise<T> {
-        return this.repository.findOneById(id)
-    }
-
-    async update(id: EntityId, data: any): Promise<T> {
-        await this.repository.update(id, data)
-        return this.findOne(id)
+        return this.repository.findOneById(id);
     }
 
     async findBy(where: any): Promise<T[]> {
         const queryBuilder = this.repository.createQueryBuilder();
         return queryBuilder.where(where).getMany();
+    }
+
+    async findByIds(ids: any): Promise<T[]> {
+        return this.repository.findByIds(ids);
+    }
+
+    async findAll(opts?): Promise<T[]> {
+        return this.repository.find(opts);
+    }
+
+    async create(data: any): Promise<T> {
+        return this.repository.save(data);
+    }
+
+    async update(id: EntityId, data: any): Promise<T> {
+        await this.repository.update(id, data);
+        return this.findOne(id);
     }
 
     async callStoredProcedure(query: string, params: any[]): Promise<StoreProcedureOutputResultInterface<T, any>> {

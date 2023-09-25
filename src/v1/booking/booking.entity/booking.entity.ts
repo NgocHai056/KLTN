@@ -9,16 +9,31 @@ export class Booking extends BaseEntity {
     user_id: number;
 
     @Column()
+    user_name: string;
+
+    @Column()
     movie_id: number;
+
+    @Column()
+    movie_name: string;
 
     @Column()
     room_id: number;
 
     @Column()
+    room_number: string;
+
+    @Column()
     seat_id: number;
 
     @Column()
+    seat_number: number;
+
+    @Column()
     time: Date;
+
+    @Column()
+    payment_method: number;
 
     @Column()
     payment_status: number;

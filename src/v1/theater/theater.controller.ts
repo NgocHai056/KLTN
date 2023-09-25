@@ -14,8 +14,7 @@ import {
 import { Response } from "express";
 import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
 import { TheaterService } from './theater.service';
-import { ApiOkResponse, getSchemaPath, ApiOperation } from '@nestjs/swagger';
-import { SwaggerResponse } from 'src/utils.common/utils.swagger.common/utils.swagger.response';
+import { ApiOperation } from '@nestjs/swagger';
 import { TheaterDto } from "./theater.dto/theater.dto";
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
 import { TheaterResponse } from "./theater.response/theater.response";
@@ -25,22 +24,6 @@ import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 export class TheaterController {
     constructor(private theaterService: TheaterService) { }
 
-    @ApiOkResponse({
-        schema: {
-            allOf: [
-                { $ref: getSchemaPath(SwaggerResponse) },
-                {
-                    properties: {
-                        data: {
-                            $ref: getSchemaPath(
-                                TheaterDto
-                            ),
-                        },
-                    },
-                },
-            ],
-        },
-    })
     @Post()
     @Roles(Role.Admin)
     @ApiOperation({ summary: "API create theater" })

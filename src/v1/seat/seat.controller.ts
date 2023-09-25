@@ -14,12 +14,10 @@ import {
 
 import { Response } from "express";
 import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
-import { ApiOkResponse, getSchemaPath, ApiOperation } from '@nestjs/swagger';
-import { SwaggerResponse } from 'src/utils.common/utils.swagger.common/utils.swagger.response';
+import { ApiOperation } from '@nestjs/swagger';
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
 import { Seat } from "./seat.entity/seat.entity";
 import { SeatService } from "./seat.service";
-import { SeatShowtime } from "./seat.entity/seat.showtime.entity";
 import { ShowtimeDto } from "./seat.dto/showtime.dto";
 import { StoreProcedureOutputResultInterface } from "src/utils.common/utils.store-procedure-result.common/utils.store-procedure-output-result.interface.common";
 import { SeatResponse } from "./seat.response/seat.response";
@@ -28,22 +26,6 @@ import { SeatResponse } from "./seat.response/seat.response";
 export class SeatController {
     constructor(private seatService: SeatService) { }
 
-    @ApiOkResponse({
-        schema: {
-            allOf: [
-                { $ref: getSchemaPath(SwaggerResponse) },
-                {
-                    properties: {
-                        data: {
-                            $ref: getSchemaPath(
-                                ShowtimeDto
-                            ),
-                        },
-                    },
-                },
-            ],
-        },
-    })
     @Get("/showtime")
     @ApiOperation({ summary: "API lấy danh sách ghế theo suất chiếu" })
     @UsePipes(new ValidationPipe({ transform: true }))
