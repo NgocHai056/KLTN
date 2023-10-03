@@ -15,6 +15,7 @@ import { BookingModule } from './v1/booking/booking.module';
 import { ShowtimeModule } from './v1/showtime/showtime.module';
 import { TicketPriceModule } from './v1/ticket-price/ticket-price.module';
 import { ReviewModule } from './v1/review/review.module';
+import { PaymentModule } from './v1/payment/payment.module';
 
 
 @Module({
@@ -48,7 +49,8 @@ import { ReviewModule } from './v1/review/review.module';
         BookingModule,
         ShowtimeModule,
         TicketPriceModule,
-        ReviewModule
+        ReviewModule,
+        PaymentModule
     ],
     providers: [
         {
