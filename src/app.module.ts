@@ -1,4 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { MongooseModule } from "@nestjs/mongoose";
 import { ConfigModule } from '@nestjs/config';
 import { AuthenticationMiddleware } from './utils.common/utils.middleware.common/utils.bearer-token.common';
 import { APP_GUARD } from '@nestjs/core';
@@ -69,7 +70,8 @@ export class AppModule implements NestModule {
             .apply(AuthenticationMiddleware)
             .exclude(
                 { path: '/auth/*', method: RequestMethod.POST },
-                { path: '/movie/*', method: RequestMethod.GET })
+                { path: '/movie/*', method: RequestMethod.GET },
+                { path: '/banner/*', method: RequestMethod.GET })
             .forRoutes({ path: "/v1/*", method: RequestMethod.ALL });
     }
 }
