@@ -27,7 +27,7 @@ import { GetMoviesDto } from "./movie.dto/get.movies.dto";
 import { MovieStatus } from "src/utils.common/utils.enum/movie-status.enum";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 
-@Controller({ version: VersionEnum.V1.toString(), path: 'movie' })
+@Controller({ path: 'movie' })
 export class MovieController {
     constructor(
         private readonly movieService: MovieService,

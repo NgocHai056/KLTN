@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Theater } from "../theater.entity/theater.entity";
 
 export class TheaterResponse {
+
     @ApiProperty({
         example: "Touch cinema!",
         description: ""
@@ -17,5 +18,13 @@ export class TheaterResponse {
     constructor(entity?: Theater) {
         this.name = entity ? entity.name : "";
         this.address = entity ? entity.address : "";
+    }
+
+    public mapToList(entities: Theater[]): TheaterResponse[] {
+        let data: TheaterResponse[] = [];
+        entities.forEach(e => {
+            data.push(new TheaterResponse(e))
+        });
+        return data;
     }
 }

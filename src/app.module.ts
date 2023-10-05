@@ -16,6 +16,8 @@ import { ShowtimeModule } from './v1/showtime/showtime.module';
 import { TicketPriceModule } from './v1/ticket-price/ticket-price.module';
 import { ReviewModule } from './v1/review/review.module';
 import { PaymentModule } from './v1/payment/payment.module';
+import { MailModule } from './mail/mail.module';
+import { BannerModule } from './v1/banner/banner.module';
 
 
 @Module({
@@ -50,7 +52,9 @@ import { PaymentModule } from './v1/payment/payment.module';
         ShowtimeModule,
         TicketPriceModule,
         ReviewModule,
-        PaymentModule
+        PaymentModule,
+        MailModule,
+        BannerModule
     ],
     providers: [
         {
@@ -64,9 +68,8 @@ export class AppModule implements NestModule {
         consumer
             .apply(AuthenticationMiddleware)
             .exclude(
-                { path: '/v1/auth/register', method: RequestMethod.POST },
-                { path: '/v1/auth/login', method: RequestMethod.POST },
-                { path: '/v1/auth/refresh-token', method: RequestMethod.POST })
-            .forRoutes({ path: "*", method: RequestMethod.ALL });
+                { path: '/auth/*', method: RequestMethod.POST },
+                { path: '/movie/*', method: RequestMethod.GET })
+            .forRoutes({ path: "/v1/*", method: RequestMethod.ALL });
     }
 }

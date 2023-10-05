@@ -11,7 +11,7 @@ import { SwaggerResponse } from 'src/utils.common/utils.swagger.common/utils.swa
 import { LoginDto } from './auth.dto/login.dto';
 
 
-@Controller({ version: VersionEnum.V1.toString(), path: 'auth' })
+@Controller({ path: 'auth' })
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
@@ -40,7 +40,7 @@ export class AuthController {
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        let result: User = await this.authService.register(registerDto);
+        let result: User = await this.authService.signUp(registerDto);
 
         response.setData(new UserResponse(result));
         return res.status(HttpStatus.OK).send(response);

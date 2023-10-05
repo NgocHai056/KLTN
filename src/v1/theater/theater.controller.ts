@@ -38,6 +38,18 @@ export class TheaterController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @Get("")
+    @ApiOperation({ summary: "API get list theater" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async findAll(
+        @Res() res: Response
+    ): Promise<any> {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(new TheaterResponse().mapToList(await this.theaterService.findAll()));
+        return res.status(HttpStatus.OK).send(response);
+    }
+
     @Get("/:id")
     @ApiOperation({ summary: "API get theater by id" })
     @UsePipes(new ValidationPipe({ transform: true }))

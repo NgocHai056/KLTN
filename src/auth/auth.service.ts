@@ -7,27 +7,53 @@ import { User } from 'src/v1/user/user.entity/user.entity';
 import { UserService } from 'src/v1/user/user.service';
 import { LoginDto } from './auth.dto/login.dto';
 import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UserService,
+        private mailService: MailService
     ) { }
 
-    async register(registerDto: UserDto): Promise<User> {
+    async signUp(user: UserDto): Promise<User> {
         /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
-        const existingUser = await this.userService.findBy({ email: registerDto.email });
+        const existingUser = await this.userService.findBy({ email: user.email });
 
         if (existingUser.length !== 0) {
             UtilsExceptionMessageCommon.showMessageError("This account has already existed.");
         }
 
         /** Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu */
-        const hashedPassword: string = await bcrypt.hash(registerDto.password, await bcrypt.genSalt());
+        const hashedPassword: string = await bcrypt.hash(user.password, await bcrypt.genSalt());
 
-        registerDto.password = hashedPassword;
+        user.password = hashedPassword;
 
-        return await this.userService.create(registerDto);
+        const token = Math.floor(100000 + Math.random() * 900000).toString();
+
+        await this.mailService.sendUserConfirmation(user, 'Welcome to NHCinema! Please validate you address…', './confirmation', { name: user.name, token });
+        return new User();
+        // return await this.userService.create(user);
+    }
+
+    async verifyAccount(user: UserDto): Promise<User> {
+        /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
+        const existingUser = await this.userService.findBy({ email: user.email });
+
+        if (existingUser.length !== 0) {
+            UtilsExceptionMessageCommon.showMessageError("This account has already existed.");
+        }
+
+        /** Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu */
+        const hashedPassword: string = await bcrypt.hash(user.password, await bcrypt.genSalt());
+
+        user.password = hashedPassword;
+
+        const token = Math.floor(100000 + Math.random() * 900000).toString();
+
+        await this.mailService.sendUserConfirmation(user, 'Welcome to NHCinema! Please validate you address…', './confirmation', { name: user.name, token });
+        return new User();
+        // return await this.userService.create(user);
     }
 
     async login(loginDto: LoginDto): Promise<any> {
@@ -52,8 +78,8 @@ export class AuthService {
 
         return {
             msg: 'Đăng nhập thành công.',
-            access_token,
-            refresh_token
+            access_token: 'Bearer ' + access_token,
+            refresh_token: 'Bearer ' + refresh_token
         };
     }
 
@@ -81,7 +107,7 @@ export class AuthService {
         await this.userService.update(existingUser.id, existingUser);
 
         return {
-            access_token: newAccessToken,
+            access_token: 'Bearer ' + newAccessToken,
         };
     }
 }
