@@ -8,6 +8,7 @@ import { UserService } from 'src/v1/user/user.service';
 import { LoginDto } from './auth.dto/login.dto';
 import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
 import { MailService } from 'src/mail/mail.service';
+import { UserResponse } from 'src/v1/user/user.response/user.response';
 
 @Injectable()
 export class AuthService {
@@ -16,33 +17,19 @@ export class AuthService {
         private mailService: MailService
     ) { }
 
-    async signUp(user: UserDto): Promise<User> {
+    async signUp(user: UserDto): Promise<any> {
         /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
-        const existingUser = await this.userService.findBy({ email: user.email });
-
-        if (existingUser.length !== 0) {
-            UtilsExceptionMessageCommon.showMessageError("This account has already existed.");
-        }
-
-        /** Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu */
-        const hashedPassword: string = await bcrypt.hash(user.password, await bcrypt.genSalt());
-
-        user.password = hashedPassword;
+        await this.userService.checkExisting(user.email);
 
         const token = Math.floor(100000 + Math.random() * 900000).toString();
 
         await this.mailService.sendUserConfirmation(user, 'Welcome to NHCinema! Please validate you address…', './confirmation', { name: user.name, token });
-        return new User();
-        // return await this.userService.create(user);
+        return "";
     }
 
     async verifyAccount(user: UserDto): Promise<User> {
         /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
-        const existingUser = await this.userService.findBy({ email: user.email });
-
-        if (existingUser.length !== 0) {
-            UtilsExceptionMessageCommon.showMessageError("This account has already existed.");
-        }
+        await this.userService.checkExisting(user.email);
 
         /** Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu */
         const hashedPassword: string = await bcrypt.hash(user.password, await bcrypt.genSalt());
@@ -79,7 +66,8 @@ export class AuthService {
         return {
             msg: 'Đăng nhập thành công.',
             access_token: 'Bearer ' + access_token,
-            refresh_token: 'Bearer ' + refresh_token
+            refresh_token: 'Bearer ' + refresh_token,
+            user: new UserResponse(user)
         };
     }
 
