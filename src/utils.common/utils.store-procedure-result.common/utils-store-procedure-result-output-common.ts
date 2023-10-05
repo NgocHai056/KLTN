@@ -89,7 +89,7 @@ export class StoreProcedureResultOutput<T> {
 
     if (data.length === 3 && parseInt(data[0].length) === 0) {
       throw new HttpException(
-        new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, "Không tồn tại!"),
+        new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, "Does not exist!"),
         HttpStatus.OK
       );
     }

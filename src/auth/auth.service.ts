@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtToken } from 'src/utils.common/utils.jwt-token.common/utils.jwt-token.common';
 import { JwtTokenInterFace } from 'src/utils.common/utils.jwt-token.common/utils.jwt-token.interface.common';
@@ -6,7 +6,7 @@ import { UserDto } from 'src/v1/user/user.dto/user.dto';
 import { User } from 'src/v1/user/user.entity/user.entity';
 import { UserService } from 'src/v1/user/user.service';
 import { LoginDto } from './auth.dto/login.dto';
-import { ExceptionResponseDetail } from 'src/utils.common/utils.exception.common/utils.exception.common';
+import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
 
 @Injectable()
 export class AuthService {
@@ -19,13 +19,7 @@ export class AuthService {
         const existingUser = await this.userService.findBy({ email: registerDto.email });
 
         if (existingUser.length !== 0) {
-            throw new HttpException(
-                new ExceptionResponseDetail(
-                    HttpStatus.BAD_REQUEST,
-                    'Tên tài khoản đã tồn tại.'
-                ),
-                HttpStatus.OK
-            );
+            UtilsExceptionMessageCommon.showMessageError("This account has already existed.");
         }
 
         /** Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu */
@@ -42,30 +36,24 @@ export class AuthService {
         const user: User = users.pop();
 
         if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
-            throw new HttpException(
-                new ExceptionResponseDetail(
-                    HttpStatus.BAD_REQUEST,
-                    'Tên đăng nhập hoặc mật khẩu không chính xác.'
-                ),
-                HttpStatus.OK
-            );
+            UtilsExceptionMessageCommon.showMessageError("Username or password incorrect.");
         }
 
         /** Tạo Access Token */
-        const accessToken = await new JwtToken().generateToken({ user_id: user.id }, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_LIFE);
+        const access_token = await new JwtToken().generateToken({ user_id: user.id }, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_LIFE);
 
         /** Tạo Refresh Token */
-        const refreshToken = await new JwtToken().generateToken({ user_id: user.id }, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_LIFE);
+        const refresh_token = await new JwtToken().generateToken({ user_id: user.id }, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_LIFE);
 
-        user.access_token = accessToken;
-        user.refresh_token = refreshToken;
+        user.access_token = access_token;
+        user.refresh_token = refresh_token;
 
         await this.userService.update(user.id, user);
 
         return {
             msg: 'Đăng nhập thành công.',
-            accessToken,
-            refreshToken
+            access_token,
+            refresh_token
         };
     }
 
@@ -73,13 +61,7 @@ export class AuthService {
         const decodedAccessToken: JwtTokenInterFace = await new JwtToken().decodeToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
 
         if (!decodedAccessToken || !decodedAccessToken.user_id) {
-            throw new HttpException(
-                new ExceptionResponseDetail(
-                    HttpStatus.BAD_REQUEST,
-                    'Access token không hợp lệ.'
-                ),
-                HttpStatus.OK
-            );
+            UtilsExceptionMessageCommon.showMessageError("Access token không hợp lệ.");
         }
 
         /** Kiểm tra tính hợp lệ của Refresh Token (so sánh với dữ liệu trong cơ sở dữ liệu) */
@@ -88,13 +70,7 @@ export class AuthService {
         const existingUser: User = await this.userService.findOne(decodeRefreshToken.user_id);
 
         if (decodeRefreshToken.jwt_token !== existingUser.refresh_token) {
-            throw new HttpException(
-                new ExceptionResponseDetail(
-                    HttpStatus.BAD_REQUEST,
-                    'Refresh token không hợp lệ.'
-                ),
-                HttpStatus.OK
-            );
+            UtilsExceptionMessageCommon.showMessageError("Refresh token is not valid.");
         }
 
         /** Tạo Access Token mới */

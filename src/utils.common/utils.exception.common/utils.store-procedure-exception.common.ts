@@ -8,9 +8,9 @@ export class ExceptionStoreProcedure {
         this.data = data;
     }
     static validate(data: any): boolean {
-        
-        if(!data){
-            throw new HttpException(new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, 'Token không hợp lệ, vui lòng kiểm tra lại!'), HttpStatus.OK);
+
+        if (!data) {
+            throw new HttpException(new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, 'Invalid token, please check again!'), HttpStatus.OK);
         }
 
         if (data.length < 3 && (parseInt(data[1][0].status_code) === StoreProcedureStatusEnum.ERROR || parseInt(data[1][0].status_code) === StoreProcedureStatusEnum.FAIL_LOGIC)) {
@@ -20,12 +20,12 @@ export class ExceptionStoreProcedure {
     }
 
     static validateSingleStoreData(data: any): boolean {
-        
-        if(!data){
-            throw new HttpException(new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, 'Token không hợp lệ, vui lòng kiểm tra lại!'), HttpStatus.OK);
+
+        if (!data) {
+            throw new HttpException(new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, 'Invalid token, please check again!'), HttpStatus.OK);
         }
-        
-        if ( 'message_error' in data[0]) {
+
+        if ('message_error' in data[0]) {
 
             throw new HttpException(new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, data[0].message_error), HttpStatus.OK);
 
@@ -40,8 +40,8 @@ export class ExceptionStoreProcedure {
             let textShow: string = data[1][0].message_error;
             throw new HttpException(new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, textShow), HttpStatus.OK);
         }
-        if (data.length === 3 && data[0].length === 0 ){
-            throw new HttpException(new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, "Không tồn tại"), HttpStatus.OK);
+        if (data.length === 3 && data[0].length === 0) {
+            throw new HttpException(new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, "Does not exist!"), HttpStatus.OK);
         }
         return true;
     }

@@ -12,18 +12,13 @@ import {
   ValidationOptions,
 } from "class-validator";
 import { ExceptionResponseDetail } from "../utils.exception.common/utils.exception.common";
+import { UtilsExceptionMessageCommon } from "../utils.exception.common/utils.exception.message.common";
 
 export const GetUser = createParamDecorator(
   async (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
     if (!request.user) {
-      throw new HttpException(
-        new ExceptionResponseDetail(
-          HttpStatus.UNAUTHORIZED,
-          "Token không hợp lệ!"
-        ),
-        HttpStatus.OK
-      );
+      UtilsExceptionMessageCommon.showMessageError("Invalid token!");
     }
 
     return request.user;
@@ -44,7 +39,7 @@ export function IsNotEmptyString(validationOptions?: ValidationOptions) {
           throw new HttpException(
             new ExceptionResponseDetail(
               HttpStatus.BAD_REQUEST,
-              `[${validationArguments.property}] không được để trống `
+              `[${validationArguments.property}] cannot be empty.`
             ),
             HttpStatus.OK
           );
@@ -68,7 +63,7 @@ export function IsNotEmpty(validationOptions?: ValidationOptions) {
           throw new HttpException(
             new ExceptionResponseDetail(
               HttpStatus.BAD_REQUEST,
-              `[${validationArguments.property}] không được để trống `
+              `[${validationArguments.property}] cannot be empty.`
             ),
             HttpStatus.OK
           );
@@ -97,7 +92,7 @@ export function IsInt(validationOptions?: ValidationOptions) {
           throw new HttpException(
             new ExceptionResponseDetail(
               HttpStatus.BAD_REQUEST,
-              `[${validationArguments.property}] phải là kiêu số nguyên!`
+              `[${validationArguments.property}] must be an integer!`
             ),
             HttpStatus.OK
           );
@@ -120,7 +115,7 @@ export function MaxLength20(validationOptions?: ValidationOptions) {
           throw new HttpException(
             new ExceptionResponseDetail(
               HttpStatus.BAD_REQUEST,
-              `[${validationArguments.property}] không được nhập quá 20 ký tự ${propertyName}!`
+              `[${validationArguments.property}] cannot exceed 20 characters in ${propertyName}!`
             ),
             HttpStatus.OK
           );
@@ -143,7 +138,7 @@ export function IsEmptyArray(validationOptions?: ValidationOptions) {
           throw new HttpException(
             new ExceptionResponseDetail(
               HttpStatus.BAD_REQUEST,
-              `[${validationArguments.property}] không được để rỗng!`
+              `[${validationArguments.property}] cannot be empty!`
             ),
             HttpStatus.OK
           );
@@ -167,7 +162,7 @@ export function Min(validationOptions?: ValidationOptions) {
           throw new HttpException(
             new ExceptionResponseDetail(
               HttpStatus.BAD_REQUEST,
-              `[${validationArguments.property}] Phải là số nguyên và lớn hơn 0!`
+              `[${validationArguments.property}] Must be an integer and greater than 0!`
             ),
             HttpStatus.OK
           );
