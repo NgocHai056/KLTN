@@ -20,7 +20,7 @@ import { ResponseData } from "src/utils.common/utils.response.common/utils.respo
 import { TheaterResponse } from "./theater.response/theater.response";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 
-@Controller({ version: VersionEnum.V1.toString(), path: 'theater' })
+@Controller({ version: VersionEnum.V1.toString(), path: 'unauth/theater' })
 export class TheaterController {
     constructor(private theaterService: TheaterService) { }
 
@@ -54,12 +54,12 @@ export class TheaterController {
     @ApiOperation({ summary: "API get theater by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findOne(
-        @Param("id", ParseIntPipe) id: number,
+        @Param("id") id: string,
         @Res() res: Response
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        response.setData(new TheaterResponse(await this.theaterService.findOne(id)));
+        response.setData(new TheaterResponse(await this.theaterService.find(id)));
         return res.status(HttpStatus.OK).send(response);
     }
 }

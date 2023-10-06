@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TheaterService } from './theater.service';
 import { TheaterController } from './theater.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Theater } from './theater.entity/theater.entity';
+import { Theater, TheaterSchema } from './theater.entity/theater.entity';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Theater]),
+    MongooseModule.forFeature([{ name: Theater.name, schema: TheaterSchema }]),
   ],
   providers: [TheaterService],
   controllers: [TheaterController],

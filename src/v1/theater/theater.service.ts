@@ -1,16 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { BaseService } from 'src/base.service/base.service';
+import BaseService from 'src/base.service/base.service';
 import { Theater } from './theater.entity/theater.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from "typeorm";
-
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class TheaterService extends BaseService<Theater> {
-    constructor(
-        @InjectRepository(Theater)
-        private readonly theaterRepository: Repository<Theater>
-    ) {
-        super(theaterRepository)
+    constructor(@InjectModel(Theater.name) private readonly theaterRepository: Model<Theater>) {
+        super(theaterRepository);
     }
 }
