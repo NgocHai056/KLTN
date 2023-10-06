@@ -15,22 +15,6 @@ import { LoginDto } from './auth.dto/login.dto';
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
-    @ApiOkResponse({
-        schema: {
-            allOf: [
-                { $ref: getSchemaPath(SwaggerResponse) },
-                {
-                    properties: {
-                        data: {
-                            $ref: getSchemaPath(
-                                UserResponse
-                            ),
-                        },
-                    },
-                },
-            ],
-        },
-    })
     @Post('register')
     @ApiOperation({ summary: "Đăng kí tài khoản" })
     @UsePipes(new ValidationPipe({ transform: true }))
@@ -46,22 +30,6 @@ export class AuthController {
         return res.status(HttpStatus.OK).send(response);
     }
 
-    @ApiOkResponse({
-        schema: {
-            allOf: [
-                { $ref: getSchemaPath(SwaggerResponse) },
-                {
-                    properties: {
-                        data: {
-                            $ref: getSchemaPath(
-                                UserResponse
-                            ),
-                        },
-                    },
-                },
-            ],
-        },
-    })
     @Post('login')
     @ApiOperation({ summary: "Đăng nhập" })
     @UsePipes(new ValidationPipe({ transform: true }))
@@ -77,22 +45,6 @@ export class AuthController {
         return res.status(HttpStatus.OK).send(response);
     }
 
-    @ApiOkResponse({
-        schema: {
-            allOf: [
-                { $ref: getSchemaPath(SwaggerResponse) },
-                {
-                    properties: {
-                        data: {
-                            $ref: getSchemaPath(
-                                UserResponse
-                            ),
-                        },
-                    },
-                },
-            ],
-        },
-    })
     @Post('refresh-token')
     @ApiOperation({ summary: "Refresh token" })
     @UsePipes(new ValidationPipe({ transform: true }))
