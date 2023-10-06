@@ -17,7 +17,7 @@ import { ApiOperation } from '@nestjs/swagger';
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
 import { BannerService } from "./banner.service";
 
-@Controller({ path: 'banner' })
+@Controller({ version: VersionEnum.V1.toString(), path: 'banner' })
 export class BannerController {
     constructor(private bannerService: BannerService) { }
 

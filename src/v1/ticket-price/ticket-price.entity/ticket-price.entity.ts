@@ -18,3 +18,7 @@ export class TicketPrice extends Document {
 }
 
 export const TicketPriceSchema = SchemaFactory.createForClass(TicketPrice);
+
+TicketPriceSchema.pre('findOneAndUpdate', function () {
+    this.set({ updated_at: new Date() });
+});

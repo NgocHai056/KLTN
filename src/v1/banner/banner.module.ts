@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { BannerService } from './banner.service';
 import { BannerController } from './banner.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Banner } from './banner.entity/user.entity';
+import { Banner, BannerSchema } from './banner.entity/banner.entity';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Banner]),
+    MongooseModule.forFeature([{ name: Banner.name, schema: BannerSchema }]),
   ],
   providers: [BannerService],
   controllers: [BannerController]
