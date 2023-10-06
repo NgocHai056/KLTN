@@ -37,7 +37,7 @@ export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
             if (privilege === Role.Admin) {
                 return true;
             } else if (!requiredRoles.some((role) => privilege === role)) {
-                UtilsExceptionMessageCommon.showMessageError("Bạn không có quyền truy cập vào chức năng này!");
+                UtilsExceptionMessageCommon.showMessageError("You do not have access to this functionality!");
             }
         }
 

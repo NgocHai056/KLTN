@@ -19,7 +19,7 @@ import { UserDto } from "./user.dto/user.dto";
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
 import { UserResponse } from "./user.response/user.response";
 
-@Controller({ version: VersionEnum.V1.toString(), path: 'user' })
+@Controller({ version: VersionEnum.V1.toString(), path: 'auth/user' })
 export class UserController {
     constructor(private userService: UserService) { }
 

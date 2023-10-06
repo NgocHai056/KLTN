@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import BaseService from 'src/base.service/base.service';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { TicketPrice } from './ticket-price.entity/ticket-price.entity';
-import { BaseService } from 'src/base.service/base.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from "typeorm";
 
 @Injectable()
 export class TicketPriceService extends BaseService<TicketPrice> {
-    constructor(
-        @InjectRepository(TicketPrice)
-        private readonly ticketPriceRepository: Repository<TicketPrice>
-    ) {
+    constructor(@InjectModel(TicketPrice.name) private readonly ticketPriceRepository: Model<TicketPrice>) {
         super(ticketPriceRepository);
     }
 }

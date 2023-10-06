@@ -1,25 +1,20 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Entity({ name: "ticket_prices" })
-export class TicketPrice extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+@Schema({ collection: 'ticket_prices' })
+export class TicketPrice extends Document {
 
-    @Column({ type: 'decimal', precision: 20, scale: 2 })
+    @Prop({ type: Number, required: true })
     price: number;
 
-    @Column()
+    @Prop({ type: Number, required: true })
     type: number;
 
-    @CreateDateColumn({
-        default: `now()`,
-        nullable: true,
-    })
+    @Prop({ type: Date, default: Date.now })
     created_at: Date;
 
-    @UpdateDateColumn({
-        default: `now()`,
-        nullable: true,
-    })
+    @Prop({ type: Date, default: Date.now })
     updated_at: Date;
 }
+
+export const TicketPriceSchema = SchemaFactory.createForClass(TicketPrice);
