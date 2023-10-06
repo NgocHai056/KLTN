@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { BaseService } from 'src/base.service/base.service';
+import BaseService from 'src/base.service/base.service';
 import { Genre } from './genre.entity/genre.entity';
-import { Repository } from "typeorm";
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class GenreService extends BaseService<Genre> {
-    constructor(
-        @InjectRepository(Genre)
-        private readonly genreRepository: Repository<Genre>
-    ) {
+    constructor(@InjectModel(Genre.name) private readonly genreRepository: Model<Genre>) {
         super(genreRepository);
     }
 }

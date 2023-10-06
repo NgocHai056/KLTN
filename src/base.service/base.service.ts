@@ -11,6 +11,7 @@ export default abstract class BaseService<T extends Document> {
 
     async find(id: string): Promise<T> {
         const objectId = this.validateObjectId(id);
+
         return await this.model.findById(objectId).exec();
     }
 
@@ -37,7 +38,7 @@ export default abstract class BaseService<T extends Document> {
 
     private validateObjectId(id: string): string {
         if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-            UtilsExceptionMessageCommon.showMessageError("'Invalid user ID'");
+            UtilsExceptionMessageCommon.showMessageError("'Invalid ID'");
         }
         return id;
     }

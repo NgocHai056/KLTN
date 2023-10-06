@@ -23,7 +23,7 @@ import { TheaterService } from "../theater/theater.service";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 
-@Controller({ version: VersionEnum.V1.toString(), path: 'room' })
+@Controller({ version: VersionEnum.V1.toString(), path: 'auth/room' })
 export class RoomController {
     constructor(
         private readonly roomService: RoomService,
@@ -40,8 +40,8 @@ export class RoomController {
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        if (!await this.theaterService.findOne(roomDto.theater_id)) {
-            UtilsExceptionMessageCommon.showMessageError("Rạp chiếu phim không tồn tại");
+        if (!await this.theaterService.find(roomDto.theater_id)) {
+            UtilsExceptionMessageCommon.showMessageError("Movie theaters don't exist");
         }
 
         response.setData(new RoomResponse(await this.roomService.create(roomDto)));
@@ -52,12 +52,12 @@ export class RoomController {
     @ApiOperation({ summary: "API get room by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findOne(
-        @Param("id", ParseIntPipe) id: number,
+        @Param("id") id: string,
         @Res() res: Response
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        response.setData(new RoomResponse(await this.roomService.findOne(id)));
+        response.setData(new RoomResponse(await this.roomService.find(id)));
         return res.status(HttpStatus.OK).send(response);
     }
 }

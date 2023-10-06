@@ -21,7 +21,7 @@ import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.co
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 
 
-@Controller({ version: VersionEnum.V1.toString(), path: 'genre' })
+@Controller({ version: VersionEnum.V1.toString(), path: 'unauth/genre' })
 export class GenreController {
     constructor(private genreService: GenreService) { }
 
@@ -35,8 +35,8 @@ export class GenreController {
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        if ((await this.genreService.findBy({ name: genreDto.name })).length > 0) {
-            UtilsExceptionMessageCommon.showMessageError("Tên thể loại đã tồn tại!");
+        if ((await this.genreService.findByCondition({ name: { $regex: new RegExp(genreDto.name, 'i') } })).length > 0) {
+            UtilsExceptionMessageCommon.showMessageError("The category name already exists!");
         }
 
         response.setData(await this.genreService.create(genreDto))
@@ -49,19 +49,19 @@ export class GenreController {
     @ApiOperation({ summary: "API create genre" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async update(
-        @Param("id", ParseIntPipe) id: number,
+        @Param("id") id: string,
         @Body() genreDto: GenreDto,
         @Res() res: Response
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        let genre = await this.genreService.findOne(id);
+        let genre = await this.genreService.find(id);
         if (!genre) {
-            UtilsExceptionMessageCommon.showMessageError("Thể loại không tồn tại!");
+            UtilsExceptionMessageCommon.showMessageError("Category does not exist!");
         }
 
         if (genre.name === genreDto.name) {
-            UtilsExceptionMessageCommon.showMessageError("Tên thể loại đã tồn tại!");
+            UtilsExceptionMessageCommon.showMessageError("The category name already exists!");
         }
 
         genre.name = genreDto.name;
@@ -75,12 +75,12 @@ export class GenreController {
     @ApiOperation({ summary: "API get genre by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findOne(
-        @Param("id", ParseIntPipe) id: number,
+        @Param("id") id: string,
         @Res() res: Response
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        response.setData(await this.genreService.findOne(id))
+        response.setData(await this.genreService.find(id))
 
         return res.status(HttpStatus.OK).send(response);
     }

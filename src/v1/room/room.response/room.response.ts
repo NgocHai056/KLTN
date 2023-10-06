@@ -7,7 +7,7 @@ export class RoomResponse {
         example: "1",
         description: "Id rạp chiếu phim"
     })
-    theater_id: number;
+    theater_id: string;
 
     @ApiProperty({
         example: "123",
@@ -22,7 +22,7 @@ export class RoomResponse {
     seat_capacity: number;
 
     constructor(entity?: Room) {
-        this.theater_id = entity ? entity.theater_id : 0;
+        this.theater_id = entity ? entity.theater_id : "";
         this.room_number = entity ? entity.room_number : "";
         this.seat_capacity = entity ? entity.seat_capacity : 0;
     }

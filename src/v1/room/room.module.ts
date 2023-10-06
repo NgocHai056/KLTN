@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { RoomController } from './room.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Room } from './room.entity/room.entity';
+import { Room, RoomSchema } from './room.entity/room.entity';
 import { TheaterModule } from '../theater/theater.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Room]),
+    MongooseModule.forFeature([{ name: Room.name, schema: RoomSchema }]),
     TheaterModule
   ],
   providers: [RoomService],
