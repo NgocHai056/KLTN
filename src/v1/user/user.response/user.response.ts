@@ -21,8 +21,8 @@ export class UserResponse {
     email: string;
 
     constructor(entity?: User) {
-        this.name = entity ? entity.name : "";
-        this.phone = entity ? entity.phone : "";
-        this.email = entity ? entity.email : "";
+        this.name = entity.name;
+        this.phone = entity.phone;
+        this.email = entity.email;
     }
 }

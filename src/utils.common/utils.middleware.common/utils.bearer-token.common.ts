@@ -48,19 +48,19 @@ export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
         let bearerToken: string = req.headers.authorization;
 
         if (!bearerToken || bearerToken === "") {
-            UtilsExceptionMessageCommon.showMessageError("Kiểm tra lại xem bạn đã truyền token vào chưa!");
+            UtilsExceptionMessageCommon.showMessageError("Check to see if you have passed the token!");
         }
 
         let decodeBearerTokenInterFace: JwtTokenInterFace = await new JwtToken().verifyBearerToken(bearerToken, process.env.ACCESS_TOKEN_SECRET);
 
-        let user: User = await this.userService.findOne(
+        let user: User = await this.userService.find(
             decodeBearerTokenInterFace.user_id
         );
 
         ExceptionStoreProcedure.validate(user);
 
         if (user.access_token !== decodeBearerTokenInterFace.jwt_token) {
-            UtilsExceptionMessageCommon.showMessageError("Không có quyền truy cập");
+            UtilsExceptionMessageCommon.showMessageError("Not have access");
         }
 
         req.user = new UserModel(user);

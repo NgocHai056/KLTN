@@ -4,6 +4,6 @@ export interface JwtTokenInterFace {
     iat: number
     sub: number
     exp: number
-    user_id: number,
+    user_id: string,
     jwt_token: string
 }

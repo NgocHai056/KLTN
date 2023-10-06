@@ -27,12 +27,13 @@ export class UserController {
     @ApiOperation({ summary: "API get user by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findOne(
-        @Param("id", ParseIntPipe) id: number,
+        @Param("id") id: string,
         @Res() res: Response
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
+        const user = await this.userService.find(id);
 
-        response.setData(new UserResponse(await this.userService.findOne(id)));
+        response.setData(user ? new UserResponse(user) : []);
         return res.status(HttpStatus.OK).send(response);
     }
 }

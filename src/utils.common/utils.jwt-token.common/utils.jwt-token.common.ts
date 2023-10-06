@@ -44,7 +44,7 @@ export class JwtToken {
             UtilsExceptionMessageCommon.showMessageError(error.message);
         }
         if (!decodeBearerTokenInterFace) {
-            UtilsExceptionMessageCommon.showMessageError("Token không hợp lệ!");
+            UtilsExceptionMessageCommon.showMessageError("Invalid Token!");
         }
         decodeBearerTokenInterFace.jwt_token = token;
 
@@ -87,13 +87,13 @@ export class JwtToken {
         let splitToken: string;
 
         if (!token || token === "") {
-            UtilsExceptionMessageCommon.showMessageError("Token không hợp lệ!");
+            UtilsExceptionMessageCommon.showMessageError("Invalid Token!");
         }
 
         splitToken = token.split(" ")[1];
 
         if (!splitToken || splitToken === "") {
-            UtilsExceptionMessageCommon.showMessageError("Token không hợp lệ!");
+            UtilsExceptionMessageCommon.showMessageError("Invalid Token!");
         }
 
         return splitToken;

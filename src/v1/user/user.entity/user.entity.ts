@@ -1,44 +1,34 @@
-import { Exclude } from 'class-transformer';
-import { Entity, Unique, Column, PrimaryGeneratedColumn, BaseEntity, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Entity({ name: "users" })
-export class User extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @Column()
+@Schema({ collection: 'users' })
+export class User extends Document {
+    @Prop()
     name: string;
 
-    @Unique(['email'])
-    @Column({ default: "" })
+    @Prop({ unique: true, default: '' })
     email: string;
 
-    @Unique(['phone'])
-    @Column({ default: "" })
+    @Prop({ unique: true, default: '' })
     phone: string;
 
-    @Exclude()
-    @Column()
+    @Prop()
     password: string;
 
-    @Column()
+    @Prop()
     role: number;
 
-    @Column()
+    @Prop()
     access_token: string;
 
-    @Column()
+    @Prop()
     refresh_token: string;
 
-    @CreateDateColumn({
-        default: `now()`,
-        nullable: true,
-    })
+    @Prop({ default: () => new Date() })
     created_at: Date;
 
-    @UpdateDateColumn({
-        default: `now()`,
-        nullable: true,
-    })
+    @Prop({ default: () => new Date() })
     updated_at: Date;
 }
+
+export const UserSchema = SchemaFactory.createForClass(User);
