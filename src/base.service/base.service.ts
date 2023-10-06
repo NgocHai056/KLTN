@@ -1,42 +1,44 @@
-import { BaseEntity, DeleteResult, Repository } from 'typeorm'
-import { EntityId } from 'typeorm/repository/EntityId'
-import { IBaseService } from './base.service.interface'
-import { StoreProcedureOutputResultInterface } from 'src/utils.common/utils.store-procedure-result.common/utils.store-procedure-output-result.interface.common';
-import { StoreProcedureResultOutput } from 'src/utils.common/utils.store-procedure-result.common/utils-store-procedure-result-output-common';
+import { Model, Document } from 'mongoose';
+import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
 
-export class BaseService<T extends BaseEntity> implements IBaseService<T> {
+export default abstract class BaseService<T extends Document> {
+    constructor(private readonly model: Model<T>) { }
 
-    constructor(private readonly repository: Repository<T>) { }
-
-    async findOne(id: EntityId): Promise<T> {
-        return this.repository.findOneById(id);
+    async create(createDto: any): Promise<T> {
+        const createdItem = new this.model(createDto);
+        return await createdItem.save();
     }
 
-    async findBy(where: any): Promise<T[]> {
-        const queryBuilder = this.repository.createQueryBuilder();
-        return queryBuilder.where(where).getMany();
+    async find(id: string): Promise<T> {
+        const objectId = this.validateObjectId(id);
+        return await this.model.findById(objectId).exec();
     }
 
-    async findByIds(ids: any): Promise<T[]> {
-        return this.repository.findByIds(ids);
+    async findByIds(ids: string[]): Promise<T[]> {
+        return await this.model.find({ _id: { $in: ids } }).exec();
     }
 
-    async findAll(opts?): Promise<T[]> {
-        return this.repository.find(opts);
+    async findByCondition(condition: any): Promise<T[]> {
+        const data = await this.model.find(condition).exec();
+        return data;
     }
 
-    async create(data: any): Promise<T> {
-        return this.repository.save(data);
+    async findAll(): Promise<T[]> {
+        return await this.model.find().exec();
     }
 
-    async update(id: EntityId, data: any): Promise<T> {
-        await this.repository.update(id, data);
-        return this.findOne(id);
+    async update(id: string, updateDto: any): Promise<T> {
+        return await this.model.findByIdAndUpdate(id, updateDto, { new: true }).exec();
     }
 
-    async callStoredProcedure(query: string, params: any[]): Promise<StoreProcedureOutputResultInterface<T, any>> {
-        let result = await this.repository.query(query, params);
+    async delete(id: string): Promise<T> {
+        return await this.model.findByIdAndRemove(id).exec();
+    }
 
-        return new StoreProcedureResultOutput<T>().getResultOutputList(result);
+    private validateObjectId(id: string): string {
+        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+            UtilsExceptionMessageCommon.showMessageError("'Invalid user ID'");
+        }
+        return id;
     }
 }

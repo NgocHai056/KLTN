@@ -9,11 +9,13 @@ import { LoginDto } from './auth.dto/login.dto';
 import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
 import { MailService } from 'src/mail/mail.service';
 import { UserResponse } from 'src/v1/user/user.response/user.response';
+import { OtpService } from 'src/otp/otp.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UserService,
+        private readonly otpService: OtpService,
         private mailService: MailService
     ) { }
 
@@ -21,15 +23,19 @@ export class AuthService {
         /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
         await this.userService.checkExisting(user.email);
 
-        const token = Math.floor(100000 + Math.random() * 900000).toString();
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-        await this.mailService.sendUserConfirmation(user, 'Welcome to NHCinema! Please validate you address…', './confirmation', { name: user.name, token });
-        return "";
+        /** Send code to email for confirmation */
+        await this.mailService.sendUserConfirmation(user, 'Welcome to NHCinema! Please validate you address…', './confirmation', { name: user.name, code });
+
+        return await this.otpService.create({ code, email: user.email, expireAt: new Date(Date.now() + 5 * 60 * 1000) });
     }
 
-    async verifyAccount(user: UserDto): Promise<User> {
+    async verifyAccount(user: UserDto, otp: string): Promise<User> {
         /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
         await this.userService.checkExisting(user.email);
+
+        await this.otpService.checkExisting(user.email, otp);
 
         /** Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu */
         const hashedPassword: string = await bcrypt.hash(user.password, await bcrypt.genSalt());
@@ -38,14 +44,13 @@ export class AuthService {
 
         const token = Math.floor(100000 + Math.random() * 900000).toString();
 
-        await this.mailService.sendUserConfirmation(user, 'Welcome to NHCinema! Please validate you address…', './confirmation', { name: user.name, token });
-        return new User();
-        // return await this.userService.create(user);
+        return await this.userService.create(user);
     }
 
     async login(loginDto: LoginDto): Promise<any> {
 
-        const users: any[] = await this.userService.findBy({ email: loginDto.email });
+        const users: any[] = await this.userService.findByCondition({ email: { $regex: new RegExp(loginDto.email, 'i') } });
+
         const user: User = users.pop();
 
         if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
@@ -81,7 +86,7 @@ export class AuthService {
         /** Kiểm tra tính hợp lệ của Refresh Token (so sánh với dữ liệu trong cơ sở dữ liệu) */
         const decodeRefreshToken: JwtTokenInterFace = await new JwtToken().verifyBearerToken(refreshToken, process.env.REFRESH_TOKEN_SECRET)
 
-        const existingUser: User = await this.userService.findOne(decodeRefreshToken.user_id);
+        const existingUser: User = await this.userService.find(decodeRefreshToken.user_id);
 
         if (decodeRefreshToken.jwt_token !== existingUser.refresh_token) {
             UtilsExceptionMessageCommon.showMessageError("Refresh token is not valid.");
@@ -96,6 +101,8 @@ export class AuthService {
 
         return {
             access_token: 'Bearer ' + newAccessToken,
+            refresh_token: 'Bearer ' + refreshToken,
+            user: new UserResponse(existingUser)
         };
     }
 }
