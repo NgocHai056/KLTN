@@ -1,15 +1,16 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsString } from "class-validator";
 import { IsInt } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 
 export class GetMoviesDto {
 
     @ApiProperty({
         example: 1,
-        default: -1,
+        default: '',
         description: "Thể loại phim"
     })
-    @IsInt()
-    genre_id: number = -1;
+    @IsString()
+    genre_id: string = '';
 
     @ApiProperty({
         example: 1,

@@ -10,7 +10,7 @@ export default abstract class BaseService<T extends Document> {
     }
 
     async find(id: string): Promise<T> {
-        const objectId = this.validateObjectId(id);
+        const objectId = await this.validateObjectId(id, "ID");
 
         return await this.model.findById(objectId).exec();
     }
@@ -36,9 +36,9 @@ export default abstract class BaseService<T extends Document> {
         return await this.model.findByIdAndRemove(id).exec();
     }
 
-    private validateObjectId(id: string): string {
+    protected async validateObjectId(id: string, msg: string) {
         if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-            UtilsExceptionMessageCommon.showMessageError("'Invalid ID'");
+            UtilsExceptionMessageCommon.showMessageError(`Invalid ${msg}`);
         }
         return id;
     }

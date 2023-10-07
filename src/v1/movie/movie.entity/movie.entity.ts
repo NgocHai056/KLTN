@@ -1,56 +1,66 @@
-import { Exclude } from 'class-transformer';
-import { Entity, Unique, Column, PrimaryGeneratedColumn, BaseEntity, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+import * as mongoose from 'mongoose';
 
-@Entity({ name: "movies" })
-export class Movie extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @Column()
+@Schema({ collection: 'movies' })
+export class Movie extends Document {
+    @Prop()
     name: string;
 
-    @Column()
-    genre_id: number;
+    @Prop()
+    english_name: string;
 
-    @Column()
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Genre' })
+    genre: mongoose.Types.ObjectId;
+
+    @Prop()
+    format: string;
+
+    @Prop()
+    age: string;
+
+    @Prop()
     title: string;
 
-    @Column()
+    @Prop()
     release: Date;
 
-    @Column()
+    @Prop()
     duration: string;
 
-    @Column()
+    @Prop()
     director: string;
 
-    @Column()
+    @Prop()
     performer: string;
 
-    @Column()
+    @Prop()
     description: string;
 
-    @Column()
+    @Prop()
+    poster: string;
+
+    @Prop()
     thumbnail: string;
 
-    @Column()
+    @Prop()
     trailer: string;
 
-    @Column({ type: 'decimal', precision: 4, scale: 2 })
+    @Prop({ type: Number, default: 0 })
     rating: number;
 
-    @Column()
+    @Prop({ type: Number, default: 1 })
     status: number;
 
-    @CreateDateColumn({
-        default: `now()`,
-        nullable: true,
-    })
+    @Prop({ type: Date, default: Date.now })
     created_at: Date;
 
-    @UpdateDateColumn({
-        default: `now()`,
-        nullable: true,
-    })
+    @Prop({ type: Date, default: Date.now })
     updated_at: Date;
 }
+
+export const MovieSchema = SchemaFactory.createForClass(Movie);
+
+MovieSchema.pre('findOneAndUpdate', function () {
+    this.set({ updated_at: new Date() });
+});

@@ -8,7 +8,7 @@ export class ReviewResponse {
         example: "1",
         description: ""
     })
-    user_id: number;
+    user_id: string;
 
 
     @ApiProperty({
@@ -28,7 +28,7 @@ export class ReviewResponse {
 
 
     constructor(entity?: Review) {
-        this.user_id = entity ? entity.user_id : 0;
+        this.user_id = entity ? entity.user_id : "";
         this.rating = entity ? entity.rating : 0;
         this.review = entity ? entity.review : '';
     }

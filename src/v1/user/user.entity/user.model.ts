@@ -3,7 +3,7 @@ import { User } from './user.entity';
 
 export class UserModel {
     @PrimaryGeneratedColumn()
-    id: number;
+    id: string;
 
     @Column()
     name: string;

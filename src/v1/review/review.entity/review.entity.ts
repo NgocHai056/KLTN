@@ -1,39 +1,29 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Entity({ name: "movie_reviews" })
-export class Review extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+@Schema({ collection: 'movie_reviews' })
+export class Review extends Document {
+    @Prop()
+    movie_id: string;
 
-    @Column()
-    movie_id: number;
+    @Prop()
+    user_id: string;
 
-    @Column()
-    user_id: number;
-
-    @Column({ type: 'decimal', precision: 4, scale: 2 })
+    @Prop({ type: Number, required: true })
     rating: number;
 
-    @Column()
+    @Prop({ required: true })
     review: string;
 
-    @CreateDateColumn({
-        default: `now()`,
-        nullable: true,
-    })
+    @Prop({ default: Date.now })
     created_at: Date;
 
-    @UpdateDateColumn({
-        default: `now()`,
-        nullable: true,
-    })
+    @Prop({ default: Date.now })
     updated_at: Date;
-
-    constructor(movieId: number, userId: number, rating: number, review: string) {
-        super();
-        this.movie_id = movieId;
-        this.user_id = userId;
-        this.rating = rating;
-        this.review = review;
-    }
 }
+
+export const ReviewSchema = SchemaFactory.createForClass(Review);
+
+ReviewSchema.pre('findOneAndUpdate', function () {
+    this.set({ updated_at: new Date() });
+});

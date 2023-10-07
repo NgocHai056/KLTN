@@ -16,7 +16,6 @@ import { Response } from "express";
 import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
 import { ApiOperation } from '@nestjs/swagger';
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
-import { StoreProcedureOutputResultInterface } from "src/utils.common/utils.store-procedure-result.common/utils.store-procedure-output-result.interface.common";
 
 import { ReviewService } from './review.service';
 import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
@@ -30,8 +29,9 @@ import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 import { UserService } from "../user/user.service";
 import { User } from "../user/user.entity/user.entity";
 import { ReviewResponse } from "./review.response/review.response";
+import { ReviewBuilder } from "./review.builder/review.builder";
 
-@Controller({ version: VersionEnum.V1.toString(), path: 'review' })
+@Controller({ version: VersionEnum.V1.toString(), path: 'auth/review' })
 export class ReviewController {
     constructor(
         private readonly reviewService: ReviewService,
@@ -55,23 +55,26 @@ export class ReviewController {
             UtilsExceptionMessageCommon.showMessageError("Bạn chưa xem phim này nên không thể đánh giá!");
         }
 
-        let movie = await this.movieService.findOne(reviewDto.movie_id);
+        let movie = await this.movieService.find(reviewDto.movie_id);
 
         if (!movie) {
             UtilsExceptionMessageCommon.showMessageError("Phim cần đánh giá không tồn tại!");
         }
 
         /** Calculate the average rating and update rating in the movie */
-        let countReview = (await this.reviewService.findBy({ user_id: user.id })).length;
+        let countReview = (await this.reviewService.findByCondition({ movie_id: reviewDto.movie_id })).length;
         movie.rating = ((movie.rating * countReview) + reviewDto.rating) / (countReview + 1);
 
         await this.movieService.update(movie.id, movie);
 
-        response.setData(
-            await this.reviewService.create(
-                new Review(reviewDto.movie_id, user.id, reviewDto.rating, reviewDto.review)
-            )
-        );
+        const reviewBuilder = new ReviewBuilder()
+            .withMovieId(reviewDto.movie_id)
+            .withUserId(user.id)
+            .withRating(reviewDto.rating)
+            .withReviewText(reviewDto.review)
+            .build();
+
+        response.setData(await this.reviewService.create(reviewBuilder));
         return res.status(HttpStatus.OK).send(response);
     }
 

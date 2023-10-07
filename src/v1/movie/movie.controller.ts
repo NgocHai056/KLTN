@@ -21,13 +21,12 @@ import { MovieResponse } from "./movie.response/movie.response";
 import { GenreService } from "../genre/genre.service";
 import { MovieDto } from "./movie.dto/movie.dto";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
-import { StoreProcedureOutputResultInterface } from "src/utils.common/utils.store-procedure-result.common/utils.store-procedure-output-result.interface.common";
 import { Movie } from "./movie.entity/movie.entity";
 import { GetMoviesDto } from "./movie.dto/get.movies.dto";
 import { MovieStatus } from "src/utils.common/utils.enum/movie-status.enum";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 
-@Controller({ path: 'movie' })
+@Controller({ version: VersionEnum.V1.toString(), path: 'unauth/movie' })
 export class MovieController {
     constructor(
         private readonly movieService: MovieService,
@@ -43,15 +42,12 @@ export class MovieController {
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        let movies: StoreProcedureOutputResultInterface<Movie, any> = await this.movieService.callStoredProcedure(
-            "CALL sp_g_list_movie(?,?,?,@status,@message);"
-            + "SELECT @status AS status_code, @message AS message_error",
-            [movieDto.genre_id, movieDto.status, movieDto.key_search]);
+        let movies = await this.movieService.findMovies(movieDto.genre_id, movieDto.status, movieDto.key_search);
 
         /** Lấy danh sách phim trừ những phim đã ngừng chiếu(status = 0) */
-        movies.list = movies.list.filter(movie => movie.status !== MovieStatus.STOP_SHOWING);
+        movies = movies.filter(movie => movie.status !== MovieStatus.STOP_SHOWING);
 
-        response.setData(movies.list);
+        response.setData(movies);
 
         return res.status(HttpStatus.OK).send(response);
     }
@@ -66,7 +62,7 @@ export class MovieController {
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        if (!await this.genreService.findOne(movieDto.genre_id)) {
+        if (!await this.genreService.find(movieDto.genre)) {
             UtilsExceptionMessageCommon.showMessageError("Thể loại phim không tồn tại");
         }
 
@@ -80,13 +76,13 @@ export class MovieController {
     @ApiOperation({ summary: "API update movie" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async update(
-        @Param("id", ParseIntPipe) id: number,
+        @Param("id") id: string,
         @Body() movieDto: MovieDto,
         @Res() res: Response
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        if (!await this.genreService.findOne(movieDto.genre_id)) {
+        if (!await this.genreService.find(movieDto.genre)) {
             UtilsExceptionMessageCommon.showMessageError("Thể loại phim không tồn tại");
         }
 
@@ -99,19 +95,19 @@ export class MovieController {
     @ApiOperation({ summary: "API get movie by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findOne(
-        @Param("id", ParseIntPipe) id: number,
+        @Param("id") id: string,
         @Res() res: Response
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        let movie = await this.movieService.findOne(id);
+        let movie = await this.movieService.find(id);
 
-        if (movie.status === MovieStatus.STOP_SHOWING || !movie) {
+        if (!movie || movie.status === MovieStatus.STOP_SHOWING) {
             UtilsExceptionMessageCommon.showMessageError("Phim không tồn tại");
         }
 
         let result = new MovieResponse(movie);
-        result.genre_name = (await this.genreService.findOne(movie.genre_id)).name;
+        result.genre_name = (await this.genreService.find(movie.genre.toString())).name;
 
         response.setData(result);
         return res.status(HttpStatus.OK).send(response);

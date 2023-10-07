@@ -1,21 +1,43 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDateString, IsString } from "class-validator";
-import { IsInt, IsNotEmptyString } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { IsNotEmptyString } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 
 export class MovieDto {
     @ApiProperty({
-        example: "The nun 2",
-        description: ""
+        example: "Ác quỷ ma sơ 2",
+        description: "Tên phim bằng tiếng Việt"
     })
     @IsNotEmptyString()
     name: string;
 
     @ApiProperty({
+        example: "The nun 2",
+        description: "Tên phim bằng tiếng Anh"
+    })
+    @IsNotEmptyString()
+    english_name: string;
+
+    @ApiProperty({
+        name: 'genre_id',
         example: 0,
         description: "Thể loại phim"
     })
-    @IsInt()
-    genre_id: number;
+    @IsNotEmptyString()
+    genre: string;
+
+    @ApiProperty({
+        example: "2D",
+        description: "Định dạng"
+    })
+    @IsNotEmptyString()
+    format: string;
+
+    @ApiProperty({
+        example: "T16+",
+        description: "Độ tuổi tối thiểu có thể xem phim"
+    })
+    @IsNotEmptyString()
+    age: string;
 
     @ApiProperty({
         example: "",
@@ -60,7 +82,14 @@ export class MovieDto {
 
     @ApiProperty({
         example: "",
-        description: "Ảnh thu nhỏ của phim"
+        description: "Ảnh của phim"
+    })
+    @IsString()
+    poster: string;
+
+    @ApiProperty({
+        example: "",
+        description: "Ảnh nền của trailer"
     })
     @IsString()
     thumbnail: string;
@@ -71,4 +100,10 @@ export class MovieDto {
     })
     @IsString()
     trailer: string;
+
+    @ApiProperty({
+        example: "",
+        description: "Danh sách phim theo trạng thái: đang chiếu, sắp chiếu,... Mặc định 0 là dừng chiếu, 1 là đang chiếu, 2 là sắp chiếu"
+    })
+    status: number = 1;
 }

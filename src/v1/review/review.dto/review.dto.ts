@@ -6,8 +6,8 @@ export class ReviewDto {
         example: "1",
         description: "Id phim"
     })
-    @Min()
-    movie_id: number;
+    @IsNotEmptyString()
+    movie_id: string;
 
     @ApiProperty({
         example: "5.0",

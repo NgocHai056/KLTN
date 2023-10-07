@@ -4,7 +4,6 @@ import { ROLES_KEY, Role } from "../utils.enum/role.enum";
 import { NextFunction, Request, Response } from "express";
 import { JwtTokenInterFace } from "../utils.jwt-token.common/utils.jwt-token.interface.common";
 import { JwtToken } from "../utils.jwt-token.common/utils.jwt-token.common";
-import { ExceptionStoreProcedure } from "../utils.exception.common/utils.store-procedure-exception.common";
 import { UserService } from "src/v1/user/user.service";
 import { User } from "src/v1/user/user.entity/user.entity";
 import { UtilsExceptionMessageCommon } from "../utils.exception.common/utils.exception.message.common";
@@ -56,8 +55,6 @@ export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
         let user: User = await this.userService.find(
             decodeBearerTokenInterFace.user_id
         );
-
-        ExceptionStoreProcedure.validate(user);
 
         if (user.access_token !== decodeBearerTokenInterFace.jwt_token) {
             UtilsExceptionMessageCommon.showMessageError("Not have access");
