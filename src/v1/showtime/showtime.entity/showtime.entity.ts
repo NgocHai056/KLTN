@@ -1,28 +1,29 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Entity({ name: "showtimes" })
-export class Showtime extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+@Schema({ collection: 'showtimes' })
+export class Showtime extends Document {
+    @Prop()
+    room_id: string;
 
-    @Column()
-    room_id: number;
+    @Prop()
+    time: string;
 
-    @Column()
-    time: Date;
+    @Prop([{
+        movie_id: String,
+        time: String,
+    }])
+    movie_times: { movie_id: string, time: string }[];
 
-    @Column()
-    movie_time: string;
-
-    @CreateDateColumn({
-        default: `now()`,
-        nullable: true,
-    })
+    @Prop({ type: Date, default: Date.now })
     created_at: Date;
 
-    @UpdateDateColumn({
-        default: `now()`,
-        nullable: true,
-    })
+    @Prop({ type: Date, default: Date.now })
     updated_at: Date;
 }
+
+export const ShowtimeSchema = SchemaFactory.createForClass(Showtime);
+
+ShowtimeSchema.pre('findOneAndUpdate', function () {
+    this.set({ updated_at: new Date() });
+});

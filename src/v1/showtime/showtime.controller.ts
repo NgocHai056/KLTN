@@ -14,18 +14,18 @@ import { Response } from "express";
 import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
 import { ApiOperation } from '@nestjs/swagger';
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
-import { StoreProcedureOutputResultInterface } from "src/utils.common/utils.store-procedure-result.common/utils.store-procedure-output-result.interface.common";
 
 import { ShowtimeService } from './showtime.service';
-import { Showtime } from "./showtime.entity/showtime.entity";
 import { ShowtimeDto } from "./showtime.dto/showtime.dto";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
-import { GetTimeDto } from "./showtime.dto/get-time.dto";
+import { GetShowtimeDto } from "./showtime.dto/get-time.dto";
+import { FacadeService } from "src/facade/facade.service";
 
-@Controller({ version: VersionEnum.V1.toString(), path: 'showtime' })
+@Controller({ version: VersionEnum.V1.toString(), path: 'unauth/showtime' })
 export class ShowtimeController {
     constructor(
-        private readonly showtimeService: ShowtimeService
+        private readonly showtimeService: ShowtimeService,
+        private readonly facadeService: FacadeService
     ) { }
 
     @Post("")
@@ -35,26 +35,30 @@ export class ShowtimeController {
     async create(
         @Body() showtimeDto: ShowtimeDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
-        let showtimes: StoreProcedureOutputResultInterface<Showtime, any> = await this.showtimeService.callStoredProcedure(
-            "CALL sp_u_create_showtime(?,?,?,?,?,@status,@message);"
-            + "SELECT @status AS status_code, @message AS message_error",
-            [showtimeDto.theater_id, showtimeDto.room_id, showtimeDto.movie_id, showtimeDto.time, showtimeDto.showtime]);
+        /** Check if theater, room and movie have exist */
+        await this.facadeService.checkTheaterAndRoomExistence(showtimeDto.theater_id, showtimeDto.room_id);
+        await this.facadeService.checkMovieExistence(showtimeDto.movie_id);
 
-        response.setData(showtimes.list);
+        response.setData(await this.showtimeService.createShowtime(showtimeDto.room_id, showtimeDto.movie_id, showtimeDto.time, showtimeDto.showtime));
         return res.status(HttpStatus.OK).send(response);
     }
 
     @Get('/times')
     async getTimesByMovieId(
-        @Query() getTimeDto: GetTimeDto,
+        @Query() showtimeDto: GetShowtimeDto,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(await this.showtimeService.getTimesByMovieId(+getTimeDto.theater_id, +getTimeDto.movie_id));
+        response.setData(await this.showtimeService
+            .getShowTimes(
+                /** Lấy danh sách room theo theater_id */
+                (await this.facadeService.getRoomsByTheaterId(showtimeDto.theater_id)).map(room => room.id),
+                showtimeDto.time)
+        );
         return res.status(HttpStatus.OK).send(response);
     }
 }

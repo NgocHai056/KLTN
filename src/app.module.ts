@@ -4,21 +4,21 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthenticationMiddleware } from './utils.common/utils.middleware.common/utils.bearer-token.common';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
-import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './v1/user/user.module';
+import { MailModule } from './mail/mail.module';
+import { OtpModule } from './otp/otp.module';
+import { TicketPriceModule } from './v1/ticket-price/ticket-price.module';
+import { BannerModule } from './v1/banner/banner.module';
 import { TheaterModule } from './v1/theater/theater.module';
-import { RoomModule } from './v1/room/room.module';
-import { SeatModule } from './v1/seat/seat.module';
-import { MovieModule } from './v1/movie/movie.module';
 import { GenreModule } from './v1/genre/genre.module';
+import { RoomModule } from './v1/room/room.module';
+import { MovieModule } from './v1/movie/movie.module';
+import { ReviewModule } from './v1/review/review.module';
 import { BookingModule } from './v1/booking/booking.module';
 import { ShowtimeModule } from './v1/showtime/showtime.module';
-import { TicketPriceModule } from './v1/ticket-price/ticket-price.module';
-import { ReviewModule } from './v1/review/review.module';
-import { PaymentModule } from './v1/payment/payment.module';
-import { MailModule } from './mail/mail.module';
-import { BannerModule } from './v1/banner/banner.module';
+import { SeatModule } from './v1/seat/seat.module';
+import { FacadeModule } from './facade/facade.module';
 
 
 @Module({
@@ -31,31 +31,26 @@ import { BannerModule } from './v1/banner/banner.module';
             global: true,
             secret: process.env.secret_token
         }),
-        TypeOrmModule.forRoot({
-            type: "mysql",
-            host: process.env.CONFIG_MYSQL_HOST,
-            port: Number(process.env.CONFIG_MYSQL_PORT),
-            username: process.env.CONFIG_MYSQL_USERNAME,
-            password: process.env.CONFIG_MYSQL_PASSWORD,
-            database: process.env.CONFIG_MYSQL_NAME,
-            entities: ["dist/**/*.entity{.ts,.js}"],
-            multipleStatements: true,
-            dateStrings: true,
-        }),
+        MongooseModule.forRoot(
+            `mongodb+srv://${process.env.CONFIG_MONGO_USERNAME}:${process.env.CONFIG_MONGO_PASSWORD
+            }@cluster0.jil4did.mongodb.net/${process.env.CONFIG_MONGO_DB_NAME}?retryWrites=true&w=majority`,
+            { autoIndex: true }
+        ),
         UserModule,
         AuthModule,
+        MailModule,
+        OtpModule,
+        TicketPriceModule,
+        BannerModule,
         TheaterModule,
-        RoomModule,
-        SeatModule,
-        MovieModule,
         GenreModule,
+        RoomModule,
+        MovieModule,
+        ReviewModule,
         BookingModule,
         ShowtimeModule,
-        TicketPriceModule,
-        ReviewModule,
-        PaymentModule,
-        MailModule,
-        BannerModule
+        SeatModule,
+        FacadeModule
     ],
     providers: [
         {
@@ -69,9 +64,11 @@ export class AppModule implements NestModule {
         consumer
             .apply(AuthenticationMiddleware)
             .exclude(
-                { path: '/auth/*', method: RequestMethod.POST },
-                { path: '/movie/*', method: RequestMethod.GET },
-                { path: '/banner/*', method: RequestMethod.GET })
-            .forRoutes({ path: "/v1/*", method: RequestMethod.ALL });
+                { path: '/v1/oauth/*', method: RequestMethod.POST },
+                { path: '/v1/unauth/*', method: RequestMethod.GET }
+            )
+            .forRoutes(
+                { path: "/v1/auth/*", method: RequestMethod.ALL },
+                { path: '/v1/unauth/*', method: RequestMethod.POST });
     }
 }

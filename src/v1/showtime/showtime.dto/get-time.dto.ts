@@ -1,20 +1,20 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDateString } from "class-validator";
-import { IsInt, Min } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { IsInt, IsNotEmptyString, Min } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { UtilsBaseExceptionLangValidator } from "src/utils.common/utils.exception.lang.common/utils.base.exception.lang.validator";
 
-export class GetTimeDto {
+export class GetShowtimeDto {
     @ApiProperty({
         example: 1,
         description: "Id rạp chiếu phim"
     })
-    @Min()
-    theater_id: number;
+    @IsNotEmptyString()
+    theater_id: string;
 
     @ApiProperty({
-        example: 1,
-        description: "Id phim"
+        example: "2023-06-05",
+        description: "Lịch chiếu theo ngày."
     })
-    @Min()
-    movie_id: number;
+    @IsNotEmptyString()
+    time: string;
 }
