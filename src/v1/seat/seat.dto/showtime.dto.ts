@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDateString } from "class-validator";
-import { Min } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { IsNotEmptyString, Min } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { UtilsBaseExceptionLangValidator } from "src/utils.common/utils.exception.lang.common/utils.base.exception.lang.validator";
 
 export class ShowtimeDto {
@@ -10,8 +10,8 @@ export class ShowtimeDto {
         example: 1,
         description: "",
     })
-    @Min()
-    readonly room_id: number;
+    @IsNotEmptyString()
+    readonly room_id: string;
 
     @ApiProperty({
         required: false,

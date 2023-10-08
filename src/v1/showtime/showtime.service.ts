@@ -61,20 +61,8 @@ export class ShowtimeService extends BaseService<Showtime> {
      * @returns         Returs list of movie contains showtime
      */
     async getShowTimes(roomIds: string[], time: string): Promise<ShowtimeResponse[]> {
-        const query = {
-            room_id: { $in: roomIds },
-            time: time
-        };
-
-        const showtime = await this.showtimeRepository.find(query).exec();
-
         /** Lấy ra {time} và movie_times: [] trong collection showtime*/
-        const data = showtime.map(({ time, movie_times }) => (
-            {
-                date: time,
-                times: movie_times
-            })
-        );
+        const data = await this.getShowTimesByTime(roomIds, time);
 
         /** Lấy danh sách id phim sau đó lấy danh sách phim theo id đó */
         const movieIds = data.map(x => x.times.map(movie => movie.movie_id));
@@ -89,5 +77,47 @@ export class ShowtimeService extends BaseService<Showtime> {
             showtimeResponse.times = movieTimes.map((movieTime) => movieTime.time);
             return showtimeResponse;
         });
+    }
+
+    /**
+     * Check to see if a showtime exists
+     * 
+     * @param roomIds 
+     * @param movieId 
+     * @param time 
+     * @returns 
+     */
+    async checkExistShowtime(roomIds: string[], movieId: string, time: string, showtime: string) {
+        const data = await this.getShowTimesByTime(roomIds, time);
+
+        if (data.length === 0) {
+            UtilsExceptionMessageCommon.showMessageError("Ticket booking failed because there are no screenings for this movie!");
+        }
+
+        return data[0].times
+            .filter(movieTime => movieTime.movie_id === movieId && movieTime.time === showtime)
+            .map(movieTime => ({
+                room_id: data[0].room_id,
+                movie_id: movieTime.movie_id,
+                time: movieTime.time,
+            }));
+    }
+
+    async getShowTimesByTime(roomIds: string[], time: string) {
+        const query = {
+            room_id: { $in: roomIds },
+            time: time
+        };
+
+        const showtime = await this.showtimeRepository.find(query).exec();
+
+        /** Lấy ra {time} và movie_times: [] trong collection showtime*/
+        return showtime.map(({ room_id, time, movie_times }) => (
+            {
+                room_id: room_id,
+                date: time,
+                times: movie_times
+            })
+        );
     }
 }

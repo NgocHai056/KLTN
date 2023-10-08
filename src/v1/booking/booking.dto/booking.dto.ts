@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDateString } from "class-validator";
-import { IsInt, Min } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { IsInt, IsNotEmptyString, Min } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { UtilsBaseExceptionLangValidator } from "src/utils.common/utils.exception.lang.common/utils.base.exception.lang.validator";
 
 export class BookingDto {
@@ -8,29 +8,43 @@ export class BookingDto {
         example: 1,
         description: "Id rạp chiếu phim"
     })
-    @Min()
-    theater_id: number;
+    @IsNotEmptyString()
+    theater_id: string;
+
+    @ApiProperty({
+        example: "Beta",
+        description: "Tên rạp chiếu phim"
+    })
+    @IsNotEmptyString()
+    theater_name: string;
+
+    @ApiProperty({
+        example: 1,
+        description: "Tên của phòng chiếu phim"
+    })
+    @IsNotEmptyString()
+    room_number: string;
 
     @ApiProperty({
         example: 1,
         description: "Id phim"
     })
-    @Min()
-    movie_id: number;
+    @IsNotEmptyString()
+    movie_id: string;
 
     @ApiProperty({
-        example: 1,
-        description: "Id ghế của phòng chiếu phim"
+        example: "The nun 2",
+        description: "Tên phim"
     })
-    @IsInt()
-    seat_id: number = -1;
+    @IsNotEmptyString()
+    movie_name: string;
 
     @ApiProperty({
         example: 1,
         description: "Số ghế của phòng chiếu phim"
     })
     @IsInt()
-    seat_number: number = -1;
+    seat_number: number;
 
     @ApiProperty({
         required: false,
@@ -53,6 +67,11 @@ export class BookingDto {
         example: 1,
         description: "Phương thức thanh toán"
     })
-    @IsInt()
-    payment_method: number = 0;
+    payment_method: number = 1;
+
+    @ApiProperty({
+        example: 1,
+        description: "Loại vé đặt: 1: Trẻ em; 2: Học sinh, Sinh viên; 3: Người lớn"
+    })
+    type: number = 2;
 }

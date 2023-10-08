@@ -19,15 +19,14 @@ import { ResponseData } from "src/utils.common/utils.response.common/utils.respo
 import { Seat } from "./seat.entity/seat.entity";
 import { SeatService } from "./seat.service";
 import { ShowtimeDto } from "./seat.dto/showtime.dto";
-import { StoreProcedureOutputResultInterface } from "src/utils.common/utils.store-procedure-result.common/utils.store-procedure-output-result.interface.common";
 import { SeatResponse } from "./seat.response/seat.response";
 
-@Controller({ version: VersionEnum.V1.toString(), path: 'seat' })
+@Controller({ version: VersionEnum.V1.toString(), path: 'unauth/seat' })
 export class SeatController {
     constructor(private seatService: SeatService) { }
 
     @Get("/showtime")
-    @ApiOperation({ summary: "API lấy danh sách ghế theo suất chiếu" })
+    @ApiOperation({ summary: "API lấy danh sách ghế theo trạng thái của 1 suất chiếu" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async showtime(
         @Query() showtimeDto: ShowtimeDto,
@@ -35,12 +34,10 @@ export class SeatController {
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        let seats: StoreProcedureOutputResultInterface<Seat, any> = await this.seatService.callStoredProcedure(
-            "CALL sp_g_list_of_the_seat_status_base_on_showtime(?,?,?,@status,@message);"
-            + "SELECT @status AS status_code, @message AS message_error",
-            [showtimeDto.room_id, showtimeDto.showtime, showtimeDto.time]);
+        const seats = await this.seatService.getStatus(
+            showtimeDto.room_id, showtimeDto.time, showtimeDto.showtime);
 
-        response.setData(new SeatResponse().mapToList(seats.list));
+        response.setData(seats);
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -48,12 +45,12 @@ export class SeatController {
     @ApiOperation({ summary: "API get seat by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findOne(
-        @Param("id", ParseIntPipe) id: number,
+        @Param("id") id: string,
         @Res() res: Response
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        let seat: Seat = await this.seatService.findOne(id);
+        let seat: Seat = await this.seatService.find(id);
 
         response.setData(seat);
         return res.status(HttpStatus.OK).send(response);

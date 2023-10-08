@@ -20,4 +20,8 @@ export class RoomService extends BaseService<Room> {
         }
         return room;
     }
+
+    async getRoomsByTheaterId(theaterId: string) {
+        return await this.roomRepository.find({ theater_id: theaterId }).exec();
+    }
 }

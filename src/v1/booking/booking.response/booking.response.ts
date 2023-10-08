@@ -9,6 +9,12 @@ export class BookingResponse {
 
     @ApiProperty({
         example: "Tranquility",
+        description: "Tên rạp chiếu phim"
+    })
+    theater_name: string;
+
+    @ApiProperty({
+        example: "Tranquility",
         description: ""
     })
     user_name: string;
@@ -63,7 +69,7 @@ export class BookingResponse {
         this.movie_name = entity ? entity.movie_name : '';
         this.room_number = entity ? entity.room_number : '';
         this.seat_number = entity ? +entity.room_number : 0;
-        this.time = entity ? UtilsDate.formatDateTimeVNToString(entity.time) : '';
+        this.time = entity ? entity.time : '';
         this.payment_method = entity ? PaymentMethod[entity.payment_method] : '';
         this.payment_status = entity ? PaymentStatus[entity.payment_status] : '';
         this.total_amount = entity ? +entity.total_amount : 0;

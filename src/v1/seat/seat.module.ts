@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
 import { SeatService } from './seat.service';
 import { SeatController } from './seat.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Seat } from './seat.entity/seat.entity';
+import { Seat, SeatSchema } from './seat.entity/seat.entity';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Seat]),
+    MongooseModule.forFeature([{ name: Seat.name, schema: SeatSchema }]),
   ],
   providers: [SeatService],
-  controllers: [SeatController]
+  controllers: [SeatController],
+  exports: [SeatService]
 })
 export class SeatModule { }

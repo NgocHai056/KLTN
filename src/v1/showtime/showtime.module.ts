@@ -13,6 +13,7 @@ import { MovieModule } from '../movie/movie.module';
     MovieModule
   ],
   providers: [ShowtimeService],
-  controllers: [ShowtimeController]
+  controllers: [ShowtimeController],
+  exports: [ShowtimeService]
 })
 export class ShowtimeModule { }

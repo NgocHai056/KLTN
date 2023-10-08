@@ -37,7 +37,7 @@ export default abstract class BaseService<T extends Document> {
     }
 
     protected async validateObjectId(id: string, msg: string) {
-        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        if (typeof (id) !== "string" || !id.match(/^[0-9a-fA-F]{24}$/)) {
             UtilsExceptionMessageCommon.showMessageError(`Invalid ${msg}`);
         }
         return id;

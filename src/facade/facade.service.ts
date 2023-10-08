@@ -11,16 +11,13 @@ export class FacadeService {
         private readonly movieService: MovieService,
     ) { }
 
-    async checkTheaterAndRoomExistence(theaterId: string, roomId: string) {
+    async checkTheaterRoomAndMovieExistence(theaterId: string, roomId: string, movieId: string) {
         await this.theaterService.checkExisting(theaterId);
         await this.roomService.checkExisting(roomId);
-    }
-
-    async checkMovieExistence(movieId: string) {
         await this.movieService.checkExisting(movieId);
     }
 
     async getRoomsByTheaterId(theaterId: string) {
-        return await this.roomService.findByCondition({ theater_id: theaterId });
+        return await this.roomService.getRoomsByTheaterId(theaterId);
     }
 }

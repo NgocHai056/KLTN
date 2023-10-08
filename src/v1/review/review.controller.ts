@@ -51,7 +51,7 @@ export class ReviewController {
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        if ((await this.bookingService.findBy({ user_id: user.id, movie_id: reviewDto.movie_id })).length < 1) {
+        if ((await this.bookingService.findByCondition({ user_id: user.id, movie_id: reviewDto.movie_id })).length < 1) {
             UtilsExceptionMessageCommon.showMessageError("Bạn chưa xem phim này nên không thể đánh giá!");
         }
 
@@ -87,7 +87,7 @@ export class ReviewController {
     ): Promise<any> {
         let response: ResponseData = new ResponseData();
 
-        let reviews = new ReviewResponse().mapToList(await this.reviewService.findBy({ movie_id: id }));
+        let reviews = new ReviewResponse().mapToList(await this.reviewService.findByCondition({ movie_id: id }));
 
         /** Get list id of user and then map user_name to reviews base on user_id of review */
         let userIds = reviews.map(review => review.user_id);

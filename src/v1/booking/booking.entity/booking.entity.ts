@@ -1,55 +1,60 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Entity({ name: "bookings" })
-export class Booking extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+@Schema({ collection: 'bookings' })
+export class Booking extends Document {
 
-    @Column()
-    user_id: number;
+    @Prop()
+    theater_name: string;
 
-    @Column()
+    @Prop()
+    user_id: string;
+
+    @Prop()
     user_name: string;
 
-    @Column()
-    movie_id: number;
-
-    @Column()
+    @Prop()
     movie_name: string;
 
-    @Column()
-    room_id: number;
+    @Prop()
+    room_id: string;
 
-    @Column()
+    @Prop()
     room_number: string;
 
-    @Column()
-    seat_id: number;
+    @Prop()
+    seat_number: string;
 
-    @Column()
-    seat_number: number;
+    @Prop()
+    time: string;
 
-    @Column()
-    time: Date;
+    @Prop()
+    showtime: string;
 
-    @Column()
+    @Prop()
     payment_method: number;
 
-    @Column()
+    @Prop()
     payment_status: number;
 
-    @Column({ type: 'decimal', precision: 20, scale: 2 })
+    @Prop()
+    type: number;
+
+    @Prop({ type: Number, default: 0 })
     total_amount: number;
 
-    @CreateDateColumn({
-        default: `now()`,
-        nullable: true,
-    })
+    @Prop()
+    expireAt: Date;
+
+    @Prop({ type: Date, default: Date.now })
     created_at: Date;
 
-    @UpdateDateColumn({
-        default: `now()`,
-        nullable: true,
-    })
+    @Prop({ type: Date, default: Date.now })
     updated_at: Date;
 }
+
+export const BookingSchema = SchemaFactory.createForClass(Booking);
+
+BookingSchema.pre('findOneAndUpdate', function () {
+    this.set({ updated_at: new Date() });
+});

@@ -5,6 +5,7 @@ import * as querystring from 'qs';
 import * as crypto from 'crypto';
 import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
 import { Role, Roles } from 'src/utils.common/utils.enum/role.enum';
+import { PaymentDto } from './payment.dto/payment.dto';
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'payment' })
 export class PaymentController {
@@ -12,7 +13,7 @@ export class PaymentController {
     @Post('create-payment-url')
     @Roles(Role.User)
     async createPaymentUrl(
-        @Body() reqBody: any,
+        @Body() paymentDto: PaymentDto,
         @Req() req: Request,
         @Res() res: Response
     ) {
@@ -28,10 +29,10 @@ export class PaymentController {
         const vnpUrl = process.env.vnp_Url;
         const returnUrl = process.env.vnp_ReturnUrl;
         const orderId = moment(date).format('DDHHmmss');
-        const amount = reqBody.amount;
-        const bankCode = reqBody.bank_code;
+        const amount = paymentDto.amount;
+        const bankCode = paymentDto.bank_code;
 
-        let locale = reqBody.language;
+        let locale = paymentDto.language;
         if (locale === null || locale === '' || !locale) {
             locale = 'vn';
         }

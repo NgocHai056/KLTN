@@ -6,13 +6,13 @@ export class SeatResponse {
         example: "",
         description: ""
     })
-    room_id: number;
+    room_id: string;
 
     @ApiProperty({
         example: "",
         description: ""
     })
-    seat_number: number;
+    seat_number: string;
 
     @ApiProperty({
         example: "",
@@ -21,16 +21,16 @@ export class SeatResponse {
     type: number;
 
     @ApiProperty({
-        example: "Happy coding!",
+        example: "2023-06-05",
         description: ""
     })
-    time: Date;
+    time: string;
 
     constructor(entity?: Seat) {
-        this.room_id = entity ? +entity.room_id : 0;
-        this.seat_number = entity ? entity.seat_number : 0;
+        this.room_id = entity ? entity.room_id : "";
+        this.seat_number = entity ? entity.seat_number : "";
         this.type = entity ? +entity.type : 0;
-        this.time = entity ? entity.time : new Date();
+        this.time = entity ? entity.time : "";
     }
 
     public mapToList(entities: Seat[]): SeatResponse[] {

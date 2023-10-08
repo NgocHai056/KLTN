@@ -39,14 +39,17 @@ export class ShowtimeController {
         let response: ResponseData = new ResponseData();
 
         /** Check if theater, room and movie have exist */
-        await this.facadeService.checkTheaterAndRoomExistence(showtimeDto.theater_id, showtimeDto.room_id);
-        await this.facadeService.checkMovieExistence(showtimeDto.movie_id);
+        await this.facadeService.checkTheaterRoomAndMovieExistence(
+            showtimeDto.theater_id, showtimeDto.room_id, showtimeDto.movie_id);
 
-        response.setData(await this.showtimeService.createShowtime(showtimeDto.room_id, showtimeDto.movie_id, showtimeDto.time, showtimeDto.showtime));
+        response.setData(await this.showtimeService.createShowtime(
+            showtimeDto.room_id, showtimeDto.movie_id, showtimeDto.time, showtimeDto.showtime));
         return res.status(HttpStatus.OK).send(response);
     }
 
     @Get('/times')
+    @ApiOperation({ summary: "API xem lịch chiếu theo ngày" })
+    @UsePipes(new ValidationPipe({ transform: true }))
     async getTimesByMovieId(
         @Query() showtimeDto: GetShowtimeDto,
         @Res() res: Response
