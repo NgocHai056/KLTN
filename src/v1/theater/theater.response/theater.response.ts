@@ -4,6 +4,12 @@ import { Theater } from "../theater.entity/theater.entity";
 export class TheaterResponse {
 
     @ApiProperty({
+        example: "123",
+        description: ""
+    })
+    _id: string;
+
+    @ApiProperty({
         example: "Touch cinema!",
         description: ""
     })
@@ -16,6 +22,7 @@ export class TheaterResponse {
     address: string;
 
     constructor(entity?: Theater) {
+        this._id = entity ? entity._id : ""
         this.name = entity ? entity.name : "";
         this.address = entity ? entity.address : "";
     }
