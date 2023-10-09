@@ -37,7 +37,7 @@ export class RoomController {
     async create(
         @Body() roomDto: RoomDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         if (!await this.theaterService.find(roomDto.theater_id)) {
@@ -54,7 +54,7 @@ export class RoomController {
     async findOne(
         @Param("id") id: string,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         response.setData(new RoomResponse(await this.roomService.find(id)));

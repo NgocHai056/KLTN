@@ -18,7 +18,7 @@ export class ShowtimeService extends BaseService<Showtime> {
 
     async createShowtime(
         roomId: string, movieId: string, time: string, showtime: string
-    ): Promise<any> {
+    ) {
         const condition = { room_id: roomId, time: time };
         const newMovieTime = { movie_id: movieId, time: showtime };
 

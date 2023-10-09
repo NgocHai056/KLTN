@@ -11,7 +11,7 @@ export class UserService extends BaseService<User> {
         super(userRepository);
     }
 
-    async checkExisting(email: string): Promise<any> {
+    async checkExisting(email: string) {
         /** 'i' để tìm kiếm không phân biệt chữ hoa chữ thường */
         const user = await this.userRepository.find({ email: { $regex: new RegExp(email, 'i') } }).exec();
 

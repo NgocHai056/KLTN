@@ -10,6 +10,7 @@ import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.co
 import { MailService } from 'src/mail/mail.service';
 import { UserResponse } from 'src/v1/user/user.response/user.response';
 import { OtpService } from 'src/otp/otp.service';
+import { UserStatus } from 'src/utils.common/utils.enum/user-status.enum';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
         private mailService: MailService
     ) { }
 
-    async signUp(user: UserDto): Promise<any> {
+    async signUp(user: UserDto): Promise<User> {
         /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
         await this.userService.checkExisting(user.email);
 
@@ -28,23 +29,36 @@ export class AuthService {
         /** Send code to email for confirmation */
         await this.mailService.sendUserConfirmation(user, 'Welcome to NHCinema! Please validate you address…', './confirmation', { name: user.name, code });
 
-        return await this.otpService.create({ code, email: user.email, expireAt: new Date(Date.now() + 5 * 60 * 1000) });
-    }
-
-    async verifyAccount(user: UserDto, otp: string): Promise<User> {
-        /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
-        await this.userService.checkExisting(user.email);
-
-        await this.otpService.checkExisting(user.email, otp);
+        await this.otpService.create({ code, email: user.email, expireAt: new Date(Date.now() + 5 * 60 * 1000) });
 
         /** Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu */
         const hashedPassword: string = await bcrypt.hash(user.password, await bcrypt.genSalt());
 
-        user.password = hashedPassword;
+        return await this.userService.create(
+            {
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                password: hashedPassword,
+                status: UserStatus.NOT_ACTIVATED,
+                expireAt: new Date(Date.now() + 10 * 60 * 1000)
+            }
+        );
+    }
 
-        const token = Math.floor(100000 + Math.random() * 900000).toString();
+    async verifyAccount(userId: string, otp: string): Promise<User> {
+        /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
+        const user = await this.userService.find(userId);
 
-        return await this.userService.create(user);
+        await this.otpService.checkExisting(user.email, otp);
+
+        return await this.userService.update(
+            userId,
+            {
+                status: UserStatus.ACTIVATED,
+                $unset: { expireAt: 1 }
+            }
+        );
     }
 
     async login(loginDto: LoginDto): Promise<any> {

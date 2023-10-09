@@ -52,7 +52,7 @@ export class BookingController {
         @Body() bookingDto: BookingDto,
         @Res() res: Response,
         @GetUser() user: UserModel
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         const roomIds = (await this.roomService.getRoomsByTheaterId(bookingDto.theater_id))
@@ -89,7 +89,7 @@ export class BookingController {
     async confirm(
         @Body() bookingConfirmDto: BookingConfirmDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         const booking = await this.bookingService.find(bookingConfirmDto.booking_id);
@@ -118,7 +118,7 @@ export class BookingController {
     async findOne(
         @Param("id") id: string,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         response.setData(new BookingResponse(await this.bookingService.find(id)));

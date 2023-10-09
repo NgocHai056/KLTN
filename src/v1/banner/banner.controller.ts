@@ -26,7 +26,7 @@ export class BannerController {
     @UsePipes(new ValidationPipe({ transform: true }))
     async findAll(
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         response.setData(await this.bannerService.findAll());

@@ -29,7 +29,7 @@ export class UserController {
     async findOne(
         @Param("id") id: string,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
         const user = await this.userService.find(id);
 

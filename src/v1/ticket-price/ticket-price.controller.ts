@@ -20,7 +20,7 @@ export class TicketPriceController {
     async register(
         @Body() ticketPriceDto: TicketPriceDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         response.setData(await this.ticketPriceService.create(ticketPriceDto));

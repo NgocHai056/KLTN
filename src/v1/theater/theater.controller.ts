@@ -31,7 +31,7 @@ export class TheaterController {
     async create(
         @Body() theaterDto: TheaterDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         response.setData(new TheaterResponse(await this.theaterService.create(theaterDto)));
@@ -43,7 +43,7 @@ export class TheaterController {
     @UsePipes(new ValidationPipe({ transform: true }))
     async findAll(
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         response.setData(new TheaterResponse().mapToList(await this.theaterService.findAll()));
@@ -56,7 +56,7 @@ export class TheaterController {
     async findOne(
         @Param("id") id: string,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         response.setData(new TheaterResponse(await this.theaterService.find(id)));

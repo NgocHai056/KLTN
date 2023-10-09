@@ -8,6 +8,7 @@ import { User } from 'src/v1/user/user.entity/user.entity';
 import { ApiOperation } from "@nestjs/swagger";
 import { UserResponse } from 'src/v1/user/user.response/user.response';
 import { LoginDto } from './auth.dto/login.dto';
+import { VerifyDto } from './auth.dto/verify.dto';
 
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'oauth' })
@@ -20,12 +21,10 @@ export class AuthController {
     async register(
         @Body() registerDto: UserDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
-        let result: User = await this.authService.signUp(registerDto);
-
-        response.setData(new UserResponse(result));
+        response.setData(new UserResponse(await this.authService.signUp(registerDto)));
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -33,15 +32,12 @@ export class AuthController {
     @ApiOperation({ summary: "Đăng kí tài khoản" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async verifyAccount(
-        @Query() otp: string,
-        @Body() registerDto: UserDto,
+        @Body() verifyDto: VerifyDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
-        let result: User = await this.authService.verifyAccount(registerDto, otp);
-
-        response.setData(new UserResponse(result));
+        response.setData(new UserResponse(await this.authService.verifyAccount(verifyDto.user_id, verifyDto.otp)));
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -63,7 +59,7 @@ export class AuthController {
     @Post('refresh-token')
     @ApiOperation({ summary: "Refresh token" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async refreshToken(@Req() req, @Res() res: Response): Promise<any> {
+    async refreshToken(@Req() req, @Res() res: Response) {
 
         let response: ResponseData = new ResponseData();
 

@@ -48,7 +48,7 @@ export class ReviewController {
         @GetUser() user: UserModel,
         @Body() reviewDto: ReviewDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         if ((await this.bookingService.findByCondition({ user_id: user.id, movie_id: reviewDto.movie_id })).length < 1) {
@@ -84,7 +84,7 @@ export class ReviewController {
     async getByMovieId(
         @Param("id", ParseIntPipe) id: number,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         let reviews = new ReviewResponse().mapToList(await this.reviewService.findByCondition({ movie_id: id }));

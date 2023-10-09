@@ -32,7 +32,7 @@ export class GenreController {
     async create(
         @Body() genreDto: GenreDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         if ((await this.genreService.findByCondition({ name: { $regex: new RegExp(genreDto.name, 'i') } })).length > 0) {
@@ -52,7 +52,7 @@ export class GenreController {
         @Param("id") id: string,
         @Body() genreDto: GenreDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         let genre = await this.genreService.find(id);
@@ -77,7 +77,7 @@ export class GenreController {
     async findOne(
         @Param("id") id: string,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         response.setData(await this.genreService.find(id))

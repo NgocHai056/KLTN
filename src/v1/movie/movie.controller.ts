@@ -39,7 +39,7 @@ export class MovieController {
     async get(
         @Query() movieDto: GetMoviesDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         let movies = await this.movieService.findMovies(movieDto.genre_id, movieDto.status, movieDto.key_search);
@@ -59,7 +59,7 @@ export class MovieController {
     async create(
         @Body() movieDto: MovieDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         if (!await this.genreService.find(movieDto.genre)) {
@@ -79,7 +79,7 @@ export class MovieController {
         @Param("id") id: string,
         @Body() movieDto: MovieDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         if (!await this.genreService.find(movieDto.genre)) {
@@ -97,7 +97,7 @@ export class MovieController {
     async findOne(
         @Param("id") id: string,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         let movie = await this.movieService.find(id);

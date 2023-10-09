@@ -24,6 +24,12 @@ export class User extends Document {
     @Prop()
     refresh_token: string;
 
+    @Prop()
+    status: number;
+
+    @Prop({ required: true, expires: '10m' })
+    expireAt: Date;
+
     @Prop({ default: () => new Date() })
     created_at: Date;
 

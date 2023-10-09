@@ -31,7 +31,7 @@ export class SeatController {
     async showtime(
         @Query() showtimeDto: ShowtimeDto,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         const seats = await this.seatService.getStatus(
@@ -47,7 +47,7 @@ export class SeatController {
     async findOne(
         @Param("id") id: string,
         @Res() res: Response
-    ): Promise<any> {
+    ) {
         let response: ResponseData = new ResponseData();
 
         let seat: Seat = await this.seatService.find(id);
