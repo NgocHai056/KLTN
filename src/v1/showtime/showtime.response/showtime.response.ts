@@ -3,6 +3,13 @@ import { Movie } from "src/v1/movie/movie.entity/movie.entity";
 
 export class ShowtimeResponse {
 
+
+    @ApiProperty({
+        example: "123",
+        description: "Movie id"
+    })
+    _id: string;
+
     @ApiProperty({
         example: "Ác quỷ ma sơ 2",
         description: ""
@@ -82,6 +89,7 @@ export class ShowtimeResponse {
     times: string[];
 
     constructor(entity: Movie) {
+        this._id = entity ? entity._id : "";
         this.name = entity ? entity.name : "";
         this.english_name = entity ? entity.english_name : "";
         this.title = entity ? entity.title : "";
