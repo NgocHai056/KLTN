@@ -44,6 +44,14 @@ export class RoomController {
             UtilsExceptionMessageCommon.showMessageError("Movie theaters don't exist");
         }
 
+        const rooms = await this.roomService.getRoomsByTheaterId(roomDto.theater_id);
+
+        const duplicateRoom = rooms.find(room => room.room_number === roomDto.room_number);
+
+        if (duplicateRoom) {
+            UtilsExceptionMessageCommon.showMessageError("Room_number already exists!");
+        }
+
         response.setData(new RoomResponse(await this.roomService.create(roomDto)));
         return res.status(HttpStatus.OK).send(response);
     }

@@ -10,8 +10,8 @@ export class Movie extends Document {
     @Prop()
     english_name: string;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Genre' })
-    genre: mongoose.Types.ObjectId;
+    @Prop()
+    genres: string[];
 
     @Prop()
     format: string;

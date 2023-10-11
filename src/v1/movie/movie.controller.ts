@@ -62,8 +62,8 @@ export class MovieController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        if (!await this.genreService.find(movieDto.genre)) {
-            UtilsExceptionMessageCommon.showMessageError("Thể loại phim không tồn tại");
+        if (!await this.genreService.findByIds(movieDto.genres)) {
+            UtilsExceptionMessageCommon.showMessageError("Category does not exist!");
         }
 
         response.setData(await this.movieService.create(movieDto));
@@ -82,8 +82,8 @@ export class MovieController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        if (!await this.genreService.find(movieDto.genre)) {
-            UtilsExceptionMessageCommon.showMessageError("Thể loại phim không tồn tại");
+        if (!await this.genreService.findByIds(movieDto.genres)) {
+            UtilsExceptionMessageCommon.showMessageError("Category does not exist!");
         }
 
         response.setData(await this.movieService.update(id, movieDto));
@@ -103,11 +103,13 @@ export class MovieController {
         let movie = await this.movieService.find(id);
 
         if (!movie || movie.status === MovieStatus.STOP_SHOWING) {
-            UtilsExceptionMessageCommon.showMessageError("Phim không tồn tại");
+            UtilsExceptionMessageCommon.showMessageError("Movie does not exist!");
         }
 
         let result = new MovieResponse(movie);
-        result.genre_name = (await this.genreService.find(movie.genre.toString())).name;
+        let genres = await this.genreService.findByIds(movie.genres);
+
+        result.genre_name = genres.map(genre => genre.name).join(', ');
 
         response.setData(result);
         return res.status(HttpStatus.OK).send(response);

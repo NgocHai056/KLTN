@@ -6,12 +6,11 @@ import { UtilsBaseExceptionLangValidator } from "src/utils.common/utils.exceptio
 export class ShowtimeDto {
 
     @ApiProperty({
-        required: true,
         example: 1,
-        description: "",
+        description: "Id rạp chiếu phim"
     })
     @IsNotEmptyString()
-    readonly room_id: string;
+    theater_id: string;
 
     @ApiProperty({
         required: false,

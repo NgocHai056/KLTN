@@ -7,7 +7,9 @@ import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.co
 
 @Injectable()
 export class MovieService extends BaseService<Movie> {
-    constructor(@InjectModel(Movie.name) private readonly movieModel: Model<Movie>) {
+    constructor(
+        @InjectModel(Movie.name) private readonly movieModel: Model<Movie>
+    ) {
         super(movieModel);
     }
 
@@ -28,8 +30,8 @@ export class MovieService extends BaseService<Movie> {
     ): Promise<Movie[]> {
         const query: any = {};
 
-        if (genreId !== '' && await this.validateObjectId(genreId, "genre_id"))
-            query.genre_id = genreId;
+        if (genreId !== '')
+            query.genres = { $in: [genreId] };
 
         if (status !== -1)
             query.status = status;
@@ -49,8 +51,63 @@ export class MovieService extends BaseService<Movie> {
             }
         }
 
-        return this.movieModel.find(query)
-            .populate({ path: 'genre', select: 'name' })
-            .exec();
+        return await this.movieModel.aggregate([
+            { $match: query },
+            { $unwind: "$genres" /** Tách các thể loại thành từng dòng riêng biệt */ },
+            {
+                $addFields: {
+                    "genres": { $toObjectId: "$genres" } /** Chuyển đổi chuỗi thành ObjectId*/
+                }
+            },
+            {
+                $lookup: {
+                    from: "genres", /** Tên của collection thể loại*/
+                    localField: "genres", /** Trường trong tài liệu phim chứa ObjectId thể loại*/
+                    foreignField: "_id", /** Trường trong collection thể loại chứa ObjectId thể loại*/
+                    as: "genre_info" /** Tên của trường sẽ lưu thông tin thể loại*/
+                }
+            },
+            { $unwind: "$genre_info" /** Tách các kết quả thành từng dòng riêng biệt*/ },
+            {
+                $group: {
+                    _id: "$_id",
+                    name: { $first: "$name" },
+                    english_name: { $first: "$english_name" },
+                    format: { $first: "$format" },
+                    age: { $first: "$age" },
+                    title: { $first: "$title" },
+                    release: { $first: "$release" },
+                    duration: { $first: "$duration" },
+                    director: { $first: "$director" },
+                    performer: { $first: "$performer" },
+                    description: { $first: "$description" },
+                    poster: { $first: "$poster" },
+                    thumbnail: { $first: "$thumbnail" },
+                    trailer: { $first: "$trailer" },
+                    rating: { $first: "$rating" },
+                    status: { $first: "$status" },
+                    created_at: { $first: "$created_at" },
+                    updated_at: { $first: "$updated_at" },
+                    genres: { $push: "$genre_info.name" } /** Tạo mảng thể loại mới*/
+                }
+            },
+            {
+                $addFields: {
+                    genres: {
+                        $reduce: {
+                            input: "$genres",
+                            initialValue: "",
+                            in: {
+                                $cond: {
+                                    if: { $eq: ["$$value", ""] },
+                                    then: "$$this",
+                                    else: { $concat: ["$$value", ", ", "$$this"] }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ]);
     }
 }

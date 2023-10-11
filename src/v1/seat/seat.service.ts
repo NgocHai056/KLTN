@@ -53,9 +53,9 @@ export class SeatService extends BaseService<Seat> {
     }
 
     async getStatus(
-        roomId: string, time: string, showtime: string
+        roomIds: string[], time: string, showtime: string
     ): Promise<SeatResponse[]> {
-        const condition = { room_id: roomId, time: time };
+        const condition = { room_id: { $in: roomIds }, time: time };
 
         const seats = await this.seatRepository.find(condition).exec();
 

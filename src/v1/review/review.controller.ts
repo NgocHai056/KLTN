@@ -51,14 +51,14 @@ export class ReviewController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        if ((await this.bookingService.findByCondition({ user_id: user.id, movie_id: reviewDto.movie_id })).length < 1) {
-            UtilsExceptionMessageCommon.showMessageError("Bạn chưa xem phim này nên không thể đánh giá!");
+        if ((await this.bookingService.findByCondition({ user_id: user.id, movie_id: reviewDto.movie_id })).length === 0) {
+            UtilsExceptionMessageCommon.showMessageError("You haven't seen this movie yet so you can't rate it!");
         }
 
         let movie = await this.movieService.find(reviewDto.movie_id);
 
         if (!movie) {
-            UtilsExceptionMessageCommon.showMessageError("Phim cần đánh giá không tồn tại!");
+            UtilsExceptionMessageCommon.showMessageError("Movies that need a review don't exist!");
         }
 
         /** Calculate the average rating and update rating in the movie */

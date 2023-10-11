@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDateString, IsString } from "class-validator";
+import { ArrayNotEmpty, ArrayUnique, IsArray, IsDateString, IsString } from "class-validator";
 import { IsNotEmptyString } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 
 export class MovieDto {
@@ -14,16 +14,18 @@ export class MovieDto {
         example: "The nun 2",
         description: "Tên phim bằng tiếng Anh"
     })
-    @IsNotEmptyString()
+    @IsString()
     english_name: string;
 
     @ApiProperty({
-        name: 'genre_id',
-        example: 0,
+        example: ["1", "2"],
         description: "Thể loại phim"
     })
-    @IsNotEmptyString()
-    genre: string;
+    @IsArray()
+    @ArrayNotEmpty()
+    @ArrayUnique()
+    @IsString({ each: true })
+    genres: string[];
 
     @ApiProperty({
         example: "2D",

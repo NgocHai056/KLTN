@@ -20,10 +20,13 @@ import { Seat } from "./seat.entity/seat.entity";
 import { SeatService } from "./seat.service";
 import { ShowtimeDto } from "./seat.dto/showtime.dto";
 import { SeatResponse } from "./seat.response/seat.response";
+import { RoomService } from "../room/room.service";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'unauth/seat' })
 export class SeatController {
-    constructor(private seatService: SeatService) { }
+    constructor(private seatService: SeatService,
+        private readonly roomService: RoomService,
+    ) { }
 
     @Get("/showtime")
     @ApiOperation({ summary: "API lấy danh sách ghế theo trạng thái của 1 suất chiếu" })
@@ -34,8 +37,11 @@ export class SeatController {
     ) {
         let response: ResponseData = new ResponseData();
 
+        const roomIds = (await this.roomService.getRoomsByTheaterId(showtimeDto.theater_id))
+            .map(room => room.id);
+
         const seats = await this.seatService.getStatus(
-            showtimeDto.room_id, showtimeDto.time, showtimeDto.showtime);
+            roomIds, showtimeDto.time, showtimeDto.showtime);
 
         response.setData(seats);
         return res.status(HttpStatus.OK).send(response);

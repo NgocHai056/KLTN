@@ -94,7 +94,7 @@ export class AuthService {
         const decodedAccessToken: JwtTokenInterFace = await new JwtToken().decodeToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
 
         if (!decodedAccessToken || !decodedAccessToken.user_id) {
-            UtilsExceptionMessageCommon.showMessageError("Access token không hợp lệ.");
+            UtilsExceptionMessageCommon.showMessageError("Access token is not valid.");
         }
 
         /** Kiểm tra tính hợp lệ của Refresh Token (so sánh với dữ liệu trong cơ sở dữ liệu) */
