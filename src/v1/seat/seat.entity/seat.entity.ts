@@ -7,19 +7,20 @@ export class Seat extends Document {
     room_id: string;
 
     @Prop()
-    seat_number: string;
-
-    @Prop()
-    type: number;
+    movie_id: string;
 
     @Prop()
     time: string;
 
+    @Prop()
+    showtime: string;
+
     @Prop([{
+        seat_number: String,
         status: Number,
-        time: String,
+        seat_type: Number
     }])
-    showtimes: { status: number, time: string }[];
+    seat_array: { seat_number: string, status: number, seat_type: number }[];
 
     @Prop({ type: Date, default: Date.now })
     created_at: Date;

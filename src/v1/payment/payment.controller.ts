@@ -7,7 +7,7 @@ import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
 import { Role, Roles } from 'src/utils.common/utils.enum/role.enum';
 import { PaymentDto } from './payment.dto/payment.dto';
 
-@Controller({ version: VersionEnum.V1.toString(), path: 'payment' })
+@Controller({ version: VersionEnum.V1.toString(), path: 'auth/payment' })
 export class PaymentController {
 
     @Post('create-payment-url')

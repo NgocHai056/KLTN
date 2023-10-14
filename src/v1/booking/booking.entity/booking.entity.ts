@@ -14,6 +14,9 @@ export class Booking extends Document {
     user_name: string;
 
     @Prop()
+    movie_id: string;
+
+    @Prop()
     movie_name: string;
 
     @Prop()
@@ -43,7 +46,7 @@ export class Booking extends Document {
     @Prop({ type: Number, default: 0 })
     total_amount: number;
 
-    @Prop()
+    @Prop({ required: true, expires: '30m' })
     expireAt: Date;
 
     @Prop({ type: Date, default: Date.now })

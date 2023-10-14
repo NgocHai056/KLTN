@@ -19,6 +19,7 @@ import { BookingModule } from './v1/booking/booking.module';
 import { ShowtimeModule } from './v1/showtime/showtime.module';
 import { SeatModule } from './v1/seat/seat.module';
 import { FacadeModule } from './facade/facade.module';
+import { PaymentModule } from './v1/payment/payment.module';
 
 
 @Module({
@@ -50,7 +51,8 @@ import { FacadeModule } from './facade/facade.module';
         BookingModule,
         ShowtimeModule,
         SeatModule,
-        FacadeModule
+        FacadeModule,
+        PaymentModule
     ],
     providers: [
         {
@@ -79,5 +81,7 @@ export class AppModule implements NestModule {
  * 2. Kiểm tra tạo khoảng cách giữa các suất chiếu
  * 3. Chỉ cho tạo lịch chiếu từ ngày hiện tại + T4
  * 4. Reply review lồng nhau
+ * 5. Xử lý seat_number. Khi mà user nhập set_number thì check xem đã tồn tại 
+ * hay vượt quá seat_capacity của 1 phòng không
  * 
  */

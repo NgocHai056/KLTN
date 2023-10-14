@@ -7,6 +7,7 @@ import { TicketPriceModule } from '../ticket-price/ticket-price.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SeatModule } from '../seat/seat.module';
 import { ShowtimeModule } from '../showtime/showtime.module';
+import { MovieModule } from '../movie/movie.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { ShowtimeModule } from '../showtime/showtime.module';
     ShowtimeModule,
     SeatModule,
     RoomModule,
-    TicketPriceModule
+    TicketPriceModule,
+    MovieModule
   ],
   controllers: [BookingController],
   providers: [BookingService],

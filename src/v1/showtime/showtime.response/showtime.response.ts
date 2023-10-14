@@ -83,10 +83,18 @@ export class ShowtimeResponse {
     rating: number;
 
     @ApiProperty({
-        example: ["12:00", "14:00"],
+        example: [
+            {
+                showtime: "14:00",
+                seat: {
+                    _id: "your_seat_id",
+                    room_id: "your_room_id"
+                }
+            }
+        ],
         description: "Suất chiếu theo từng phim trong ngày"
     })
-    times: string[];
+    times: any;
 
     constructor(entity: Movie) {
         this._id = entity ? entity._id : "";

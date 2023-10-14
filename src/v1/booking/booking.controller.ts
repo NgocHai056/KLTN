@@ -32,6 +32,7 @@ import { PaymentStatus } from "src/utils.common/utils.enum/payment-status.enum";
 import { SeatType } from "src/utils.common/utils.enum/seat-type.enum";
 import { SeatStatus } from "src/utils.common/utils.enum/seat-status.enum";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
+import { MovieService } from "../movie/movie.service";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/booking' })
 export class BookingController {
@@ -41,6 +42,7 @@ export class BookingController {
         private readonly showtimeService: ShowtimeService,
         private readonly seatService: SeatService,
         private readonly roomService: RoomService,
+        private readonly movieService: MovieService,
         private readonly ticketPriceService: TicketPriceService,
     ) { }
 
@@ -55,13 +57,30 @@ export class BookingController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        const roomIds = (await this.roomService.getRoomsByTheaterId(bookingDto.theater_id))
-            .map(room => room.id);
+        const room = await this.roomService.find(bookingDto.room_id);
 
-        const showtime = await this.showtimeService.checkExistShowtime(roomIds, bookingDto.movie_id, bookingDto.time, bookingDto.showtime);
+        if (!room)
+            UtilsExceptionMessageCommon.showMessageError("Room doesn't exist!");
 
-        if (showtime.length === 0) {
+        const movie = await this.movieService.find(bookingDto.movie_id);
+
+        if (!movie)
+            UtilsExceptionMessageCommon.showMessageError("Movie doesn't exist!");
+
+
+        const showtime = await this.showtimeService.checkExistShowtime([bookingDto.room_id], bookingDto.movie_id, bookingDto.time, bookingDto.showtime);
+
+        if (showtime.length === 0)
             UtilsExceptionMessageCommon.showMessageError("Ticket booking failed because there are no screenings for this movie!");
+
+
+        if ((await this.bookingService.findByCondition(
+            {
+                user_id: user.id, movie_id: bookingDto.movie_id,
+                room_number: room.room_number, seat_number: bookingDto.seat_number,
+                time: bookingDto.time, showtime: bookingDto.showtime
+            })).length !== 0) {
+            UtilsExceptionMessageCommon.showMessageError("You cannot book the same chair!");
         }
 
         response.setData(
@@ -69,16 +88,17 @@ export class BookingController {
                 .create({
                     theater_name: bookingDto.theater_name,
                     user_id: user.id, user_name: user.name,
-                    movie_name: bookingDto.movie_name,
+                    movie_id: bookingDto.movie_id,
+                    movie_name: movie.name,
                     room_id: showtime[0].room_id,
-                    room_number: bookingDto.room_number,
+                    room_number: room.room_number,
                     seat_number: bookingDto.seat_number,
                     time: bookingDto.time,
                     showtime: bookingDto.showtime,
                     payment_method: bookingDto.payment_method, payment_status: PaymentStatus.PENDING,
                     type: bookingDto.type,
                     total_amount: (await this.ticketPriceService.findByCondition({ type: bookingDto.type })).pop().price,
-                    expireAt: new Date(Date.now() + 60 * 60 * 1000)
+                    expireAt: new Date(Date.now() + 30 * 60 * 1000)
                 }));
         return res.status(HttpStatus.OK).send(response);
     }
@@ -98,7 +118,11 @@ export class BookingController {
             UtilsExceptionMessageCommon.showMessageError("Ticket completion failed!");
         }
 
-        await this.seatService.createSeat(booking.room_id, booking.seat_number, SeatType.NORMAL, SeatStatus.COMPLETE, booking.time, booking.showtime);
+        if (booking.payment_status === PaymentStatus.PAID) {
+            UtilsExceptionMessageCommon.showMessageError("Tickets have been completed!");
+        }
+
+        await this.seatService.createSeat(booking.room_id, booking.movie_id, booking.seat_number, booking.type, SeatStatus.COMPLETE, booking.time, booking.showtime);
 
         response.setData(new BookingResponse(
             await this.bookingService.update(

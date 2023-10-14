@@ -7,13 +7,20 @@ export class Showtime extends Document {
     room_id: string;
 
     @Prop()
+    movie_id: string;
+
+    @Prop()
     time: string;
 
+    @Prop()
+    showtime: string;
+
     @Prop([{
-        movie_id: String,
-        time: String,
+        seat_number: String,
+        status: Number,
+        seat_type: Number
     }])
-    movie_times: { movie_id: string, time: string }[];
+    seat_array: { seat_number: string, status: number, seat_type: number }[];
 
     @Prop({ type: Date, default: Date.now })
     created_at: Date;

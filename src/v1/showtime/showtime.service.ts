@@ -6,12 +6,14 @@ import { Model } from 'mongoose';
 import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
 import { MovieService } from '../movie/movie.service';
 import { ShowtimeResponse } from './showtime.response/showtime.response';
+import { SeatService } from '../seat/seat.service';
 
 
 @Injectable()
 export class ShowtimeService extends BaseService<Showtime> {
     constructor(
         private readonly movieService: MovieService,
+        private readonly seatService: SeatService,
         @InjectModel(Showtime.name) private readonly showtimeRepository: Model<Showtime>) {
         super(showtimeRepository);
     }
@@ -61,22 +63,61 @@ export class ShowtimeService extends BaseService<Showtime> {
      * @returns         Returs list of movie contains showtime
      */
     async getShowTimes(roomIds: string[], time: string): Promise<ShowtimeResponse[]> {
-        /** Lấy ra {time} và movie_times: [] trong collection showtime*/
-        const data = await this.getShowTimesByTime(roomIds, time);
+        const showtimes = await this.getShowTimesByTime(roomIds, time);
 
-        /** Lấy danh sách id phim sau đó lấy danh sách phim theo id đó */
-        const movieIds = data.map(x => x.times.map(movie => movie.movie_id));
-        const movies = await this.movieService.findByIds(movieIds[0]);
+        /** Get list movieId base on showtimes and then get list movies */
+        const movieIds = showtimes.map(showtime => showtime.times.map(movieTime => movieTime.movie_id)).flat();
+        const movies = await this.movieService.findByIds(movieIds);
 
-        /** Ánh xạ thông tin thời gian vào mảng movies */
-        return movies.map((movie) => {
+        const seatConditions = {
+            room_id: { $in: roomIds },
+            movie_id: { $in: movieIds },
+            time: time,
+        };
+
+        const seats = await this.seatService.findByCondition(seatConditions);
+
+        /** Map value of seats follow key: room_id, movie_id, time, showtime */
+        const seatMap = {};
+        seats.forEach(seat => {
+            const key = `${seat.room_id}_${seat.movie_id}_${seat.time}_${seat.showtime}`;
+            seatMap[key] = seat._id;
+        });
+
+        return movies.map(movie => {
             const showtimeResponse = new ShowtimeResponse(movie);
-            const movieTimes = data[0].times.filter((movieTime) => {
-                return movieTime.movie_id === movie.id;
+
+            let times: any[] = [];
+
+            showtimes.forEach(showtime => {
+                const movieTimes = showtime.times.filter(movieTime => movieTime.movie_id === movie.id);
+
+                const timesForMovie = movieTimes.map(movieTime => {
+                    const key = `${showtime.room_id}_${movie.id}_${showtime.date}_${movieTime.time}`;
+                    const seat_id = seatMap[key];
+                    return {
+                        showtime: {
+                            _id: showtime.id,
+                            time: movieTime.time
+                        },
+                        seat: {
+                            _id: seat_id ? seat_id : 0,
+                            room_id: showtime.room_id
+                        }
+                    };
+                });
+
+                /** Chỉ push nếu timesForMovie không rỗng*/
+                if (timesForMovie.length > 0) {
+                    times.push(timesForMovie);
+                }
             });
-            showtimeResponse.times = movieTimes.map((movieTime) => movieTime.time);
+
+            showtimeResponse.times = times;
+
             return showtimeResponse;
         });
+
     }
 
     /**
@@ -112,8 +153,9 @@ export class ShowtimeService extends BaseService<Showtime> {
         const showtime = await this.showtimeRepository.find(query).exec();
 
         /** Lấy ra {time} và movie_times: [] trong collection showtime*/
-        return showtime.map(({ room_id, time, movie_times }) => (
+        return showtime.map(({ _id, room_id, time, movie_times }) => (
             {
+                id: _id,
                 room_id: room_id,
                 date: time,
                 times: movie_times

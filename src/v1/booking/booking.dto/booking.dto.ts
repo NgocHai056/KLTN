@@ -4,12 +4,6 @@ import { IsInt, IsNotEmptyString, Min } from "src/utils.common/utils.decorator.c
 import { UtilsBaseExceptionLangValidator } from "src/utils.common/utils.exception.lang.common/utils.base.exception.lang.validator";
 
 export class BookingDto {
-    @ApiProperty({
-        example: 1,
-        description: "Id rạp chiếu phim"
-    })
-    @IsNotEmptyString()
-    theater_id: string;
 
     @ApiProperty({
         example: "Beta",
@@ -20,10 +14,10 @@ export class BookingDto {
 
     @ApiProperty({
         example: 1,
-        description: "Tên của phòng chiếu phim"
+        description: "Id của phòng chiếu phim"
     })
     @IsNotEmptyString()
-    room_number: string;
+    room_id: string;
 
     @ApiProperty({
         example: 1,
@@ -31,13 +25,6 @@ export class BookingDto {
     })
     @IsNotEmptyString()
     movie_id: string;
-
-    @ApiProperty({
-        example: "The nun 2",
-        description: "Tên phim"
-    })
-    @IsNotEmptyString()
-    movie_name: string;
 
     @ApiProperty({
         example: 1,

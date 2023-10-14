@@ -28,8 +28,8 @@ export class SeatResponse {
 
     constructor(entity?: Seat) {
         this.room_id = entity ? entity.room_id : "";
-        this.seat_number = entity ? entity.seat_number : "";
-        this.type = entity ? +entity.type : 0;
+        // this.seat_number = entity ? entity.seat_number : "";
+        // this.type = entity ? +entity.type : 0;
         this.time = entity ? entity.time : "";
     }
 
