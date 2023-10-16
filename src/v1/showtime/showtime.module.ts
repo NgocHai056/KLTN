@@ -5,14 +5,12 @@ import { Showtime, ShowtimeSchema } from './showtime.entity/showtime.entity';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FacadeModule } from 'src/facade/facade.module';
 import { MovieModule } from '../movie/movie.module';
-import { SeatModule } from '../seat/seat.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Showtime.name, schema: ShowtimeSchema }]),
     FacadeModule,
-    MovieModule,
-    SeatModule
+    MovieModule
   ],
   providers: [ShowtimeService],
   controllers: [ShowtimeController],

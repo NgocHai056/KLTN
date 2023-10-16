@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDateString } from "class-validator";
-import { IsInt, IsNotEmptyString, Min } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { IsInt, IsNotEmptyString, IsValidTimeFormat, Min } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { UtilsBaseExceptionLangValidator } from "src/utils.common/utils.exception.lang.common/utils.base.exception.lang.validator";
 
 export class BookingDto {
@@ -30,8 +30,8 @@ export class BookingDto {
         example: 1,
         description: "Số ghế của phòng chiếu phim"
     })
-    @IsInt()
-    seat_number: number;
+    @IsNotEmptyString()
+    seat_number: string;
 
     @ApiProperty({
         required: false,
@@ -48,6 +48,7 @@ export class BookingDto {
         example: "10:15",
         description: UtilsBaseExceptionLangValidator.exceptionStringDate(),
     })
+    @IsValidTimeFormat()
     readonly showtime: string = '';
 
     @ApiProperty({

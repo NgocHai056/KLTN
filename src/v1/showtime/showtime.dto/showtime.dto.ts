@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDateString } from "class-validator";
-import { IsInt, IsNotEmptyString, Min } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { IsInt, IsNotEmptyString, IsValidTimeFormat, Min } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { UtilsBaseExceptionLangValidator } from "src/utils.common/utils.exception.lang.common/utils.base.exception.lang.validator";
 
 export class ShowtimeDto {
@@ -40,5 +40,6 @@ export class ShowtimeDto {
         example: "10:15",
         description: UtilsBaseExceptionLangValidator.exceptionStringDate(),
     })
+    @IsValidTimeFormat()
     readonly showtime: string = '';
 }

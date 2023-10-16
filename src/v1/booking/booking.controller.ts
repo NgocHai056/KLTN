@@ -59,14 +59,16 @@ export class BookingController {
 
         const room = await this.roomService.find(bookingDto.room_id);
 
-        if (!room)
-            UtilsExceptionMessageCommon.showMessageError("Room doesn't exist!");
+        if (!room && room.seat_capacity < parseInt(bookingDto.seat_number, 10))
+            UtilsExceptionMessageCommon.showMessageError("Room doesn't exist or Seat number is out of range!");
 
         const movie = await this.movieService.find(bookingDto.movie_id);
 
         if (!movie)
             UtilsExceptionMessageCommon.showMessageError("Movie doesn't exist!");
 
+        /** Check empty seat */
+        await this.seatService.checkEmptySeat(bookingDto.room_id, bookingDto.movie_id, bookingDto.seat_number, bookingDto.time, bookingDto.showtime);
 
         const showtime = await this.showtimeService.checkExistShowtime([bookingDto.room_id], bookingDto.movie_id, bookingDto.time, bookingDto.showtime);
 
@@ -122,7 +124,7 @@ export class BookingController {
             UtilsExceptionMessageCommon.showMessageError("Tickets have been completed!");
         }
 
-        await this.seatService.createSeat(booking.room_id, booking.movie_id, booking.seat_number, booking.type, SeatStatus.COMPLETE, booking.time, booking.showtime);
+        await this.seatService.createSeat(booking.room_id, booking.movie_id, booking.seat_number, SeatType.NORMAL, SeatStatus.COMPLETE, booking.time, booking.showtime);
 
         response.setData(new BookingResponse(
             await this.bookingService.update(

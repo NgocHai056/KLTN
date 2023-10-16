@@ -24,18 +24,4 @@ export class SeatController {
     constructor(private seatService: SeatService,
     ) { }
 
-    @Get("/:id")
-    @ApiOperation({ summary: "API get seat by id" })
-    @UsePipes(new ValidationPipe({ transform: true }))
-    async findOne(
-        @Param("id") id: string,
-        @Res() res: Response
-    ) {
-        let response: ResponseData = new ResponseData();
-
-        let seat: Seat = await this.seatService.find(id);
-
-        response.setData(seat);
-        return res.status(HttpStatus.OK).send(response);
-    }
 }

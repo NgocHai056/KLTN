@@ -7,7 +7,8 @@ import {
     ValidationPipe,
     Post,
     Body,
-    Query
+    Query,
+    Param
 } from "@nestjs/common";
 
 import { Response } from "express";
@@ -20,6 +21,8 @@ import { ShowtimeDto } from "./showtime.dto/showtime.dto";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 import { GetShowtimeDto } from "./showtime.dto/get-time.dto";
 import { FacadeService } from "src/facade/facade.service";
+import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
+import { ShowtimeResponse } from "./showtime.response/showtime.response";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'unauth/showtime' })
 export class ShowtimeController {
@@ -62,6 +65,24 @@ export class ShowtimeController {
                 (await this.facadeService.getRoomsByTheaterId(showtimeDto.theater_id)).map(room => room.id),
                 showtimeDto.time)
         );
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Get("/:id")
+    @ApiOperation({ summary: "API get showtime by id" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async findOne(
+        @Param("id") id: string,
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        const showtime = await this.showtimeService.find(id);
+
+        let showtimeResponse = new ShowtimeResponse(showtime);
+        showtimeResponse.mapArraySeat(showtime.seat_array)
+
+        response.setData(showtimeResponse);
         return res.status(HttpStatus.OK).send(response);
     }
 }
