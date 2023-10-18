@@ -42,7 +42,7 @@ export class MovieController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        let movies = await this.movieService.findMovies(movieDto.genre_id, movieDto.status, movieDto.key_search);
+        let movies = await this.movieService.findMovies(movieDto.genre_id, +movieDto.status, movieDto.key_search);
 
         /** Lấy danh sách phim trừ những phim đã ngừng chiếu(status = 0) */
         movies = movies.filter(movie => movie.status !== MovieStatus.STOP_SHOWING);
