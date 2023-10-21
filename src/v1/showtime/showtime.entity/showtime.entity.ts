@@ -18,9 +18,10 @@ export class Showtime extends Document {
     @Prop([{
         seat_number: String,
         status: Number,
-        seat_type: Number
+        seat_type: Number,
+        time_order: Date
     }])
-    seat_array: { seat_number: string, status: number, seat_type: number }[];
+    seat_array: { seat_number: string, status: number, seat_type: number, time_order: Date }[];
 
     @Prop({ type: Date, default: Date.now })
     created_at: Date;

@@ -5,7 +5,7 @@ import { Review } from '../review.entity/review.entity';
 export class ReviewResponse {
 
     @ApiProperty({
-        example: "1",
+        example: "65260f822f91993c64422e07",
         description: ""
     })
     user_id: string;

@@ -5,7 +5,7 @@ import { IsInt } from "src/utils.common/utils.decorator.common/utils.decorator.c
 export class GetMoviesDto {
 
     @ApiProperty({
-        example: 1,
+        example: "65260f822f91993c64422e07",
         default: '',
         description: "Thể loại phim"
     })

@@ -68,7 +68,7 @@ export class ShowtimeController {
         return res.status(HttpStatus.OK).send(response);
     }
 
-    @Get("/:id")
+    @Get("/:id/seats")
     @ApiOperation({ summary: "API get showtime by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findOne(
@@ -79,7 +79,12 @@ export class ShowtimeController {
 
         const showtime = await this.showtimeService.find(id);
 
-        let showtimeResponse = new ShowtimeResponse(showtime);
+        if (!showtime)
+            return res.status(HttpStatus.OK).send(response);
+
+        const data = await this.showtimeService.checkSeatStatus(showtime.id);
+
+        let showtimeResponse = new ShowtimeResponse(data);
         showtimeResponse.mapArraySeat(showtime.seat_array)
 
         response.setData(showtimeResponse);

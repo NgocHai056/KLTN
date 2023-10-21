@@ -3,20 +3,20 @@ import { Seat } from "../seat.entity/seat.entity";
 
 export class SeatResponse {
     @ApiProperty({
-        example: "",
+        example: "652a1a14464026525552677c",
         description: ""
     })
     room_id: string;
 
     @ApiProperty({
-        example: "",
+        example: "1",
         description: ""
     })
     seat_number: string;
 
     @ApiProperty({
-        example: "",
-        description: ""
+        example: "1",
+        description: "Loại ghế"
     })
     type: number;
 

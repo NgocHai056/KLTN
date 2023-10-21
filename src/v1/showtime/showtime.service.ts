@@ -6,6 +6,8 @@ import { Model } from 'mongoose';
 import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
 import { MovieService } from '../movie/movie.service';
 import { ShowtimeByDayResponse } from './showtime.response/showtime-by-day.response';
+import { UtilsDate } from 'src/utils.common/utils.format-time.common/utils.format-time.common';
+import { SeatStatus } from 'src/utils.common/utils.enum/seat-status.enum';
 
 
 @Injectable()
@@ -90,6 +92,35 @@ export class ShowtimeService extends BaseService<Showtime> {
 
             return showtimeResponse;
         });
+
+    }
+
+    async checkSeatStatus(showtimeId: string) {
+
+        await this.validateObjectId(showtimeId, "showtime ID");
+
+        const data = await this.showtimeRepository.findById(showtimeId).exec();
+
+        const currentTime = new Date();
+
+        /** Filter of expired time and remove each element expired */
+        const filteredSeats = data.seat_array.filter(seat => {
+            return ((currentTime.getTime() - new Date(seat.time_order).getTime()) >= 0 && seat.status !== SeatStatus.PENDING);
+        });
+
+        const seatNumbers = filteredSeats.map(seat => seat.seat_number);
+
+        return await this.showtimeRepository.findByIdAndUpdate(
+            showtimeId,
+            {
+                $pull: {
+                    seat_array: {
+                        seat_number: { $in: seatNumbers }
+                    }
+                }
+            },
+            { new: true }
+        ).exec();;
 
     }
 

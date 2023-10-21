@@ -3,8 +3,6 @@ import {
     Get,
     HttpStatus,
     Param,
-    Query,
-    ParseIntPipe,
     Res,
     UsePipes,
     ValidationPipe,
@@ -17,7 +15,6 @@ import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
 import { ApiOperation } from '@nestjs/swagger';
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
 import { BookingService } from "./booking.service";
-import { Booking } from "./booking.entity/booking.entity";
 import { BookingDto } from "./booking.dto/booking.dto";
 import { RoomService } from "../room/room.service";
 import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
@@ -29,7 +26,6 @@ import { SeatService } from "../seat/seat.service";
 import { ShowtimeService } from "../showtime/showtime.service";
 import { BookingConfirmDto } from "./booking.dto/booking-confirm.dto";
 import { PaymentStatus } from "src/utils.common/utils.enum/payment-status.enum";
-import { SeatType } from "src/utils.common/utils.enum/seat-type.enum";
 import { SeatStatus } from "src/utils.common/utils.enum/seat-status.enum";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { MovieService } from "../movie/movie.service";
@@ -49,7 +45,6 @@ export class BookingController {
     @Post("")
     @Roles(Role.User)
     @ApiOperation({ summary: "API booking vé theo suất chiếu" })
-    @UsePipes(new ValidationPipe({ transform: true }))
     async create(
         @Body() bookingDto: BookingDto,
         @Res() res: Response,
@@ -59,31 +54,56 @@ export class BookingController {
 
         const room = await this.roomService.find(bookingDto.room_id);
 
-        if (!room && room.seat_capacity < parseInt(bookingDto.seat_number, 10))
-            UtilsExceptionMessageCommon.showMessageError("Room doesn't exist or Seat number is out of range!");
+        if (!room)
+            UtilsExceptionMessageCommon.showMessageError("Room doesn't exist!");
+
+        if (bookingDto.seats.filter(seat => room.seat_capacity < parseInt(seat.seat_number, 10)).length !== 0)
+            UtilsExceptionMessageCommon.showMessageError("Seat number is out of range!");
+
+        const showtime = await this.showtimeService.checkExistShowtime([bookingDto.room_id], bookingDto.movie_id, bookingDto.time, bookingDto.showtime);
 
         const movie = await this.movieService.find(bookingDto.movie_id);
 
         if (!movie)
             UtilsExceptionMessageCommon.showMessageError("Movie doesn't exist!");
 
+        const seatNumbers: string[] = bookingDto.seats.map(seat => seat.seat_number).flat();
+
         /** Check empty seat */
-        await this.seatService.checkEmptySeat(bookingDto.room_id, bookingDto.movie_id, bookingDto.seat_number, bookingDto.time, bookingDto.showtime);
-
-        const showtime = await this.showtimeService.checkExistShowtime([bookingDto.room_id], bookingDto.movie_id, bookingDto.time, bookingDto.showtime);
-
-        if (showtime.length === 0)
-            UtilsExceptionMessageCommon.showMessageError("Ticket booking failed because there are no screenings for this movie!");
+        await this.seatService.checkEmptySeat(bookingDto.room_id, bookingDto.movie_id, seatNumbers, bookingDto.time, bookingDto.showtime);
 
 
         if ((await this.bookingService.findByCondition(
             {
                 user_id: user.id, movie_id: bookingDto.movie_id,
-                room_number: room.room_number, seat_number: bookingDto.seat_number,
+                room_number: room.room_number, seat_number: { $in: seatNumbers },
                 time: bookingDto.time, showtime: bookingDto.showtime
             })).length !== 0) {
             UtilsExceptionMessageCommon.showMessageError("You cannot book the same chair!");
         }
+
+        /** Lấy danh sách giá tiền theo loại ghế sau đó map vào theo từng cặp key : value */
+        const ticketPrice = await this.ticketPriceService.findByCondition({ type: { $in: bookingDto.seats.map(seat => seat.seat_type).flat() } });
+
+        const priceMap = {};
+        ticketPrice.forEach(ticket => {
+            priceMap[ticket.type] = ticket.price;
+        });
+
+        /** Calculate total amount and format new object for seat_array of schema booking */
+        let totalAmount = 0;
+        const seats = bookingDto.seats.map(seat => {
+            const price = priceMap[seat.seat_type];
+            totalAmount += price;
+            return { seat_number: seat.seat_number, seat_type: seat.seat_type, price: price };
+        });
+
+        /** Format object seat_array for update seat_array of showtime */
+        const seatArray = bookingDto.seats.map(seat => {
+            return { seat_number: seat.seat_number, status: SeatStatus.PENDING, seat_type: seat.seat_type, time_order: new Date() };
+        });
+
+        await this.seatService.createManySeat(showtime[0].room_id, bookingDto.movie_id, bookingDto.time, bookingDto.showtime, seatArray);
 
         response.setData(
             await this.bookingService
@@ -94,13 +114,12 @@ export class BookingController {
                     movie_name: movie.name,
                     room_id: showtime[0].room_id,
                     room_number: room.room_number,
-                    seat_number: bookingDto.seat_number,
+                    seats: seats,
                     time: bookingDto.time,
                     showtime: bookingDto.showtime,
                     payment_method: bookingDto.payment_method, payment_status: PaymentStatus.PENDING,
-                    type: bookingDto.type,
-                    total_amount: (await this.ticketPriceService.findByCondition({ type: bookingDto.type })).pop().price,
-                    expireAt: new Date(Date.now() + 30 * 60 * 1000)
+                    total_amount: totalAmount,
+                    expireAt: new Date(Date.now() + 10 * 60 * 1000)
                 }));
         return res.status(HttpStatus.OK).send(response);
     }
@@ -124,7 +143,8 @@ export class BookingController {
             UtilsExceptionMessageCommon.showMessageError("Tickets have been completed!");
         }
 
-        await this.seatService.createSeat(booking.room_id, booking.movie_id, booking.seat_number, SeatType.NORMAL, SeatStatus.COMPLETE, booking.time, booking.showtime);
+        /** Update status of seats and status of booking */
+        await this.seatService.updateManySeat(booking.room_id, booking.movie_id, booking.time, booking.showtime, booking.seats.map(seat => seat.seat_number).flat());
 
         response.setData(new BookingResponse(
             await this.bookingService.update(

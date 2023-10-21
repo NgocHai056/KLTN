@@ -7,19 +7,19 @@ import { SeatType } from "src/utils.common/utils.enum/seat-type.enum";
 export class ShowtimeResponse {
 
     @ApiProperty({
-        example: "123",
+        example: "652a1a52464026525552679c",
         description: "Showtime ID"
     })
     _id: string;
 
     @ApiProperty({
-        example: "1",
+        example: "652a1a14464026525552677c",
         description: "Room ID"
     })
     room_id: string;
 
     @ApiProperty({
-        example: "1",
+        example: "65260f822f91993c64422e07",
         description: "Movie ID"
     })
     movie_id: string;

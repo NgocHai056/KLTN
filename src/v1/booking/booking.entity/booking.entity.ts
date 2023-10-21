@@ -25,8 +25,12 @@ export class Booking extends Document {
     @Prop()
     room_number: string;
 
-    @Prop()
-    seat_number: string;
+    @Prop([{
+        seat_number: String,
+        seat_type: Number,
+        price: Number
+    }])
+    seats: { seat_number: string, seat_type: number, price: number }[];
 
     @Prop()
     time: string;
@@ -46,7 +50,7 @@ export class Booking extends Document {
     @Prop({ type: Number, default: 0 })
     total_amount: number;
 
-    @Prop({ required: true, expires: '30m' })
+    @Prop({ required: true, expires: '10m' })
     expireAt: Date;
 
     @Prop({ type: Date, default: Date.now })

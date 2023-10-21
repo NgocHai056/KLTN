@@ -77,11 +77,15 @@ export class AppModule implements NestModule {
 
 
 /**
- * 1. Xử lý trạng thái chưa hoàn tất booking mà đã giữ ghế                      
+ * 1. Xử lý trạng thái chưa hoàn tất booking mà đã giữ ghế                      #DONE
  * 2. Kiểm tra tạo khoảng cách giữa các suất chiếu, validate showtime           #DONE
  * 3. Chỉ cho tạo lịch chiếu từ ngày hiện tại + T4          
  * 4. Reply review lồng nhau
  * 5. Xử lý seat_number. Khi mà user nhập set_number thì check xem đã tồn tại   #DONE
  * hay vượt quá seat_capacity của 1 phòng không
+ * 6. Khi nào từ phim đang chiếu -> sắp chiếu
+ * 7. Khoảng cách chiếu bằng thời gian chiếu bộ phim + 30'
+ * 8. Đặt nhiều ghế cùng lúc
+ * 9. Định dạng thời gian
  * 
  */

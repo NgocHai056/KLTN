@@ -4,8 +4,8 @@ import { Theater } from "../theater.entity/theater.entity";
 export class TheaterResponse {
 
     @ApiProperty({
-        example: "123",
-        description: ""
+        example: "652a1a52464026525552679c",
+        description: "Id rạp chiếu phim"
     })
     _id: string;
 
