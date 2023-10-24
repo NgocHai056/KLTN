@@ -100,7 +100,7 @@ export class BookingController {
 
         /** Format object seat_array for update seat_array of showtime */
         const seatArray = bookingDto.seats.map(seat => {
-            return { seat_number: seat.seat_number, status: SeatStatus.PENDING, seat_type: seat.seat_type, time_order: new Date() };
+            return { seat_number: seat.seat_number, status: SeatStatus.PENDING, seat_type: seat.seat_type, time_order: new Date(Date.now() + 10 * 60 * 1000) };
         });
 
         await this.seatService.createManySeat(showtime[0].room_id, bookingDto.movie_id, bookingDto.time, bookingDto.showtime, seatArray);

@@ -8,7 +8,7 @@ import { MovieService } from '../movie/movie.service';
 import { ShowtimeByDayResponse } from './showtime.response/showtime-by-day.response';
 import { UtilsDate } from 'src/utils.common/utils.format-time.common/utils.format-time.common';
 import { SeatStatus } from 'src/utils.common/utils.enum/seat-status.enum';
-
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class ShowtimeService extends BaseService<Showtime> {
@@ -95,6 +95,40 @@ export class ShowtimeService extends BaseService<Showtime> {
 
     }
 
+    async getShowTimeByMovie(roomIds: string[], movieId: string): Promise<ShowtimeByDayResponse[]> {
+        const currentDate = moment();
+
+        const nextDate = moment().add(4, 'days');
+
+        const query = {
+            room_id: { $in: roomIds },
+            movie_id: movieId,
+            time: {
+                $gte: currentDate.format("YYYY-MM-DD"),
+                $lte: nextDate.format("YYYY-MM-DD")
+            }
+        };
+
+        const showtimes = await this.showtimeRepository.find(query).exec();
+
+        const movie = await this.movieService.find(movieId);
+
+        /** Map showtime and showtime_id follow each movie */
+
+        const showtimeResponse = new ShowtimeByDayResponse(movie);
+
+        showtimeResponse.times =
+            showtimes
+                .filter(showtime => showtime.movie_id === movie.id)
+                .map(showtime => ({
+                    time: showtime.time,
+                    showtime: showtime.showtime,
+                    showtime_id: showtime.id
+                }));
+
+        return [showtimeResponse];
+    }
+
     async checkSeatStatus(showtimeId: string) {
 
         await this.validateObjectId(showtimeId, "showtime ID");
@@ -105,7 +139,7 @@ export class ShowtimeService extends BaseService<Showtime> {
 
         /** Filter of expired time and remove each element expired */
         const filteredSeats = data.seat_array.filter(seat => {
-            return ((currentTime.getTime() - new Date(seat.time_order).getTime()) >= 0 && seat.status !== SeatStatus.PENDING);
+            return ((currentTime.getTime() - new Date(seat.time_order).getTime()) >= 0 && seat.status === SeatStatus.PENDING);
         });
 
         const seatNumbers = filteredSeats.map(seat => seat.seat_number);

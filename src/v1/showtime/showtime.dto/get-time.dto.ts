@@ -15,6 +15,6 @@ export class GetShowtimeDto {
         example: "2023-06-05",
         description: "Lịch chiếu theo ngày."
     })
-    @IsNotEmptyString()
+    @IsDateString()
     time: string;
 }

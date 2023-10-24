@@ -4,6 +4,7 @@ import { Booking } from "../booking.entity/booking.entity";
 import { PaymentMethod } from "src/utils.common/utils.enum/payment-method.enum";
 import { PaymentStatus } from "src/utils.common/utils.enum/payment-status.enum";
 import { UtilsDate } from "src/utils.common/utils.format-time.common/utils.format-time.common";
+import { IsDateString } from "class-validator";
 
 export class BookingResponse {
 
@@ -43,6 +44,7 @@ export class BookingResponse {
         example: "2023-09-26 12:00:00.000",
         description: UtilsBaseExceptionLangValidator.exceptionStringDate(),
     })
+    @IsDateString()
     readonly time: string;
 
 
@@ -69,7 +71,7 @@ export class BookingResponse {
         this.movie_name = entity ? entity.movie_name : '';
         this.room_number = entity ? entity.room_number : '';
         this.seat_number = entity ? entity.room_number : "";
-        this.time = entity ? entity.time : '';
+        this.time = entity ? entity.time + " " + entity.showtime : '';
         this.payment_method = entity ? PaymentMethod[entity.payment_method] : '';
         this.payment_status = entity ? PaymentStatus[entity.payment_status] : '';
         this.total_amount = entity ? +entity.total_amount : 0;

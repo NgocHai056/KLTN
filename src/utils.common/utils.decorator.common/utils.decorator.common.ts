@@ -117,6 +117,36 @@ export function IsValidTimeFormat(validationOptions?: ValidationOptions) {
 	};
 }
 
+export function IsDateAfterNow(validationOptions?: ValidationOptions) {
+	return (object: Record<string, any>, propertyName: string) => {
+		registerDecorator({
+			name: "isDateBeforeNow",
+			target: object.constructor,
+			propertyName,
+			options: validationOptions,
+			validator: {
+				validate: (value: string, args: ValidationArguments): boolean => {
+					const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+					if (!dateRegex.test(value)) {
+						return false;
+					}
+
+					return new Date(value) > new Date();
+				},
+				defaultMessage: (validationArguments?: ValidationArguments): string => {
+					throw new HttpException(
+						new ExceptionResponseDetail(
+							HttpStatus.BAD_REQUEST,
+							`The date in [${validationArguments.property}] should be before the current date.`
+						),
+						HttpStatus.OK
+					);
+				},
+			},
+		});
+	};
+}
+
 export function IsNotEmptyString(validationOptions?: ValidationOptions) {
 	return (object: unknown, propertyName: string) => {
 		registerDecorator({

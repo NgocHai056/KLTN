@@ -23,6 +23,7 @@ import { GetShowtimeDto } from "./showtime.dto/get-time.dto";
 import { FacadeService } from "src/facade/facade.service";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { ShowtimeResponse } from "./showtime.response/showtime.response";
+import { GetShowtimeByMovieDto } from "./showtime.dto/get-time-by-movie.dto";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'unauth/showtime' })
 export class ShowtimeController {
@@ -53,7 +54,7 @@ export class ShowtimeController {
     @Get('/times')
     @ApiOperation({ summary: "API xem lịch chiếu theo ngày" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async getTimesByMovieId(
+    async getTimes(
         @Query() showtimeDto: GetShowtimeDto,
         @Res() res: Response
     ) {
@@ -64,6 +65,24 @@ export class ShowtimeController {
                 /** Lấy danh sách room theo theater_id */
                 (await this.facadeService.getRoomsByTheaterId(showtimeDto.theater_id)).map(room => room.id),
                 showtimeDto.time)
+        );
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Get('/time-by-movie')
+    @ApiOperation({ summary: "API xem lịch chiếu theo phim" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async getTimesByMovieId(
+        @Query() showtimeDto: GetShowtimeByMovieDto,
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(await this.showtimeService
+            .getShowTimeByMovie(
+                /** Lấy danh sách room theo theater_id */
+                (await this.facadeService.getRoomsByTheaterId(showtimeDto.theater_id)).map(room => room.id),
+                showtimeDto.movie_id)
         );
         return res.status(HttpStatus.OK).send(response);
     }
@@ -85,7 +104,7 @@ export class ShowtimeController {
         const data = await this.showtimeService.checkSeatStatus(showtime.id);
 
         let showtimeResponse = new ShowtimeResponse(data);
-        showtimeResponse.mapArraySeat(showtime.seat_array)
+        showtimeResponse.mapArraySeat(data.seat_array)
 
         response.setData(showtimeResponse);
         return res.status(HttpStatus.OK).send(response);

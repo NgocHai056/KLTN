@@ -33,8 +33,14 @@ export class MovieService extends BaseService<Movie> {
         if (genreId !== '')
             query.genres = { $in: [genreId] };
 
-        if (status !== -1)
-            query.status = status;
+        if (status === 1)
+            query.release = {
+                $lte: new Date()
+            }
+        else if (status === 2)
+            query.release = {
+                $gt: new Date()
+            }
 
         if (keySearch !== '') {
             if (!isNaN(Number(keySearch))) {
@@ -68,6 +74,16 @@ export class MovieService extends BaseService<Movie> {
                 }
             },
             { $unwind: "$genre_info" /** Tách các kết quả thành từng dòng riêng biệt*/ },
+            {
+                $addFields: {
+                    release: {
+                        $dateToString: {
+                            format: "%d/%m/%Y", // Định dạng ngày/tháng/năm theo ý muốn
+                            date: "$release" // Trường ngày tháng cần định dạng
+                        }
+                    }
+                }
+            },
             {
                 $group: {
                     _id: "$_id",
