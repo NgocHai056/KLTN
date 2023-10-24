@@ -109,7 +109,7 @@ export class MovieController {
         let result = new MovieResponse(movie);
         let genres = await this.genreService.findByIds(movie.genres);
 
-        result.genre_name = genres.map(genre => genre.name).join(', ');
+        result.genres = genres.map(genre => genre.name).join(', ');
 
         response.setData(result);
         return res.status(HttpStatus.OK).send(response);

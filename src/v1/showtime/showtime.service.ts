@@ -9,11 +9,13 @@ import { ShowtimeByDayResponse } from './showtime.response/showtime-by-day.respo
 import { UtilsDate } from 'src/utils.common/utils.format-time.common/utils.format-time.common';
 import { SeatStatus } from 'src/utils.common/utils.enum/seat-status.enum';
 import * as moment from 'moment-timezone';
+import { GenreService } from '../genre/genre.service';
 
 @Injectable()
 export class ShowtimeService extends BaseService<Showtime> {
     constructor(
         private readonly movieService: MovieService,
+        private readonly genreService: GenreService,
         @InjectModel(Showtime.name) private readonly showtimeRepository: Model<Showtime>) {
         super(showtimeRepository);
     }
@@ -58,6 +60,30 @@ export class ShowtimeService extends BaseService<Showtime> {
 
     }
 
+    async copyShowtime(
+        roomIds: string[], time: string, targetTime: string
+    ) {
+        /** Find by list room_id of theater and time for copy list showtime of day specific */
+        const query = {
+            room_id: { $in: roomIds },
+            time: time,
+        };
+
+        const showtimes = await this.showtimeRepository.find(query).exec();
+
+        const copiedShowtimes = showtimes.map(showtime => {
+            return {
+                room_id: showtime.room_id,
+                movie_id: showtime.movie_id,
+                time: targetTime,
+                showtime: showtime.showtime,
+                seat_array: []
+            }
+        })
+
+        return await this.showtimeRepository.insertMany(copiedShowtimes);
+    }
+
     /**
      * Get list showtime of movie base on request {time}
      * 
@@ -78,9 +104,18 @@ export class ShowtimeService extends BaseService<Showtime> {
         const movieIds = showtimes.map(showtime => showtime.movie_id).flat();
         const movies = await this.movieService.findByIds(movieIds);
 
+        const gernes = await this.genreService.findAll();
+
+        const genreMap = {};
+        gernes.forEach(genre => {
+            genreMap[genre.id] = genre.name;
+        });
+
         /** Map showtime and showtime_id follow each movie */
         return movies.map(movie => {
             const showtimeResponse = new ShowtimeByDayResponse(movie);
+
+            showtimeResponse.genres = movie.genres.map(id => genreMap[id]).join(", ");
 
             showtimeResponse.times =
                 showtimes
@@ -92,7 +127,6 @@ export class ShowtimeService extends BaseService<Showtime> {
 
             return showtimeResponse;
         });
-
     }
 
     async getShowTimeByMovie(roomIds: string[], movieId: string): Promise<ShowtimeByDayResponse[]> {
@@ -117,14 +151,29 @@ export class ShowtimeService extends BaseService<Showtime> {
 
         const showtimeResponse = new ShowtimeByDayResponse(movie);
 
+        let timeMap = {};
+
         showtimeResponse.times =
-            showtimes
-                .filter(showtime => showtime.movie_id === movie.id)
-                .map(showtime => ({
-                    time: showtime.time,
-                    showtime: showtime.showtime,
-                    showtime_id: showtime.id
-                }));
+            showtimes.reduce((acc, showtime) => {
+                const existingItem = acc.find(item => item.time === showtime.time);
+
+                if (existingItem) {
+                    existingItem.showtimes.push({
+                        showtime: showtime.showtime,
+                        showtime_id: showtime.id
+                    });
+                } else {
+                    acc.push({
+                        time: showtime.time,
+                        showtimes: [{
+                            showtime: showtime.showtime,
+                            showtime_id: showtime.id
+                        }]
+                    });
+                }
+
+                return acc;
+            }, []);
 
         return [showtimeResponse];
     }

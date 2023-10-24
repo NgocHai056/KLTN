@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { UtilsDate } from "src/utils.common/utils.format-time.common/utils.format-time.common";
 import { Movie } from "src/v1/movie/movie.entity/movie.entity";
 
 export class ShowtimeByDayResponse {
@@ -26,7 +27,7 @@ export class ShowtimeByDayResponse {
         example: "Horror",
         description: "Thể loại phim"
     })
-    genre_name: string;
+    genres: string;
 
     @ApiProperty({
         example: "2D",
@@ -50,7 +51,7 @@ export class ShowtimeByDayResponse {
         example: "08/09/2023",
         description: "Thời gian phát hành"
     })
-    release: Date;
+    release: string;
 
     @ApiProperty({
         example: "110 phút",
@@ -103,7 +104,7 @@ export class ShowtimeByDayResponse {
         this.title = entity ? entity.title : "";
         this.format = entity ? entity.format : "";
         this.age = entity ? entity.age : "";
-        this.release = entity ? entity.release : new Date();
+        this.release = entity ? UtilsDate.formatDateVNToString(entity.release) : UtilsDate.formatDateVNToString(new Date());
         this.duration = entity ? entity.duration : "";
         this.director = entity ? entity.director : "";
         this.performer = entity ? entity.performer : "";

@@ -19,14 +19,12 @@ import { BookingDto } from "./booking.dto/booking.dto";
 import { RoomService } from "../room/room.service";
 import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { UserModel } from "../user/user.entity/user.model";
-import { TicketPriceService } from "../ticket-price/ticket-price.service";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 import { BookingResponse } from "./booking.response/booking.response";
 import { SeatService } from "../seat/seat.service";
 import { ShowtimeService } from "../showtime/showtime.service";
 import { BookingConfirmDto } from "./booking.dto/booking-confirm.dto";
 import { PaymentStatus } from "src/utils.common/utils.enum/payment-status.enum";
-import { SeatStatus } from "src/utils.common/utils.enum/seat-status.enum";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { MovieService } from "../movie/movie.service";
 
@@ -39,7 +37,6 @@ export class BookingController {
         private readonly seatService: SeatService,
         private readonly roomService: RoomService,
         private readonly movieService: MovieService,
-        private readonly ticketPriceService: TicketPriceService,
     ) { }
 
     @Post("")
@@ -82,45 +79,7 @@ export class BookingController {
             UtilsExceptionMessageCommon.showMessageError("You cannot book the same chair!");
         }
 
-        /** Lấy danh sách giá tiền theo loại ghế sau đó map vào theo từng cặp key : value */
-        const ticketPrice = await this.ticketPriceService.findByCondition({ type: { $in: bookingDto.seats.map(seat => seat.seat_type).flat() } });
-
-        const priceMap = {};
-        ticketPrice.forEach(ticket => {
-            priceMap[ticket.type] = ticket.price;
-        });
-
-        /** Calculate total amount and format new object for seat_array of schema booking */
-        let totalAmount = 0;
-        const seats = bookingDto.seats.map(seat => {
-            const price = priceMap[seat.seat_type];
-            totalAmount += price;
-            return { seat_number: seat.seat_number, seat_type: seat.seat_type, price: price };
-        });
-
-        /** Format object seat_array for update seat_array of showtime */
-        const seatArray = bookingDto.seats.map(seat => {
-            return { seat_number: seat.seat_number, status: SeatStatus.PENDING, seat_type: seat.seat_type, time_order: new Date(Date.now() + 10 * 60 * 1000) };
-        });
-
-        await this.seatService.createManySeat(showtime[0].room_id, bookingDto.movie_id, bookingDto.time, bookingDto.showtime, seatArray);
-
-        response.setData(
-            await this.bookingService
-                .create({
-                    theater_name: bookingDto.theater_name,
-                    user_id: user.id, user_name: user.name,
-                    movie_id: bookingDto.movie_id,
-                    movie_name: movie.name,
-                    room_id: showtime[0].room_id,
-                    room_number: room.room_number,
-                    seats: seats,
-                    time: bookingDto.time,
-                    showtime: bookingDto.showtime,
-                    payment_method: bookingDto.payment_method, payment_status: PaymentStatus.PENDING,
-                    total_amount: totalAmount,
-                    expireAt: new Date(Date.now() + 10 * 60 * 1000)
-                }));
+        response.setData(await this.bookingService.createBooking(bookingDto, user.id, user.name, showtime[0].room_id, room.room_number, movie.name));
         return res.status(HttpStatus.OK).send(response);
     }
 

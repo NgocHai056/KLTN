@@ -20,6 +20,7 @@ import { ShowtimeModule } from './v1/showtime/showtime.module';
 import { SeatModule } from './v1/seat/seat.module';
 import { FacadeModule } from './facade/facade.module';
 import { PaymentModule } from './v1/payment/payment.module';
+import { QrModule } from './qr/qr.module';
 
 
 @Module({
@@ -52,7 +53,8 @@ import { PaymentModule } from './v1/payment/payment.module';
         ShowtimeModule,
         SeatModule,
         FacadeModule,
-        PaymentModule
+        PaymentModule,
+        QrModule
     ],
     providers: [
         {
@@ -83,10 +85,13 @@ export class AppModule implements NestModule {
  * 4. Reply review lồng nhau
  * 5. Xử lý seat_number. Khi mà user nhập set_number thì check xem đã tồn tại   #DONE
  * hay vượt quá seat_capacity của 1 phòng không
+ * 
  * 6. Khi nào từ phim đang chiếu -> sắp chiếu                                   #DONE
- * 7. Khoảng cách chiếu bằng thời gian chiếu bộ phim + 30'
+ * 7. Khoảng cách chiếu bằng thời gian chiếu bộ phim + 30' và có chức năng copy
+ * chưa check trùng hay khoảng thời gian tạo
+ * 
  * 8. Đặt nhiều ghế cùng lúc                                                    #DONE
  * 9. Định dạng thời gian                                                       #DONE
  * 10. Viết api lấy lịch chiếu theo từng phim                                   #DONE
- * 
+ * 11. Trả về room_name cho lấy danh sách trạng thái ghế
  */

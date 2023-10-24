@@ -24,6 +24,7 @@ import { FacadeService } from "src/facade/facade.service";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { ShowtimeResponse } from "./showtime.response/showtime.response";
 import { GetShowtimeByMovieDto } from "./showtime.dto/get-time-by-movie.dto";
+import { CopyShowtimeDto } from "./showtime.dto/copy-showtime.dto";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'unauth/showtime' })
 export class ShowtimeController {
@@ -48,6 +49,25 @@ export class ShowtimeController {
 
         response.setData(await this.showtimeService.createShowtime(
             showtimeDto.room_id, showtimeDto.movie_id, showtimeDto.time, showtimeDto.showtime));
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Post('/copy-showtime')
+    @Roles(Role.Admin)
+    @ApiOperation({ summary: "API sao chép lịch chiếu của toàn bộ ngày cụ thể {time} truyền vào!" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async copyShowtimes(
+        @Body() showtimeDto: CopyShowtimeDto,
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(await this.showtimeService.copyShowtime(
+            /** Lấy danh sách room theo theater_id */
+            (await this.facadeService.getRoomsByTheaterId(showtimeDto.theater_id)).map(room => room.id),
+            showtimeDto.time, showtimeDto.target_time)
+        );
+
         return res.status(HttpStatus.OK).send(response);
     }
 
