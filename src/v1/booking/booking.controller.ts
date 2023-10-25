@@ -79,7 +79,7 @@ export class BookingController {
             UtilsExceptionMessageCommon.showMessageError("You cannot book the same chair!");
         }
 
-        response.setData(await this.bookingService.createBooking(bookingDto, user.id, user.name, showtime[0].room_id, room.room_number, movie.name));
+        response.setData(await this.bookingService.createBooking(bookingDto, user.id, user.name, showtime[0].room_id, room.room_number, movie));
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -126,7 +126,7 @@ export class BookingController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(new BookingResponse(await this.bookingService.find(id)));
+        response.setData(await this.bookingService.find(id));
         return res.status(HttpStatus.OK).send(response);
     }
 }

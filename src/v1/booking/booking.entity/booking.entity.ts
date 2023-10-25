@@ -20,6 +20,9 @@ export class Booking extends Document {
     movie_name: string;
 
     @Prop()
+    format: string;
+
+    @Prop()
     room_id: string;
 
     @Prop()
