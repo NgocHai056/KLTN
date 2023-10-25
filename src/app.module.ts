@@ -93,5 +93,5 @@ export class AppModule implements NestModule {
  * 8. Đặt nhiều ghế cùng lúc                                                    #DONE
  * 9. Định dạng thời gian                                                       #DONE
  * 10. Viết api lấy lịch chiếu theo từng phim                                   #DONE
- * 11. Trả về room_name cho lấy danh sách trạng thái ghế
+ * 11. Trả về room_name cho lấy danh sách trạng thái ghế                        #DONE
  */

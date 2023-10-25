@@ -20,4 +20,8 @@ export class FacadeService {
     async getRoomsByTheaterId(theaterId: string) {
         return await this.roomService.getRoomsByTheaterId(theaterId);
     }
+
+    async getRoom(roomId: string) {
+        return await this.roomService.find(roomId);
+    }
 }

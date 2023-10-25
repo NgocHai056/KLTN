@@ -124,7 +124,8 @@ export class ShowtimeController {
         const data = await this.showtimeService.checkSeatStatus(showtime.id);
 
         let showtimeResponse = new ShowtimeResponse(data);
-        showtimeResponse.mapArraySeat(data.seat_array)
+        showtimeResponse.room_number = (await this.facadeService.getRoom(showtimeResponse.room_id)).room_number;
+        showtimeResponse.mapArraySeat(data.seat_array);
 
         response.setData(showtimeResponse);
         return res.status(HttpStatus.OK).send(response);

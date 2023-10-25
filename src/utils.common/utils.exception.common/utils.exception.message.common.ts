@@ -11,4 +11,14 @@ export class UtilsExceptionMessageCommon {
             HttpStatus.OK
         );
     }
+
+    public static showMessageErrorAndStatus(msg: string, httpStatus: HttpStatus) {
+        throw new HttpException(
+            new ExceptionResponseDetail(
+                httpStatus,
+                msg
+            ),
+            HttpStatus.OK
+        );
+    }
 }

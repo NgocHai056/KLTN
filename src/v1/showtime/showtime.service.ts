@@ -164,7 +164,7 @@ export class ShowtimeService extends BaseService<Showtime> {
                     });
                 } else {
                     acc.push({
-                        time: showtime.time,
+                        time: UtilsDate.formatDateVNToString(new Date(showtime.time)),
                         showtimes: [{
                             showtime: showtime.showtime,
                             showtime_id: showtime.id

@@ -41,7 +41,7 @@ export class JwtToken {
         try {
             decodeBearerTokenInterFace = Object(await jwt.verify(token, secretSignature));
         } catch (error) {
-            UtilsExceptionMessageCommon.showMessageError(error.message);
+            UtilsExceptionMessageCommon.showMessageErrorAndStatus(error.message, HttpStatus.UNAUTHORIZED);
         }
         if (!decodeBearerTokenInterFace) {
             UtilsExceptionMessageCommon.showMessageError("Invalid Token!");

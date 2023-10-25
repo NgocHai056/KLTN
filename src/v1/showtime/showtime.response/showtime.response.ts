@@ -19,6 +19,12 @@ export class ShowtimeResponse {
     room_id: string;
 
     @ApiProperty({
+        example: "01",
+        description: "Room name"
+    })
+    room_number: string;
+
+    @ApiProperty({
         example: "65260f822f91993c64422e07",
         description: "Movie ID"
     })
