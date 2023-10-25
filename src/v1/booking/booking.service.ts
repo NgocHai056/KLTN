@@ -8,6 +8,7 @@ import { BookingDto } from './booking.dto/booking.dto';
 import { SeatService } from '../seat/seat.service';
 import { SeatStatus } from 'src/utils.common/utils.enum/seat-status.enum';
 import { PaymentStatus } from 'src/utils.common/utils.enum/payment-status.enum';
+import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
 
 @Injectable()
 export class BookingService extends BaseService<Booking> {
@@ -24,6 +25,9 @@ export class BookingService extends BaseService<Booking> {
 
         /** Lấy danh sách giá tiền theo loại ghế sau đó map vào theo từng cặp key : value */
         const ticketPrice = await this.ticketPriceService.findByCondition({ type: { $in: bookingDto.seats.map(seat => seat.seat_type).flat() } });
+
+        if (ticketPrice.length === 0)
+            UtilsExceptionMessageCommon.showMessageError("Ticket booking failed!");
 
         const priceMap = {};
         ticketPrice.forEach(ticket => {

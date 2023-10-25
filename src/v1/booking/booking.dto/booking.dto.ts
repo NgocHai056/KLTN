@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { ArrayNotEmpty, IsArray, IsDateString } from "class-validator";
-import { IsInt, IsNotEmpty, IsNotEmptyString, IsValidTimeFormat, ValidateNested } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { IsInt, IsNotEmptyString, IsValidTimeFormat, ValidateNested } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { UtilsBaseExceptionLangValidator } from "src/utils.common/utils.exception.lang.common/utils.base.exception.lang.validator";
 
 class SeatDto {
@@ -17,7 +17,6 @@ class SeatDto {
         description: "Loại vé đặt: 1: Trẻ em; 2: Học sinh, Sinh viên; 3: Người lớn"
     })
     @IsInt()
-    @IsNotEmpty()
     seat_type: number;
 }
 
