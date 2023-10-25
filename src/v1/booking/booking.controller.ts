@@ -27,6 +27,7 @@ import { BookingConfirmDto } from "./booking.dto/booking-confirm.dto";
 import { PaymentStatus } from "src/utils.common/utils.enum/payment-status.enum";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { MovieService } from "../movie/movie.service";
+import { UtilsDate } from "src/utils.common/utils.format-time.common/utils.format-time.common";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/booking' })
 export class BookingController {
@@ -126,7 +127,10 @@ export class BookingController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(await this.bookingService.find(id));
+        const booking = await this.bookingService.find(id);
+        booking.time = UtilsDate.formatDateVNToString(new Date(booking.time));
+
+        response.setData(booking);
         return res.status(HttpStatus.OK).send(response);
     }
 }
