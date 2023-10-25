@@ -164,7 +164,7 @@ export class ShowtimeService extends BaseService<Showtime> {
                     });
                 } else {
                     acc.push({
-                        time: UtilsDate.formatDateVNToString(new Date(showtime.time)),
+                        time: showtime.time,
                         showtimes: [{
                             showtime: showtime.showtime,
                             showtime_id: showtime.id
@@ -174,6 +174,13 @@ export class ShowtimeService extends BaseService<Showtime> {
 
                 return acc;
             }, []);
+
+        showtimeResponse.times = showtimeResponse.times.map(item => {
+            return {
+                time: UtilsDate.formatDateVNToString(new Date(item.time)),
+                showtimes: item.showtimes
+            }
+        });
 
         return [showtimeResponse];
     }
