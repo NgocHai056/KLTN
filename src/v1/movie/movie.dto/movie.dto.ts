@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { ArrayNotEmpty, ArrayUnique, IsArray, IsDateString, IsString } from "class-validator";
+import { ArrayNotEmpty, ArrayUnique, IsArray, IsDateString, IsEnum, IsString } from "class-validator";
 import { IsNotEmptyString } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { MovieStatus } from "src/utils.common/utils.enum/movie-status.enum";
 
 export class MovieDto {
     @ApiProperty({
@@ -105,7 +106,10 @@ export class MovieDto {
 
     @ApiProperty({
         example: "",
-        description: "Danh sách phim theo trạng thái: đang chiếu, sắp chiếu,... Mặc định 0 là dừng chiếu, 1 là đang chiếu, 2 là sắp chiếu"
+        description: "Danh sách phim theo trạng thái: đang chiếu, sắp chiếu,... Mặc định 0 là dừng chiếu, 1 là đang chiếu"
+    })
+    @IsEnum(MovieStatus, {
+        message: "status must be one of the values: 0, 1",
     })
     status: number = 1;
 }

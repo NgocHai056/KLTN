@@ -1,33 +1,30 @@
 import {
+    Body,
     Controller,
     Get,
     HttpStatus,
     Param,
+    Post,
     Res,
     UsePipes,
-    ValidationPipe,
-    Post,
-    Body
+    ValidationPipe
 } from "@nestjs/common";
 
-import { Response } from "express";
-import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
 import { ApiOperation } from '@nestjs/swagger';
-import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
-import { BookingService } from "./booking.service";
-import { BookingDto } from "./booking.dto/booking.dto";
-import { RoomService } from "../room/room.service";
+import { Response } from "express";
 import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
-import { UserModel } from "../user/user.entity/user.model";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
-import { BookingResponse } from "./booking.response/booking.response";
+import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
+import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
+import { UtilsDate } from "src/utils.common/utils.format-time.common/utils.format-time.common";
+import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
+import { MovieService } from "../movie/movie.service";
+import { RoomService } from "../room/room.service";
 import { SeatService } from "../seat/seat.service";
 import { ShowtimeService } from "../showtime/showtime.service";
-import { BookingConfirmDto } from "./booking.dto/booking-confirm.dto";
-import { PaymentStatus } from "src/utils.common/utils.enum/payment-status.enum";
-import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
-import { MovieService } from "../movie/movie.service";
-import { UtilsDate } from "src/utils.common/utils.format-time.common/utils.format-time.common";
+import { UserModel } from "../user/user.entity/user.model";
+import { BookingDto } from "./booking.dto/booking.dto";
+import { BookingService } from "./booking.service";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/booking' })
 export class BookingController {
@@ -38,6 +35,7 @@ export class BookingController {
         private readonly seatService: SeatService,
         private readonly roomService: RoomService,
         private readonly movieService: MovieService,
+
     ) { }
 
     @Post("")
@@ -84,39 +82,6 @@ export class BookingController {
         return res.status(HttpStatus.OK).send(response);
     }
 
-    @Post("/confirm")
-    @ApiOperation({ summary: "API xác nhận thanh toán." })
-    @UsePipes(new ValidationPipe({ transform: true }))
-    async confirm(
-        @Body() bookingConfirmDto: BookingConfirmDto,
-        @Res() res: Response
-    ) {
-        let response: ResponseData = new ResponseData();
-
-        const booking = await this.bookingService.find(bookingConfirmDto.booking_id);
-
-        if (!booking) {
-            UtilsExceptionMessageCommon.showMessageError("Ticket completion failed!");
-        }
-
-        if (booking.payment_status === PaymentStatus.PAID) {
-            UtilsExceptionMessageCommon.showMessageError("Tickets have been completed!");
-        }
-
-        /** Update status of seats and status of booking */
-        await this.seatService.updateManySeat(booking.room_id, booking.movie_id, booking.time, booking.showtime, booking.seats.map(seat => seat.seat_number).flat());
-
-        response.setData(new BookingResponse(
-            await this.bookingService.update(
-                bookingConfirmDto.booking_id,
-                {
-                    payment_status: PaymentStatus.PAID,
-                    $unset: { expireAt: 1 }
-                }
-            ))
-        );
-        return res.status(HttpStatus.OK).send(response);
-    }
 
     @Get("/:id")
     @ApiOperation({ summary: "API get booking by id" })

@@ -16,7 +16,7 @@ import { MovieModule } from '../movie/movie.module';
     SeatModule,
     RoomModule,
     TicketPriceModule,
-    MovieModule
+    MovieModule,
   ],
   controllers: [BookingController],
   providers: [BookingService],

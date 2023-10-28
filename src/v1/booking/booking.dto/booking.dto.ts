@@ -1,6 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { ArrayNotEmpty, IsArray, IsDateString } from "class-validator";
+import { ArrayNotEmpty, IsArray, IsDateString, IsEnum } from "class-validator";
 import { IsInt, IsNotEmptyString, IsValidTimeFormat, ValidateNested } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { PaymentMethod } from "src/utils.common/utils.enum/payment-method.enum";
+import { SeatType } from "src/utils.common/utils.enum/seat-type.enum";
 import { UtilsBaseExceptionLangValidator } from "src/utils.common/utils.exception.lang.common/utils.base.exception.lang.validator";
 
 class SeatDto {
@@ -14,9 +16,11 @@ class SeatDto {
 
     @ApiProperty({
         example: 1,
-        description: "Loại vé đặt: 1: Trẻ em; 2: Học sinh, Sinh viên; 3: Người lớn"
+        description: "Loại vé đặt: /** 0: Ghế bình thường, 1: Ghế đôi, 2: Ghế víp pro, 3: Ghế ưu tiên */"
     })
-    @IsInt()
+    @IsEnum(SeatType, {
+        message: "seat_type must be one of the values: 0, 1, 2, 3",
+    })
     seat_type: number;
 }
 
@@ -78,9 +82,11 @@ export class BookingDto {
 
     @ApiProperty({
         example: 1,
-        description: "Phương thức thanh toán"
+        description: "Phương thức thanh toán 0: Trả tiền mặt, 1: Chuyển khoản, 2: Credit card"
     })
-    @IsInt()
+    @IsEnum(PaymentMethod, {
+        message: "payment_method must be one of the values: 0, 1, 2",
+    })
     payment_method: number = 1;
 
 }

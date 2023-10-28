@@ -10,6 +10,7 @@ import { UtilsDate } from 'src/utils.common/utils.format-time.common/utils.forma
 import { SeatStatus } from 'src/utils.common/utils.enum/seat-status.enum';
 import * as moment from 'moment-timezone';
 import { GenreService } from '../genre/genre.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class ShowtimeService extends BaseService<Showtime> {
@@ -237,5 +238,46 @@ export class ShowtimeService extends BaseService<Showtime> {
         }
 
         return showtimes;
+    }
+
+    @Cron(CronExpression.EVERY_5_MINUTES)
+    async handleCron() {
+        const currentDate = moment();
+
+        const nextDate = moment().add(4, 'days');
+
+        const query = {
+            time: {
+                $gte: currentDate.format("YYYY-MM-DD"),
+                $lte: nextDate.format("YYYY-MM-DD")
+            }
+        };
+
+        const showtimes = await this.showtimeRepository.find(query).exec();
+
+        const currentTime = new Date();
+
+        const filteredShowtimes = showtimes.map(item => {
+            const filteredSeats = item.seat_array.filter(seat => {
+                return ((currentTime.getTime() - new Date(seat.time_order).getTime()) >= 0 && seat.status === SeatStatus.PENDING);
+            });
+
+            return { id: item.id, seat_numbers: filteredSeats.map(seat => seat.seat_number) }
+        });
+
+        const operations: any[] = filteredShowtimes.map(item => ({
+            updateOne: {
+                filter: { _id: item.id },
+                update: {
+                    $pull: {
+                        seat_array: {
+                            seat_number: { $in: item.seat_numbers }
+                        }
+                    }
+                }
+            }
+        }));
+
+        await this.showtimeRepository.bulkWrite(operations);
     }
 }

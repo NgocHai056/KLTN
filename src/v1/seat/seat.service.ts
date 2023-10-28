@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { ShowtimeService } from '../showtime/showtime.service';
-import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
-import * as moment from 'moment';
 import { SeatStatus } from 'src/utils.common/utils.enum/seat-status.enum';
+import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
+import { ShowtimeService } from '../showtime/showtime.service';
 
 @Injectable()
 export class SeatService {

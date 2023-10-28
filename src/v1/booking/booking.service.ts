@@ -10,6 +10,7 @@ import { SeatStatus } from 'src/utils.common/utils.enum/seat-status.enum';
 import { PaymentStatus } from 'src/utils.common/utils.enum/payment-status.enum';
 import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
 import { Movie } from '../movie/movie.entity/movie.entity';
+import { BookingResponse } from './booking.response/booking.response';
 
 @Injectable()
 export class BookingService extends BaseService<Booking> {
@@ -67,5 +68,29 @@ export class BookingService extends BaseService<Booking> {
         });
 
         return await createdItem.save();
+    }
+
+    async confirm(booking: Booking): Promise<BookingResponse> {
+
+        if (!booking) {
+            UtilsExceptionMessageCommon.showMessageError("Ticket completion failed!");
+        }
+
+        if (booking.payment_status === PaymentStatus.PAID) {
+            UtilsExceptionMessageCommon.showMessageError("Tickets have been completed!");
+        }
+
+        /** Update status of seats and status of booking */
+        this.seatService.updateManySeat(booking.room_id, booking.movie_id, booking.time, booking.showtime, booking.seats.map(seat => seat.seat_number).flat());
+
+
+        return new BookingResponse(await this.bookingRepository.findByIdAndUpdate(
+            booking.id,
+            {
+                payment_status: PaymentStatus.PAID,
+                $unset: { expireAt: 1 }
+            },
+            { new: true }
+        ).exec());
     }
 }

@@ -21,6 +21,7 @@ import { SeatModule } from './v1/seat/seat.module';
 import { FacadeModule } from './facade/facade.module';
 import { PaymentModule } from './v1/payment/payment.module';
 import { QrModule } from './qr/qr.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 
 @Module({
@@ -38,6 +39,7 @@ import { QrModule } from './qr/qr.module';
             }@cluster0.jil4did.mongodb.net/${process.env.CONFIG_MONGO_DB_NAME}?retryWrites=true&w=majority`,
             { autoIndex: true }
         ),
+        ScheduleModule.forRoot(),
         UserModule,
         AuthModule,
         MailModule,
@@ -81,12 +83,15 @@ export class AppModule implements NestModule {
 /**
  * 1. Xử lý trạng thái chưa hoàn tất booking mà đã giữ ghế                      #DONE
  * 2. Kiểm tra tạo khoảng cách giữa các suất chiếu, validate showtime           #DONE
- * 3. Chỉ cho tạo lịch chiếu từ ngày hiện tại + T4                              #DONE          
+ * 3. Chỉ cho tạo lịch chiếu từ ngày hiện tại + T4                              #DONE  
+ *         
  * 4. Reply review lồng nhau
+ * 
  * 5. Xử lý seat_number. Khi mà user nhập set_number thì check xem đã tồn tại   #DONE
  * hay vượt quá seat_capacity của 1 phòng không
  * 
  * 6. Khi nào từ phim đang chiếu -> sắp chiếu                                   #DONE
+ * 
  * 7. Khoảng cách chiếu bằng thời gian chiếu bộ phim + 30' và có chức năng copy
  * chưa check trùng hay khoảng thời gian tạo
  * 
@@ -94,5 +99,8 @@ export class AppModule implements NestModule {
  * 9. Định dạng thời gian                                                       #DONE
  * 10. Viết api lấy lịch chiếu theo từng phim                                   #DONE
  * 11. Trả về room_name cho lấy danh sách trạng thái ghế                        #DONE
- * 12. Validate 1 type, status trong khoảng cho phép
+ * 12. Validate 1 type, status trong khoảng cho phép                            #DONE
+ * 13. Xử lý chỗ loại vé với loại ghế
+ * 14. Gửi mail thông báo hoàn tất đặt vé
+ * 15. Tạo mã QR gửi cùng khi đặt vé thành công hỗ trợ quét nhanh vé khi tới quầy
  */

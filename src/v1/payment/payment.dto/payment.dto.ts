@@ -1,15 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString } from "class-validator";
-import { IsInt, IsNotEmptyString } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { IsNotEmptyString } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 
 export class PaymentDto {
 
     @ApiProperty({
-        example: 56000,
-        description: "Tổng tiền cần thanh toán"
+        example: "6533a540b1cee6d6b62f520c",
+        description: "Booking Id"
     })
-    @IsInt()
-    amount: number;
+    @IsNotEmptyString()
+    booking_id: string;
 
     @ApiProperty({
         example: "ACB",
