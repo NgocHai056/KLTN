@@ -20,8 +20,8 @@ import { ShowtimeModule } from './v1/showtime/showtime.module';
 import { SeatModule } from './v1/seat/seat.module';
 import { FacadeModule } from './facade/facade.module';
 import { PaymentModule } from './v1/payment/payment.module';
-import { QrModule } from './qr/qr.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { QrCodeModule } from './qr-code/qr-code.module';
 
 
 @Module({
@@ -56,7 +56,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         SeatModule,
         FacadeModule,
         PaymentModule,
-        QrModule
+        QrCodeModule
     ],
     providers: [
         {

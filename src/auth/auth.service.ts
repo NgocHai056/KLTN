@@ -27,7 +27,7 @@ export class AuthService {
         const code = Math.floor(100000 + Math.random() * 900000).toString();
 
         /** Send code to email for confirmation */
-        await this.mailService.sendUserConfirmation(user, 'Welcome to NHCinema! Please validate you address…', './confirmation', { name: user.name, code });
+        await this.mailService.sendConfirmation(user.email, 'Welcome to NHCinema! Please validate you address…', './confirmation', { name: user.name, code });
 
         await this.otpService.create({ code, email: user.email, expireAt: new Date(Date.now() + 5 * 60 * 1000) });
 

@@ -9,13 +9,17 @@ import { ResponseData } from 'src/utils.common/utils.response.common/utils.respo
 import { BookingService } from '../booking/booking.service';
 import { PaymentDto } from './payment.dto/payment.dto';
 import { PaymentService } from './payment.service';
+import { MailService } from 'src/mail/mail.service';
+import { GetUser } from 'src/utils.common/utils.decorator.common/utils.decorator.common';
+import { UserModel } from '../user/user.entity/user.model';
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/payment' })
 export class PaymentController {
 
     constructor(
         private readonly bookingService: BookingService,
-        private readonly paymentService: PaymentService
+        private readonly paymentService: PaymentService,
+        private readonly mailService: MailService
     ) { }
 
     @Post('create-payment-url')
@@ -75,7 +79,9 @@ export class PaymentController {
     }
 
     @Post("/booking-confirm")
+    @Roles(Role.User)
     async handleVnpayIPN(
+        @GetUser() user: UserModel,
         @Query() vnpParams, @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
@@ -87,6 +93,18 @@ export class PaymentController {
             UtilsExceptionMessageCommon.showMessageError("Payment confirmation failed!");
 
         const booking = await this.bookingService.find(data.booking_id);
+
+        if (!booking)
+            UtilsExceptionMessageCommon.showMessageError("Payment confirmation failed!");
+
+        this.mailService.sendConfirmation(
+            user.email,
+            "Thank you for booking with NHCinema!",
+            './booking-confirm',
+            {
+                movieName: booking.movie_name, date: booking.time,
+                time: booking.showtime, seats: booking.seats.map(seat => seat.seat_number).join(', ')
+            });
 
         response.setData(await this.bookingService.confirm(booking));
         return res.status(HttpStatus.OK).send(response);

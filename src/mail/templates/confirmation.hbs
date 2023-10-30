@@ -1,19 +1,37 @@
-<div>
+<div class="container">
     <h3>Hey {{ name }},</h3>
     <h3>Thanks for starting the new NHCinema account creation process. We want to make sure it's really you. Please enter the following verification code when prompted.</h3>
-    <h3>Verification code</h3>
-    <h3>{{ code }}</h3>
-    <h3>If you don’t want to create an account, you can ignore this message.</h3>
+    <h3>Verification code:</h3>
+    <div class="verification-code">{{ code }}</div>
+    <p class="note">If you don’t want to create an account, you can ignore this message.</p>
 </div>
+
 <style>
-    div {
-        margin-left: 20px;
-        font-size: 16px;
+    body {
+        font-family: Arial, sans-serif;
+        color: #444;
     }
-    h3{
-    color:#444;
+
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
     }
-    strong{
-    color:#000;
+
+    h3 {
+        color: #444;
+        font-size: 18px;
+    }
+
+    .verification-code {
+        margin-top: 20px;
+        font-size: 24px;
+        color: #000;
+    }
+
+    .note {
+        margin-top: 20px;
     }
 </style>
