@@ -176,6 +176,9 @@ export class ShowtimeService extends BaseService<Showtime> {
                 return acc;
             }, []);
 
+        /** Sort showtime increase */
+        showtimeResponse.times = showtimeResponse.times.sort((a, b) => a.time.localeCompare(b.time));
+
         showtimeResponse.times = showtimeResponse.times.map(item => {
             return {
                 time: UtilsDate.formatDateVNToString(new Date(item.time)),
