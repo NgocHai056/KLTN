@@ -18,7 +18,7 @@ export class UtilsExceptionMessageCommon {
                 httpStatus,
                 msg
             ),
-            HttpStatus.OK
+            httpStatus
         );
     }
 }
