@@ -9,6 +9,10 @@ export class UtilsDate {
     return moment.utc(date).tz('Asia/Ho_Chi_Minh').format("DD/MM/YYYY");
   }
 
+  static formatDateVN(date: Date): string {
+    return moment.utc(date).tz('Asia/Ho_Chi_Minh').format("MM/DD/YYYY");
+  }
+
   static formatDateInsertDatabase(date: string): string {
     if (date == null || date == "") {
       return "";

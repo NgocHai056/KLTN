@@ -133,7 +133,7 @@ export class ShowtimeService extends BaseService<Showtime> {
     async getShowTimeByMovie(roomIds: string[], movieId: string): Promise<ShowtimeByDayResponse[]> {
         const currentDate = moment();
 
-        const nextDate = moment().add(4, 'days');
+        const nextDate = moment().add(3, 'days');
 
         const query = {
             room_id: { $in: roomIds },
@@ -181,7 +181,7 @@ export class ShowtimeService extends BaseService<Showtime> {
 
         showtimeResponse.times = showtimeResponse.times.map(item => {
             return {
-                time: UtilsDate.formatDateVNToString(new Date(item.time)),
+                time: UtilsDate.formatDateVN(new Date(item.time)),
                 showtimes: item.showtimes
             }
         });
