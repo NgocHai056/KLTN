@@ -100,6 +100,9 @@ export class AuthService {
         /** Kiểm tra tính hợp lệ của Refresh Token (so sánh với dữ liệu trong cơ sở dữ liệu) */
         const decodeRefreshToken: JwtTokenInterFace = await new JwtToken().verifyBearerToken(refreshToken, process.env.REFRESH_TOKEN_SECRET)
 
+        if (decodedAccessToken.user_id !== decodeRefreshToken.user_id)
+            UtilsExceptionMessageCommon.showMessageError("Refresh token failed.");
+
         const existingUser: User = await this.userService.find(decodeRefreshToken.user_id);
 
         if (decodeRefreshToken.jwt_token !== existingUser.refresh_token) {

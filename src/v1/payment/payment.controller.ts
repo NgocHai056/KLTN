@@ -29,6 +29,8 @@ export class PaymentController {
         @Req() req: Request,
         @Res() res: Response
     ) {
+        let response: ResponseData = new ResponseData();
+
         const booking = await this.bookingService.find(paymentDto.booking_id);
 
         if (!booking)
@@ -75,7 +77,8 @@ export class PaymentController {
         vnp_Params['vnp_SecureHash'] = signed;
         const finalUrl = `${vnpUrl}?${querystring.stringify(vnp_Params, { encode: false })}`;
 
-        res.redirect(finalUrl);
+        response.setData(finalUrl);
+        return res.status(HttpStatus.OK).send(response);
     }
 
     @Post("/booking-confirm")
