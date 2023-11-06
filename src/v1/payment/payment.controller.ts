@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Post, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post, Query, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import * as moment from 'moment';
 import * as querystring from 'qs';
@@ -48,7 +48,6 @@ export class PaymentController {
         const vnpUrl = process.env.vnp_Url;
         const returnUrl = process.env.vnp_ReturnUrl;
         const amount = booking.total_amount;
-        const bankCode = paymentDto.bank_code;
 
         let locale = paymentDto.language;
         if (locale === null || locale === '' || !locale) {
@@ -68,9 +67,6 @@ export class PaymentController {
         vnp_Params['vnp_ReturnUrl'] = returnUrl;
         vnp_Params['vnp_IpAddr'] = ipAddr;
         vnp_Params['vnp_CreateDate'] = createDate;
-        if (bankCode !== null && bankCode !== '') {
-            vnp_Params['vnp_BankCode'] = bankCode;
-        }
 
         const sortedParams = this.paymentService.sortObject(vnp_Params);
 
@@ -82,7 +78,7 @@ export class PaymentController {
         return res.status(HttpStatus.OK).send(response);
     }
 
-    @Post("/booking-confirm")
+    @Get("/booking-confirm")
     @Roles(Role.User)
     async handleVnpayIPN(
         @GetUser() user: UserModel,

@@ -12,13 +12,6 @@ export class PaymentDto {
     booking_id: string;
 
     @ApiProperty({
-        example: "ACB",
-        description: "Mã code của ngân hàng"
-    })
-    @IsString()
-    bank_code: string = "";
-
-    @ApiProperty({
         example: "vn",
         default: "vn",
         description: "Mã quốc gia"
