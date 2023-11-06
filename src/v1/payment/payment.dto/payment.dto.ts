@@ -15,8 +15,8 @@ export class PaymentDto {
         example: "ACB",
         description: "Mã code của ngân hàng"
     })
-    @IsNotEmptyString()
-    bank_code: string;
+    @IsString()
+    bank_code: string = "";
 
     @ApiProperty({
         example: "vn",

@@ -12,6 +12,7 @@ import { PaymentService } from './payment.service';
 import { MailService } from 'src/mail/mail.service';
 import { GetUser } from 'src/utils.common/utils.decorator.common/utils.decorator.common';
 import { UserModel } from '../user/user.entity/user.model';
+import { PaymentStatus } from 'src/utils.common/utils.enum/payment-status.enum';
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/payment' })
 export class PaymentController {
@@ -33,7 +34,7 @@ export class PaymentController {
 
         const booking = await this.bookingService.find(paymentDto.booking_id);
 
-        if (!booking)
+        if (!booking || booking.payment_status === PaymentStatus.PAID)
             UtilsExceptionMessageCommon.showMessageError("Payment failed!");
 
         const date = new Date();

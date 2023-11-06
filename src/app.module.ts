@@ -85,7 +85,6 @@ export class AppModule implements NestModule {
  * 2. Kiểm tra tạo khoảng cách giữa các suất chiếu, validate showtime           #DONE
  * 3. Chỉ cho tạo lịch chiếu từ ngày hiện tại + T4                              #DONE  
  *         
- * 4. Reply review lồng nhau
  * 
  * 5. Xử lý seat_number. Khi mà user nhập set_number thì check xem đã tồn tại   #DONE
  * hay vượt quá seat_capacity của 1 phòng không
@@ -94,13 +93,23 @@ export class AppModule implements NestModule {
  * 
  * 7. Khoảng cách chiếu bằng thời gian chiếu bộ phim + 30' và có chức năng copy
  * chưa check trùng hay khoảng thời gian tạo
+ * 4. Reply review lồng nhau
  * 
  * 8. Đặt nhiều ghế cùng lúc                                                    #DONE
  * 9. Định dạng thời gian                                                       #DONE
  * 10. Viết api lấy lịch chiếu theo từng phim                                   #DONE
  * 11. Trả về room_name cho lấy danh sách trạng thái ghế                        #DONE
  * 12. Validate 1 type, status trong khoảng cho phép                            #DONE
+ * 
  * 13. Xử lý chỗ loại vé với loại ghế
  * 14. Gửi mail thông báo hoàn tất đặt vé
  * 15. Tạo mã QR gửi cùng khi đặt vé thành công hỗ trợ quét nhanh vé khi tới quầy
+ * 16. Xử lý lưu ảnh vào DB thay vì lưu link
+ * 17. Socket lúc người dùng chọn ghế
+ * 
+ * 
+ * Tính năng: 
+ * - Chẳng hạn như đề xuất phim tương tự, hiển thị thông báo 
+ * về các suất chiếu sắp tới hoặc điều hướng người dùng đến phần khác của trang web.
+ * - Tích hợp AI chatbox, map chỉ đường tới rạp.
  */
