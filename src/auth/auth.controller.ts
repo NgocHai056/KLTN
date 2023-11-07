@@ -9,6 +9,8 @@ import { ApiOperation } from "@nestjs/swagger";
 import { UserResponse } from 'src/v1/user/user.response/user.response';
 import { LoginDto } from './auth.dto/login.dto';
 import { VerifyDto } from './auth.dto/verify.dto';
+import { UserModel } from 'src/v1/user/user.entity/user.model';
+import { GetUser } from 'src/utils.common/utils.decorator.common/utils.decorator.common';
 
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'oauth' })
@@ -37,7 +39,7 @@ export class AuthController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(new UserResponse(await this.authService.verifyAccount(verifyDto.user_id, verifyDto.otp)));
+        response.setData((await this.authService.verifyAccount(verifyDto.user_id, verifyDto.otp)));
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -53,6 +55,19 @@ export class AuthController {
         let result = await this.authService.login(loginDto);
 
         response.setData(result);
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Post('logout')
+    @ApiOperation({ summary: "Đăng xuất" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async logout(
+        @GetUser() user: UserModel,
+        @Res() res: Response) {
+
+        let response: ResponseData = new ResponseData();
+
+        response.setData(await this.authService.logout(user));
         return res.status(HttpStatus.OK).send(response);
     }
 

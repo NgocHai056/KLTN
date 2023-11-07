@@ -11,6 +11,7 @@ import { MailService } from 'src/mail/mail.service';
 import { UserResponse } from 'src/v1/user/user.response/user.response';
 import { OtpService } from 'src/otp/otp.service';
 import { UserStatus } from 'src/utils.common/utils.enum/user-status.enum';
+import { UserModel } from 'src/v1/user/user.entity/user.model';
 
 @Injectable()
 export class AuthService {
@@ -46,22 +47,29 @@ export class AuthService {
         );
     }
 
-    async verifyAccount(userId: string, otp: string): Promise<User> {
+    async verifyAccount(userId: string, otp: string) {
         /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
         const user = await this.userService.find(userId);
 
         await this.otpService.checkExisting(user.email, otp);
 
-        return await this.userService.update(
+        const data = await this.userService.update(
             userId,
             {
                 status: UserStatus.ACTIVATED,
                 $unset: { expireAt: 1 }
             }
         );
+
+        return {
+            msg: 'Verify successfully.',
+            access_token: 'Bearer ' + data.access_token,
+            refresh_token: 'Bearer ' + data.refresh_token,
+            user: new UserResponse(data)
+        };
     }
 
-    async login(loginDto: LoginDto): Promise<any> {
+    async login(loginDto: LoginDto) {
 
         const users: any[] = await this.userService.findByCondition({ email: { $regex: new RegExp(loginDto.email, 'i') } });
 
@@ -83,10 +91,24 @@ export class AuthService {
         await this.userService.update(user.id, user);
 
         return {
-            msg: 'Đăng nhập thành công.',
+            msg: 'Logged in successfully.',
             access_token: 'Bearer ' + access_token,
             refresh_token: 'Bearer ' + refresh_token,
             user: new UserResponse(user)
+        };
+    }
+
+    async logout(userModel: UserModel) {
+        console.log(123);
+
+        const user = await this.userService.find(userModel.id);
+
+        user.access_token = user.refresh_token = '';
+
+        await this.userService.update(user.id, user);
+
+        return {
+            msg: 'Đăng xuất thành công.'
         };
     }
 

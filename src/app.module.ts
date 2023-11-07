@@ -22,6 +22,7 @@ import { FacadeModule } from './facade/facade.module';
 import { PaymentModule } from './v1/payment/payment.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { QrCodeModule } from './qr-code/qr-code.module';
+import { ComboModule } from './v1/combo/combo.module';
 
 
 @Module({
@@ -56,7 +57,8 @@ import { QrCodeModule } from './qr-code/qr-code.module';
         SeatModule,
         FacadeModule,
         PaymentModule,
-        QrCodeModule
+        QrCodeModule,
+        ComboModule
     ],
     providers: [
         {

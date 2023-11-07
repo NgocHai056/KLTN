@@ -13,6 +13,7 @@ import { MailService } from 'src/mail/mail.service';
 import { GetUser } from 'src/utils.common/utils.decorator.common/utils.decorator.common';
 import { UserModel } from '../user/user.entity/user.model';
 import { PaymentStatus } from 'src/utils.common/utils.enum/payment-status.enum';
+import { UtilsDate } from 'src/utils.common/utils.format-time.common/utils.format-time.common';
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/payment' })
 export class PaymentController {
@@ -97,6 +98,7 @@ export class PaymentController {
         if (!booking)
             UtilsExceptionMessageCommon.showMessageError("Payment confirmation failed!");
 
+        booking.time = UtilsDate.formatDateVNToString(new Date(booking.time));
         response.setData(await this.bookingService.confirm(booking));
 
         this.mailService.sendConfirmation(
