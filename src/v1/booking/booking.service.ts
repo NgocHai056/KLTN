@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import BaseService from 'src/base.service/base.service';
-import { Booking } from './booking.entity/booking.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { TicketPriceService } from '../ticket-price/ticket-price.service';
-import { BookingDto } from './booking.dto/booking.dto';
-import { SeatService } from '../seat/seat.service';
-import { SeatStatus } from 'src/utils.common/utils.enum/seat-status.enum';
+import BaseService from 'src/base.service/base.service';
 import { PaymentStatus } from 'src/utils.common/utils.enum/payment-status.enum';
+import { SeatStatus } from 'src/utils.common/utils.enum/seat-status.enum';
 import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
 import { Movie } from '../movie/movie.entity/movie.entity';
-import { BookingResponse } from './booking.response/booking.response';
+import { SeatService } from '../seat/seat.service';
+import { TicketPriceService } from '../ticket-price/ticket-price.service';
+import { BookingDto } from './booking.dto/booking.dto';
+import { Booking } from './booking.entity/booking.entity';
 
 @Injectable()
 export class BookingService extends BaseService<Booking> {
@@ -70,7 +69,7 @@ export class BookingService extends BaseService<Booking> {
         return await createdItem.save();
     }
 
-    async confirm(booking: Booking): Promise<BookingResponse> {
+    async confirm(booking: Booking): Promise<Booking> {
 
         if (!booking) {
             UtilsExceptionMessageCommon.showMessageError("Ticket completion failed!");
@@ -84,13 +83,13 @@ export class BookingService extends BaseService<Booking> {
         this.seatService.updateManySeat(booking.room_id, booking.movie_id, booking.time, booking.showtime, booking.seats.map(seat => seat.seat_number).flat());
 
 
-        return new BookingResponse(await this.bookingRepository.findByIdAndUpdate(
+        return await this.bookingRepository.findByIdAndUpdate(
             booking.id,
             {
                 payment_status: PaymentStatus.PAID,
                 $unset: { expireAt: 1 }
             },
             { new: true }
-        ).exec());
+        ).exec();
     }
 }

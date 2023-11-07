@@ -1,5 +1,7 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Query, Res } from '@nestjs/common';
 import { QrCodeService } from './qr-code.service';
+import { ResponseData } from 'src/utils.common/utils.response.common/utils.response.common';
+import { Response } from 'express';
 
 @Controller('qr-code')
 export class QrCodeController {
@@ -9,10 +11,12 @@ export class QrCodeController {
     ) { }
 
     @Get()
-    async generateQrCode(@Query('data') data: string) {
+    async generateQrCode(@Query('data') data: string, @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
 
-        const qrCodeDataURL = await this.qrCodeService.generateQrCode(data);
+        response.setData(await this.qrCodeService.generateQrCode(data));
 
-        return `<img src="${qrCodeDataURL}" alt="QR Code" />`;
+        return res.status(HttpStatus.OK).send(response);
     }
 }

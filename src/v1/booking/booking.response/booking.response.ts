@@ -33,10 +33,14 @@ export class BookingResponse {
     room_number: string = '';
 
     @ApiProperty({
-        example: 1,
+        example: [{
+            seat_number: String,
+            seat_type: Number,
+            price: Number
+        }],
         description: "Số ghế của phòng chiếu phim"
     })
-    seat_number: string;
+    seats: { seat_number: string, seat_type: number, price: number }[];
 
     @ApiProperty({
         required: false,
@@ -70,7 +74,7 @@ export class BookingResponse {
         this.user_name = entity ? entity.user_name : '';
         this.movie_name = entity ? entity.movie_name : '';
         this.room_number = entity ? entity.room_number : '';
-        this.seat_number = entity ? entity.room_number : "";
+        this.seats = entity ? entity.seats : [];
         this.time = entity ? entity.time + " " + entity.showtime : '';
         this.payment_method = entity ? PaymentMethod[entity.payment_method] : '';
         this.payment_status = entity ? PaymentStatus[entity.payment_status] : '';

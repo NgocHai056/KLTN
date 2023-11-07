@@ -97,6 +97,8 @@ export class PaymentController {
         if (!booking)
             UtilsExceptionMessageCommon.showMessageError("Payment confirmation failed!");
 
+        response.setData(await this.bookingService.confirm(booking));
+
         this.mailService.sendConfirmation(
             user.email,
             "Thank you for booking with NHCinema!",
@@ -106,7 +108,6 @@ export class PaymentController {
                 time: booking.showtime, seats: booking.seats.map(seat => seat.seat_number).join(', ')
             });
 
-        response.setData(await this.bookingService.confirm(booking));
         return res.status(HttpStatus.OK).send(response);
     }
 }
