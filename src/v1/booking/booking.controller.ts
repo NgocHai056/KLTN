@@ -82,6 +82,24 @@ export class BookingController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @Get("/:id/user")
+    @ApiOperation({ summary: "API get booking by user_id" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async findAllByUserId(
+        @Param("id") userId: string,
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        const bookings = await this.bookingService.findByCondition({ user_id: userId });
+
+        bookings.forEach(booking => {
+            booking.time = UtilsDate.formatDateVNToString(new Date(booking.time));
+        })
+
+        response.setData(bookings);
+        return res.status(HttpStatus.OK).send(response);
+    }
 
     @Get("/:id")
     @ApiOperation({ summary: "API get booking by id" })

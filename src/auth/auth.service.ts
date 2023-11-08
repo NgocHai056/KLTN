@@ -99,7 +99,6 @@ export class AuthService {
     }
 
     async logout(userModel: UserModel) {
-        console.log(123);
 
         const user = await this.userService.find(userModel.id);
 

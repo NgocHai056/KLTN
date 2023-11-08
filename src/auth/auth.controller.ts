@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Post, Query, Req, Res, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post, Query, Req, Res, UsePipes, ValidationPipe } from '@nestjs/common';
 import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
 import { AuthService } from './auth.service';
 import { UserDto } from 'src/v1/user/user.dto/user.dto';
@@ -58,7 +58,7 @@ export class AuthController {
         return res.status(HttpStatus.OK).send(response);
     }
 
-    @Post('logout')
+    @Get('logout')
     @ApiOperation({ summary: "Đăng xuất" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async logout(
