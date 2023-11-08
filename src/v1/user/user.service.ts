@@ -21,4 +21,14 @@ export class UserService extends BaseService<User> {
 
         return user;
     }
+
+    async checkExistPhone(phone: string) {
+        const user = await this.userRepository.find({ phone: phone }).exec();
+
+        if (user.length !== 0) {
+            UtilsExceptionMessageCommon.showMessageError("This phone number has already existed.");
+        }
+
+        return user;
+    }
 }

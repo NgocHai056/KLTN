@@ -24,6 +24,7 @@ export class AuthService {
     async signUp(user: UserDto): Promise<User> {
         /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
         await this.userService.checkExisting(user.email);
+        await this.userService.checkExistPhone(user.phone);
 
         const code = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -53,10 +54,19 @@ export class AuthService {
 
         await this.otpService.checkExisting(user.email, otp);
 
+        /** Tạo Access Token */
+        const access_token = await new JwtToken().generateToken({ user_id: user.id }, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_LIFE);
+
+        /** Tạo Refresh Token */
+        const refresh_token = await new JwtToken().generateToken({ user_id: user.id }, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_LIFE);
+
+
         const data = await this.userService.update(
             userId,
             {
                 status: UserStatus.ACTIVATED,
+                access_token: access_token,
+                refresh_token: refresh_token,
                 $unset: { expireAt: 1 }
             }
         );
