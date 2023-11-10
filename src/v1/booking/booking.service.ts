@@ -81,16 +81,15 @@ export class BookingService extends BaseService<Booking> {
         }
 
         /** Update status of seats and status of booking */
-        this.seatService.updateManySeat(booking.room_id, booking.movie_id, booking.time, booking.showtime, booking.seats.map(seat => seat.seat_number).flat());
+        await this.seatService.updateManySeat(booking.room_id, booking.movie_id, booking.time, booking.showtime, booking.seats.map(seat => seat.seat_number).flat());
 
 
-        return await this.bookingRepository.findByIdAndUpdate(
+        return await this.update(
             booking.id,
             {
                 payment_status: PaymentStatus.PAID,
                 $unset: { expireAt: 1 }
-            },
-            { new: true }
-        ).exec();
+            }
+        );
     }
 }

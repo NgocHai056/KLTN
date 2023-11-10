@@ -97,8 +97,9 @@ export class PaymentController {
         if (!booking)
             UtilsExceptionMessageCommon.showMessageError("Payment confirmation failed!");
 
-        booking.time = UtilsDate.formatDateVNToString(new Date(booking.time));
         response.setData(await this.bookingService.confirm(booking));
+
+        booking.time = UtilsDate.formatDateVNToString(new Date(booking.time));
 
         this.mailService.sendConfirmation(
             booking.email,
