@@ -11,6 +11,9 @@ export class Booking extends Document {
     user_id: string;
 
     @Prop()
+    email: string;
+
+    @Prop()
     user_name: string;
 
     @Prop()

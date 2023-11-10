@@ -15,6 +15,12 @@ export class User extends Document {
     @Prop()
     password: string;
 
+    @Prop()
+    date_of_birth: string;
+
+    @Prop()
+    gender: string;
+
     @Prop({ default: 0 })
     role: number;
 

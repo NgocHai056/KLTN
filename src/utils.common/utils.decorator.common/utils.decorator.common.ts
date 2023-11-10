@@ -5,6 +5,7 @@ import {
 	HttpStatus,
 } from "@nestjs/common";
 import {
+	isArray,
 	isNotEmpty,
 	isString,
 	registerDecorator,
@@ -46,7 +47,17 @@ export function ValidateNested(
 			options: validationOptions,
 			validator: {
 				validate(value: any, args: ValidationArguments) {
-					args.value;
+
+					if (typeof value === 'undefined') {
+						throw new HttpException(
+							new ExceptionResponseDetail(
+								HttpStatus.BAD_REQUEST,
+								`[${args.property}] should not be empty.`
+							),
+							HttpStatus.OK
+						);
+					}
+
 					if (Array.isArray(value)) {
 						for (let i = 0; i < (<Array<any>>value).length; i++) {
 							if (validateSync(plainToClass(schema, value[i])).length) {
@@ -146,6 +157,7 @@ export function IsDateAfterNow(validationOptions?: ValidationOptions) {
 		});
 	};
 }
+
 
 export function IsNotEmptyString(validationOptions?: ValidationOptions) {
 	return (object: unknown, propertyName: string) => {

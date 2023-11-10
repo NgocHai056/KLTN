@@ -16,6 +16,12 @@ export default abstract class BaseService<T extends Document> {
     }
 
     async findByIds(ids: string[]): Promise<T[]> {
+        const promises = ids.map(async id => {
+            await this.validateObjectId(id, "ID");
+        });
+
+        await Promise.all(promises);
+
         return await this.model.find({ _id: { $in: ids } }).exec();
     }
 
@@ -38,6 +44,7 @@ export default abstract class BaseService<T extends Document> {
 
     protected async validateObjectId(id: string, msg: string) {
         if (typeof (id) !== "string" || !id.match(/^[0-9a-fA-F]{24}$/)) {
+
             UtilsExceptionMessageCommon.showMessageError(`Invalid ${msg}`);
         }
         return id;

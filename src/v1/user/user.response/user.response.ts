@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { User } from "../user.entity/user.entity";
+import { UtilsDate } from "src/utils.common/utils.format-time.common/utils.format-time.common";
 
 export class UserResponse {
     @ApiProperty({
@@ -26,10 +27,24 @@ export class UserResponse {
     })
     email: string;
 
+    @ApiProperty({
+        example: "05/06/2001",
+        description: "Date of birth"
+    })
+    date_of_birth: string;
+
+    @ApiProperty({
+        example: "Male",
+        description: "Gender"
+    })
+    gender: string;
+
     constructor(entity?: User) {
         this._id = entity.id;
         this.name = entity.name;
         this.phone = entity.phone;
         this.email = entity.email;
+        this.date_of_birth = UtilsDate.formatDateVNToString(new Date(entity.date_of_birth));
+        this.gender = entity.gender;
     }
 }

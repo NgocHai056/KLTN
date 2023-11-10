@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtToken } from 'src/utils.common/utils.jwt-token.common/utils.jwt-token.common';
 import { JwtTokenInterFace } from 'src/utils.common/utils.jwt-token.common/utils.jwt-token.interface.common';
@@ -125,19 +125,19 @@ export class AuthService {
         const decodedAccessToken: JwtTokenInterFace = await new JwtToken().decodeToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
 
         if (!decodedAccessToken || !decodedAccessToken.user_id) {
-            UtilsExceptionMessageCommon.showMessageError("Access token is not valid.");
+            UtilsExceptionMessageCommon.showMessageErrorAndStatus("Access token is not valid.", HttpStatus.UNAUTHORIZED);
         }
 
         /** Kiểm tra tính hợp lệ của Refresh Token (so sánh với dữ liệu trong cơ sở dữ liệu) */
         const decodeRefreshToken: JwtTokenInterFace = await new JwtToken().verifyBearerToken(refreshToken, process.env.REFRESH_TOKEN_SECRET)
 
         if (decodedAccessToken.user_id !== decodeRefreshToken.user_id)
-            UtilsExceptionMessageCommon.showMessageError("Refresh token failed.");
+            UtilsExceptionMessageCommon.showMessageErrorAndStatus("Refresh token failed.", HttpStatus.UNAUTHORIZED);
 
         const existingUser: User = await this.userService.find(decodeRefreshToken.user_id);
 
         if (decodeRefreshToken.jwt_token !== existingUser.refresh_token) {
-            UtilsExceptionMessageCommon.showMessageError("Refresh token is not valid.");
+            UtilsExceptionMessageCommon.showMessageErrorAndStatus("Refresh token is not valid.", HttpStatus.UNAUTHORIZED);
         }
 
         /** Tạo Access Token mới */
