@@ -3,7 +3,7 @@ import { ShowtimeService } from './showtime.service';
 import { ShowtimeController } from './showtime.controller';
 import { Showtime, ShowtimeSchema } from './showtime.entity/showtime.entity';
 import { MongooseModule } from '@nestjs/mongoose';
-import { FacadeModule } from 'src/facade/facade.module';
+import { FacadeModule } from 'src/v1/facade-theater/facade.module';
 import { MovieModule } from '../movie/movie.module';
 import { GenreModule } from '../genre/genre.module';
 

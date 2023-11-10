@@ -10,6 +10,7 @@ import { SeatService } from '../seat/seat.service';
 import { TicketPriceService } from '../ticket-price/ticket-price.service';
 import { BookingDto } from './booking.dto/booking.dto';
 import { Booking } from './booking.entity/booking.entity';
+import { UserModel } from '../user/user.entity/user.model';
 
 @Injectable()
 export class BookingService extends BaseService<Booking> {
@@ -22,7 +23,7 @@ export class BookingService extends BaseService<Booking> {
     }
 
     async createBooking(
-        bookingDto: BookingDto, userId: string, userName: string, roomId: string, roomNumber: string, movie: Movie) {
+        bookingDto: BookingDto, user: UserModel, roomId: string, roomNumber: string, movie: Movie) {
 
         /** Lấy danh sách giá tiền theo loại ghế sau đó map vào theo từng cặp key : value */
         const ticketPrice = await this.ticketPriceService.findByCondition({ type: { $in: bookingDto.seats.map(seat => seat.seat_type).flat() } });
@@ -52,7 +53,7 @@ export class BookingService extends BaseService<Booking> {
 
         const createdItem = new this.bookingRepository({
             theater_name: bookingDto.theater_name,
-            user_id: userId, user_name: userName,
+            user_id: user.id, email: user.email, user_name: user.name,
             movie_id: bookingDto.movie_id,
             movie_name: movie.name,
             format: movie.format,

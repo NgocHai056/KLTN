@@ -20,7 +20,7 @@ import { ShowtimeService } from './showtime.service';
 import { ShowtimeDto } from "./showtime.dto/showtime.dto";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 import { GetShowtimeDto } from "./showtime.dto/get-time.dto";
-import { FacadeService } from "src/facade/facade.service";
+import { FacadeService } from "src/v1/facade-theater/facade.service";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { ShowtimeResponse } from "./showtime.response/showtime.response";
 import { GetShowtimeByMovieDto } from "./showtime.dto/get-time-by-movie.dto";

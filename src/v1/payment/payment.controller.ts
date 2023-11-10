@@ -82,7 +82,6 @@ export class PaymentController {
     @Get("/booking-confirm")
     @Roles(Role.User)
     async handleVnpayIPN(
-        @GetUser() user: UserModel,
         @Query() vnpParams, @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
@@ -102,7 +101,7 @@ export class PaymentController {
         response.setData(await this.bookingService.confirm(booking));
 
         this.mailService.sendConfirmation(
-            user.email,
+            booking.email,
             "Thank you for booking with NHCinema!",
             './booking-confirm',
             {

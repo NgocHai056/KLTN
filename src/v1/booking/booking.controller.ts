@@ -78,7 +78,7 @@ export class BookingController {
             UtilsExceptionMessageCommon.showMessageError("You cannot book the same chair!");
         }
 
-        response.setData(await this.bookingService.createBooking(bookingDto, user.id, user.name, showtime[0].room_id, room.room_number, movie));
+        response.setData(await this.bookingService.createBooking(bookingDto, user, showtime[0].room_id, room.room_number, movie));
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -92,6 +92,9 @@ export class BookingController {
         let response: ResponseData = new ResponseData();
 
         const bookings = await this.bookingService.findByCondition({ user_id: userId });
+
+        if (bookings.length === 0)
+            UtilsExceptionMessageCommon.showMessageError("The user don't have any booking yet!");
 
         bookings.forEach(booking => {
             booking.time = UtilsDate.formatDateVNToString(new Date(booking.time));
@@ -111,6 +114,10 @@ export class BookingController {
         let response: ResponseData = new ResponseData();
 
         const booking = await this.bookingService.find(id);
+
+        if (!booking)
+            UtilsExceptionMessageCommon.showMessageError("Booking not found!");
+
         booking.time = UtilsDate.formatDateVNToString(new Date(booking.time));
 
         response.setData(booking);

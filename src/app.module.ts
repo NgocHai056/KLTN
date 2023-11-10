@@ -18,11 +18,14 @@ import { ReviewModule } from './v1/review/review.module';
 import { BookingModule } from './v1/booking/booking.module';
 import { ShowtimeModule } from './v1/showtime/showtime.module';
 import { SeatModule } from './v1/seat/seat.module';
-import { FacadeModule } from './facade/facade.module';
+import { FacadeModule } from './v1/facade-theater/facade.module';
 import { PaymentModule } from './v1/payment/payment.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { QrCodeModule } from './qr-code/qr-code.module';
 import { ComboModule } from './v1/combo/combo.module';
+import { ProductModule } from './v1/product/product.module';
+import { ProductInventoryModule } from './v1/product-inventory/product-inventory.module';
+import { DecoratorComboModule } from './v1/decorator-combo/decorator-combo.module';
 
 
 @Module({
@@ -58,7 +61,10 @@ import { ComboModule } from './v1/combo/combo.module';
         FacadeModule,
         PaymentModule,
         QrCodeModule,
-        ComboModule
+        ComboModule,
+        ProductModule,
+        ProductInventoryModule,
+        DecoratorComboModule
     ],
     providers: [
         {
@@ -76,6 +82,7 @@ export class AppModule implements NestModule {
                 { path: '/v1/unauth/*', method: RequestMethod.GET }
             )
             .forRoutes(
+                { path: '/v1/oauth/*', method: RequestMethod.GET },
                 { path: "/v1/auth/*", method: RequestMethod.ALL },
                 { path: '/v1/unauth/*', method: RequestMethod.POST });
     }
