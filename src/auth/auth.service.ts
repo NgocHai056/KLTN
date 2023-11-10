@@ -12,12 +12,15 @@ import { UserResponse } from 'src/v1/user/user.response/user.response';
 import { OtpService } from 'src/otp/otp.service';
 import { UserStatus } from 'src/utils.common/utils.enum/user-status.enum';
 import { UserModel } from 'src/v1/user/user.entity/user.model';
+import { TheaterService } from 'src/v1/theater/theater.service';
+import { Role } from 'src/utils.common/utils.enum/role.enum';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UserService,
         private readonly otpService: OtpService,
+        private readonly theaterService: TheaterService,
         private mailService: MailService
     ) { }
 
@@ -71,17 +74,12 @@ export class AuthService {
             }
         );
 
-        return {
-            msg: 'Verify successfully.',
-            access_token: 'Bearer ' + data.access_token,
-            refresh_token: 'Bearer ' + data.refresh_token,
-            user: new UserResponse(data)
-        };
+        return this.commonResponse('Verify successfully.', data.access_token, data.refresh_token, data);
     }
 
     async login(loginDto: LoginDto) {
 
-        const users: any[] = await this.userService.findByCondition({ email: { $regex: new RegExp(loginDto.email, 'i') } });
+        const users = await this.userService.findByCondition({ email: { $regex: new RegExp(loginDto.email, 'i') } });
 
         const user: User = users.pop();
 
@@ -100,12 +98,7 @@ export class AuthService {
 
         await this.userService.update(user.id, user);
 
-        return {
-            msg: 'Logged in successfully.',
-            access_token: 'Bearer ' + access_token,
-            refresh_token: 'Bearer ' + refresh_token,
-            user: new UserResponse(user)
-        };
+        return this.commonResponse('Logged in successfully.', access_token, refresh_token, user);
     }
 
     async logout(userModel: UserModel) {
@@ -147,10 +140,16 @@ export class AuthService {
 
         await this.userService.update(existingUser.id, existingUser);
 
+        return this.commonResponse('Logged in successfully.', newAccessToken, refreshToken, existingUser);
+    }
+
+    private async commonResponse(message: string, accessToken: string, refreshToken: string, user: User) {
         return {
-            access_token: 'Bearer ' + newAccessToken,
+            msg: message,
+            access_token: 'Bearer ' + accessToken,
             refresh_token: 'Bearer ' + refreshToken,
-            user: new UserResponse(existingUser)
+            user: new UserResponse(user),
+            theater: user.role === Role.MANAGER ? await this.theaterService.find(user.theater_id) : {}
         };
     }
 }

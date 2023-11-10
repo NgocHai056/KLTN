@@ -18,6 +18,9 @@ export class UserModel {
     role: number;
 
     @Column()
+    theater_id: string;
+
+    @Column()
     access_token: string;
 
     @Column()
@@ -29,7 +32,8 @@ export class UserModel {
         this.phone = entity ? entity.phone : "";
         this.email = entity ? entity.email : "";
         this.role = entity ? entity.role : 0;
-        this.access_token = entity ? entity.access_token : "";
+        this.theater_id = entity ? entity.theater_id : "",
+            this.access_token = entity ? entity.access_token : "";
         this.refresh_token = entity ? entity.refresh_token : "";
     }
 }

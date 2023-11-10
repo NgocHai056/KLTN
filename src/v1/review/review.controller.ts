@@ -41,7 +41,7 @@ export class ReviewController {
     ) { }
 
     @Post("")
-    @Roles(Role.User)
+    @Roles(Role.USER)
     @ApiOperation({ summary: "API đánh giá cho từng bộ phim" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async create(

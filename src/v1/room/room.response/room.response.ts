@@ -26,4 +26,14 @@ export class RoomResponse {
         this.room_number = entity ? entity.room_number : "";
         this.seat_capacity = entity ? entity.seat_capacity : 0;
     }
+
+    public static mapToList(entities: Room[]) {
+        let data: RoomResponse[] = [];
+
+        entities.forEach(e => {
+            data.push(new RoomResponse(e));
+        });
+
+        return data;
+    }
 }

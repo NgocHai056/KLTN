@@ -26,7 +26,7 @@ export class GenreController {
     constructor(private genreService: GenreService) { }
 
     @Post()
-    @Roles(Role.Admin)
+    @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API create genre" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async create(
@@ -45,8 +45,8 @@ export class GenreController {
     }
 
     @Post("/:id/update")
-    @Roles(Role.Admin)
-    @ApiOperation({ summary: "API create genre" })
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: "API update genre" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async update(
         @Param("id") id: string,

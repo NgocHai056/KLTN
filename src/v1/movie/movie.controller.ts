@@ -53,7 +53,7 @@ export class MovieController {
     }
 
     @Post()
-    @Roles(Role.Admin)
+    @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API create movie" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async create(
@@ -72,7 +72,7 @@ export class MovieController {
     }
 
     @Post("/:id/update")
-    @Roles(Role.Admin)
+    @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API update movie" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async update(

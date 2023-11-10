@@ -39,7 +39,7 @@ export class BookingController {
     ) { }
 
     @Post("")
-    @Roles(Role.User)
+    @Roles(Role.USER)
     @ApiOperation({ summary: "API booking vé theo suất chiếu" })
     async create(
         @Body() bookingDto: BookingDto,

@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsOptional, Max } from "class-validator";
 import { IsNotEmptyString, Min } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 
 export class RoomDto {
@@ -7,6 +8,7 @@ export class RoomDto {
         description: "Id rạp chiếu phim"
     })
     @IsNotEmptyString()
+    @IsOptional()
     theater_id: string;
 
     @ApiProperty({
@@ -14,6 +16,7 @@ export class RoomDto {
         description: "Số phòng của rạp chiếu phim"
     })
     @IsNotEmptyString()
+    @IsOptional()
     room_number: string;
 
     @ApiProperty({
@@ -21,5 +24,7 @@ export class RoomDto {
         description: "Tổng số ghế của 1 phòng"
     })
     @Min()
+    @Max(84)
+    @IsOptional()
     seat_capacity: number;
 }

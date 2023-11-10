@@ -25,7 +25,7 @@ export class TheaterController {
     constructor(private theaterService: TheaterService) { }
 
     @Post()
-    @Roles(Role.Admin)
+    @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API create theater" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async create(
@@ -46,7 +46,7 @@ export class TheaterController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(new TheaterResponse().mapToList(await this.theaterService.findAll()));
+        response.setData(TheaterResponse.mapToList(await this.theaterService.findAll()));
         return res.status(HttpStatus.OK).send(response);
     }
 

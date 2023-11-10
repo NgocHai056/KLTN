@@ -34,7 +34,7 @@ export class ShowtimeController {
     ) { }
 
     @Post("")
-    @Roles(Role.Admin)
+    @Roles(Role.MANAGER, Role.ADMIN)
     @ApiOperation({ summary: "API tạo suất chiếu" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async create(
@@ -53,7 +53,7 @@ export class ShowtimeController {
     }
 
     @Post('/copy-showtime')
-    @Roles(Role.Admin)
+    @Roles(Role.MANAGER, Role.ADMIN)
     @ApiOperation({ summary: "API sao chép lịch chiếu của toàn bộ ngày cụ thể {time} truyền vào!" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async copyShowtimes(

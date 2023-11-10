@@ -33,7 +33,7 @@ export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
         if (user instanceof UserModel) {
             const privilege: number = user.role;
 
-            if (privilege === Role.Admin) {
+            if (privilege === Role.ADMIN) {
                 return true;
             } else if (!requiredRoles.some((role) => privilege === role)) {
                 UtilsExceptionMessageCommon.showMessageError("You do not have access to this functionality!");

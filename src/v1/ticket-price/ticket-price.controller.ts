@@ -14,7 +14,7 @@ export class TicketPriceController {
     ) { }
 
     @Post()
-    @Roles(Role.Admin)
+    @Roles(Role.ADMIN)
     @ApiOperation({ summary: "Create ticket price" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async register(

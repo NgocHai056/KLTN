@@ -39,12 +39,19 @@ export class UserResponse {
     })
     gender: string;
 
+    @ApiProperty({
+        example: "652410591da9eba4f2dd83cd",
+        description: "Theater ID"
+    })
+    theater_id: string;
+
     constructor(entity?: User) {
         this._id = entity.id;
         this.name = entity.name;
         this.phone = entity.phone;
         this.email = entity.email;
-        this.date_of_birth = UtilsDate.formatDateVNToString(new Date(entity.date_of_birth));
+        this.date_of_birth = entity.date_of_birth ? UtilsDate.formatDateVNToString(new Date(entity.date_of_birth)) : "";
         this.gender = entity.gender;
+        this.theater_id = entity.theater_id;
     }
 }

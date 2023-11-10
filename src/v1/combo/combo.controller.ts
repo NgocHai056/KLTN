@@ -13,19 +13,17 @@ import { ApiOperation } from '@nestjs/swagger';
 import { Response } from "express";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
-import { ComboService } from './combo.service';
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
 import { ComboDto } from "./combo.dto/combo.dto";
-import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
+import { ComboService } from './combo.service';
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'unauth/combo' })
 export class ComboController {
     constructor(
         private readonly comboService: ComboService
-
     ) { }
 
-    @Get("")
+    @Get()
     @ApiOperation({ summary: "API get combo" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findAll(
@@ -38,7 +36,7 @@ export class ComboController {
     }
 
     @Post()
-    @Roles(Role.Admin)
+    @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API create combo" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async create(

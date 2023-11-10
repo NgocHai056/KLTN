@@ -14,6 +14,7 @@ import { GetUser } from 'src/utils.common/utils.decorator.common/utils.decorator
 import { UserModel } from '../user/user.entity/user.model';
 import { PaymentStatus } from 'src/utils.common/utils.enum/payment-status.enum';
 import { UtilsDate } from 'src/utils.common/utils.format-time.common/utils.format-time.common';
+import { seatArray } from 'src/utils.common/utils.enum/seat-array.const';
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/payment' })
 export class PaymentController {
@@ -25,7 +26,7 @@ export class PaymentController {
     ) { }
 
     @Post('create-payment-url')
-    @Roles(Role.User)
+    @Roles(Role.USER)
     async createPaymentUrl(
         @Body() paymentDto: PaymentDto,
         @Req() req: Request,
@@ -80,7 +81,7 @@ export class PaymentController {
     }
 
     @Get("/booking-confirm")
-    @Roles(Role.User)
+    @Roles(Role.USER)
     async handleVnpayIPN(
         @Query() vnpParams, @Res() res: Response
     ) {
@@ -107,7 +108,7 @@ export class PaymentController {
             './booking-confirm',
             {
                 movieName: booking.movie_name, date: booking.time,
-                time: booking.showtime, seats: booking.seats.map(seat => seat.seat_number).join(', ')
+                time: booking.showtime, seats: booking.seats.map(seat => seatArray[parseInt(seat.seat_number) - 1]).join(', ')
             });
 
         return res.status(HttpStatus.OK).send(response);

@@ -27,7 +27,7 @@ export class TheaterResponse {
         this.address = entity ? entity.address : "";
     }
 
-    public mapToList(entities: Theater[]): TheaterResponse[] {
+    public static mapToList(entities: Theater[]): TheaterResponse[] {
         let data: TheaterResponse[] = [];
         entities.forEach(e => {
             data.push(new TheaterResponse(e))

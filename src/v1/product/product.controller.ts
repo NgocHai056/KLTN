@@ -26,7 +26,7 @@ export class ProductController {
     constructor(private productService: ProductService) { }
 
     @Post()
-    @Roles(Role.Admin)
+    @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API create product" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async create(

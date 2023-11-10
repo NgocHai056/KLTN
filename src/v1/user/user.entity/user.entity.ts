@@ -25,6 +25,9 @@ export class User extends Document {
     role: number;
 
     @Prop()
+    theater_id: string;
+
+    @Prop()
     access_token: string;
 
     @Prop()
