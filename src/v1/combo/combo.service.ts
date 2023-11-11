@@ -7,6 +7,7 @@ import { ProductService } from '../product/product.service';
 import { ComboDto } from './combo.dto/combo.dto';
 import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
 import { ComboType } from 'src/utils.common/utils.enum/combo-type.enum';
+import { BookingComboDto } from '../booking/booking.dto/booking.dto';
 
 @Injectable()
 export class ComboService extends BaseService<Combo> {
@@ -23,8 +24,8 @@ export class ComboService extends BaseService<Combo> {
         const combos = await this.findAll();
 
         return [
-            ...products.map(({ _id, name, description, price }) => ({ _id, name, description, price, type: ComboType.ITEM })),
-            ...combos.map(({ _id, name, description, price }) => ({ _id, name, description, price, type: ComboType.COMBO }))
+            ...products.map(({ id, name, description, price }) => ({ id, name, description, price, type: ComboType.ITEM })),
+            ...combos.map(({ id, name, description, price }) => ({ id, name, description, price, type: ComboType.COMBO }))
         ]
     }
 
@@ -51,5 +52,27 @@ export class ComboService extends BaseService<Combo> {
         const data = { name, description, ...comboDto };
 
         return await this.create(data);
+    }
+
+    async calculatePriceCombo(bookingComboDto: BookingComboDto[]) {
+
+        const filteredCombos = bookingComboDto.filter(combo => combo.combo_type === ComboType.COMBO);
+
+        const filteredItems = bookingComboDto.filter(item => item.combo_type === ComboType.ITEM);
+
+        const comboMap = new Map(bookingComboDto.map(combo => [combo.combo_id, combo]));
+
+        const comboDetails = (combos) => combos.map(({ id, name, description, price }) => ({
+            name,
+            description,
+            price,
+            quantity: comboMap.get(id).quantity,
+        }));
+
+        return [
+            ...comboDetails(await this.findByIds(filteredCombos.flatMap(x => x.combo_id))),
+            ...comboDetails(await this.productService.findByIds(filteredItems.flatMap(x => x.combo_id))),
+
+        ];
     }
 }

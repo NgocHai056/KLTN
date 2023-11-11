@@ -11,12 +11,14 @@ import { TicketPriceService } from '../ticket-price/ticket-price.service';
 import { BookingDto } from './booking.dto/booking.dto';
 import { Booking } from './booking.entity/booking.entity';
 import { UserModel } from '../user/user.entity/user.model';
+import { ComboService } from '../combo/combo.service';
 
 @Injectable()
 export class BookingService extends BaseService<Booking> {
     constructor(
         private readonly ticketPriceService: TicketPriceService,
         private readonly seatService: SeatService,
+        private readonly comboServie: ComboService,
         @InjectModel(Booking.name) private readonly bookingRepository: Model<Booking>
     ) {
         super(bookingRepository);
@@ -31,13 +33,19 @@ export class BookingService extends BaseService<Booking> {
         if (ticketPrice.length === 0)
             UtilsExceptionMessageCommon.showMessageError("Ticket booking failed!");
 
+
+        const combos = await this.comboServie.calculatePriceCombo(bookingDto.combos);
+
+        let totalAmount = 0;
+
+        combos.forEach(combo => totalAmount += combo.price * combo.quantity)
+
         const priceMap = {};
         ticketPrice.forEach(ticket => {
             priceMap[ticket.type] = ticket.price;
         });
 
         /** Calculate total amount and format new object for seat_array of schema booking */
-        let totalAmount = 0;
         const seats = bookingDto.seats.map(seat => {
             const price = priceMap[seat.seat_type];
             totalAmount += price;
@@ -60,6 +68,7 @@ export class BookingService extends BaseService<Booking> {
             room_id: roomId,
             room_number: roomNumber,
             seats: seats,
+            combos: combos,
             time: bookingDto.time,
             showtime: bookingDto.showtime,
             payment_method: bookingDto.payment_method, payment_status: PaymentStatus.PENDING,

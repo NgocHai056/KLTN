@@ -16,7 +16,7 @@ class ComboItemDto {
         description: "Quantity of each element product"
     })
     @Min()
-    @Max(10)
+    @Max(3)
     quantity: number;
 }
 

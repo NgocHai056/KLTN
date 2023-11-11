@@ -38,6 +38,14 @@ export class Booking extends Document {
     }])
     seats: { seat_number: string, seat_type: number, price: number }[];
 
+    @Prop([{
+        name: String,
+        description: String,
+        price: Number,
+        quantity: Number
+    }])
+    combos: { name: string, description: string, price: number, quantity: number }[];
+
     @Prop()
     time: string;
 

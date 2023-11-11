@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { ArrayNotEmpty, IsArray, IsDateString, IsEnum } from "class-validator";
-import { IsInt, IsNotEmptyString, IsValidTimeFormat, ValidateNested } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { ArrayNotEmpty, IsArray, IsDateString, IsEnum, Max } from "class-validator";
+import { IsInt, IsNotEmptyString, IsValidTimeFormat, Min, ValidateNested } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { ComboType } from "src/utils.common/utils.enum/combo-type.enum";
 import { PaymentMethod } from "src/utils.common/utils.enum/payment-method.enum";
 import { SeatType } from "src/utils.common/utils.enum/seat-type.enum";
 import { UtilsBaseExceptionLangValidator } from "src/utils.common/utils.exception.lang.common/utils.base.exception.lang.validator";
@@ -22,6 +23,33 @@ class SeatDto {
         message: "seat_type must be one of the values: 0, 1, 2, 3",
     })
     seat_type: number;
+}
+
+export class BookingComboDto {
+
+    @ApiProperty({
+        example: "654b8f8617fb16cd5e0da7f9",
+        description: "Combo Id."
+    })
+    @IsNotEmptyString()
+    combo_id: string;
+
+    @ApiProperty({
+        example: 1,
+        description: "Loại combo: /** 1: Chỉ nước hoặc đồ ăn, 2: Combo */"
+    })
+    @IsEnum(ComboType, {
+        message: "combo_type must be one of the values: 1, 2",
+    })
+    combo_type: number;
+
+    @ApiProperty({
+        example: 10,
+        description: "Quantity."
+    })
+    @Min()
+    @Max(10)
+    quantity: number;
 }
 
 export class BookingDto {
@@ -61,6 +89,18 @@ export class BookingDto {
     @ValidateNested(SeatDto)
     seats: SeatDto[];
 
+    @ApiProperty({
+        example: [
+            {
+                combo_id: "654b8f8617fb16cd5e0da7f9",
+                combo_type: 1
+            }
+        ],
+        description: "Loại thức ăn đồ uống đặt kèm."
+    })
+    @IsArray()
+    @ValidateNested(BookingComboDto)
+    combos: BookingComboDto[];
 
     @ApiProperty({
         required: false,

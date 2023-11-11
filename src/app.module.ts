@@ -25,7 +25,6 @@ import { QrCodeModule } from './qr-code/qr-code.module';
 import { ComboModule } from './v1/combo/combo.module';
 import { ProductModule } from './v1/product/product.module';
 import { ProductInventoryModule } from './v1/product-inventory/product-inventory.module';
-import { DecoratorComboModule } from './v1/decorator-combo/decorator-combo.module';
 
 
 @Module({
@@ -63,8 +62,7 @@ import { DecoratorComboModule } from './v1/decorator-combo/decorator-combo.modul
         QrCodeModule,
         ComboModule,
         ProductModule,
-        ProductInventoryModule,
-        DecoratorComboModule
+        ProductInventoryModule
     ],
     providers: [
         {
