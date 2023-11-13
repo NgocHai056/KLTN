@@ -38,6 +38,12 @@ export default abstract class BaseService<T extends Document> {
         return await this.model.findByIdAndUpdate(id, updateDto, { new: true }).exec();
     }
 
+    async updateMany(condition: any, updateDto: any) {
+        const updateResult = await this.model.updateMany(condition, updateDto, { new: true }).exec();
+
+        return updateResult.modifiedCount > 0;
+    }
+
     async delete(id: string): Promise<T> {
         return await this.model.findByIdAndRemove(id).exec();
     }

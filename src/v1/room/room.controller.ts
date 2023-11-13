@@ -88,6 +88,28 @@ export class RoomController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @Post("/delete")
+    @Roles(Role.ADMIN, Role.MANAGER)
+    @ApiOperation({ summary: "API delete room" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async delete(
+        @Body() roomIds: string[],
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        const rooms = await this.roomService.findByIds(roomIds);
+
+        if (rooms.length === 0)
+            UtilsExceptionMessageCommon.showMessageError("Rooms not exist.");
+
+        response.setData(await this.roomService
+            .updateMany(
+                { _id: { $in: rooms.flatMap(x => x.id) } },
+                { $set: { status: 0 } }) ? { msg: "Update successful." } : { msg: "Update failed." });
+        return res.status(HttpStatus.OK).send(response);
+    }
+
     @Get("/by-theater")
     @Roles(Role.MANAGER, Role.ADMIN)
     @ApiOperation({ summary: "API get all room by theater id" })

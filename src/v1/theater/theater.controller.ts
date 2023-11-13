@@ -40,9 +40,10 @@ export class TheaterController {
         if (theaters.length === 0)
             UtilsExceptionMessageCommon.showMessageError("Theater not exist.");
 
-        await this.theaterService.updateMany(theaters.flatMap(x => x.id));
-
-        response.setData({ msg: "Update successful." });
+        response.setData(await this.theaterService
+            .updateMany(
+                { _id: { $in: theaters.flatMap(x => x.id) } },
+                { $set: { status: 0 } }) ? { msg: "Update successful." } : { msg: "Update failed." });
         return res.status(HttpStatus.OK).send(response);
     }
 
