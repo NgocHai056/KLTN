@@ -20,4 +20,8 @@ export class TheaterService extends BaseService<Theater> {
         }
         return theater;
     }
+
+    async updateMany(ids: string[]) {
+        await this.theaterRepository.updateMany({ _id: { $in: ids } }, { $set: { status: 0 } });
+    }
 }

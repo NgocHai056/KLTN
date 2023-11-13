@@ -57,7 +57,7 @@ export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
         );
 
         if (user.access_token !== decodeBearerTokenInterFace.jwt_token) {
-            UtilsExceptionMessageCommon.showMessageErrorAndStatus("Not have access", HttpStatus.UNAUTHORIZED);
+            UtilsExceptionMessageCommon.showMessageErrorAndStatus("Token is incorrect.", HttpStatus.UNAUTHORIZED);
         }
 
         req.user = new UserModel(user);

@@ -26,8 +26,7 @@ export class AuthService {
 
     async signUp(user: UserDto): Promise<User> {
         /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
-        await this.userService.checkExisting(user.email);
-        await this.userService.checkExistPhone(user.phone);
+        await this.userService.checkExisting(user.email, user.phone);
 
         const code = Math.floor(100000 + Math.random() * 900000).toString();
 

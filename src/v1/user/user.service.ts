@@ -11,23 +11,22 @@ export class UserService extends BaseService<User> {
         super(userRepository);
     }
 
-    async checkExisting(email: string) {
+    async checkExisting(email: string, phone: string) {
         /** 'i' để tìm kiếm không phân biệt chữ hoa chữ thường */
-        const user = await this.userRepository.find({ email: { $regex: new RegExp(email, 'i') } }).exec();
+        const user = await this.userRepository.find(
+            {
+                $or: [
+                    { email: { $regex: new RegExp(email, 'i') } },
+                    { phone: phone }
+                ]
+            }
+        ).exec();
 
-        if (user.length !== 0) {
+        if (user.length !== 0 && user[0].email === email)
             UtilsExceptionMessageCommon.showMessageError("This account has already existed.");
-        }
 
-        return user;
-    }
-
-    async checkExistPhone(phone: string) {
-        const user = await this.userRepository.find({ phone: phone }).exec();
-
-        if (user.length !== 0) {
+        if (user.length !== 0 && user[0].phone === phone)
             UtilsExceptionMessageCommon.showMessageError("This phone number has already existed.");
-        }
 
         return user;
     }

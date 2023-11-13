@@ -19,10 +19,54 @@ import { TheaterDto } from "./theater.dto/theater.dto";
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
 import { TheaterResponse } from "./theater.response/theater.response";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
+import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'unauth/theater' })
 export class TheaterController {
     constructor(private theaterService: TheaterService) { }
+
+    @Post("/delete")
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: "API delete theater" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async delete(
+        @Body() theaterIds: string[],
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        const theaters = await this.theaterService.findByIds(theaterIds);
+
+        if (theaters.length === 0)
+            UtilsExceptionMessageCommon.showMessageError("Theater not exist.");
+
+        await this.theaterService.updateMany(theaters.flatMap(x => x.id));
+
+        response.setData({ msg: "Update successful." });
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Post("/:id/update")
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: "API update theater" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async update(
+        @Param("id") id: string,
+        @Body() theaterDto: TheaterDto,
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        const theater = await this.theaterService.find(id);
+
+        if (!theater)
+            UtilsExceptionMessageCommon.showMessageError("Theater not exist.");
+
+        theater.status = 0;
+
+        response.setData(new TheaterResponse(await this.theaterService.update(id, theater)));
+        return res.status(HttpStatus.OK).send(response);
+    }
 
     @Post()
     @Roles(Role.ADMIN)
@@ -46,7 +90,7 @@ export class TheaterController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(TheaterResponse.mapToList(await this.theaterService.findAll()));
+        response.setData(TheaterResponse.mapToList((await this.theaterService.findAll()).filter(theater => theater.status !== 0)));
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -59,7 +103,12 @@ export class TheaterController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(new TheaterResponse(await this.theaterService.find(id)));
+        const theater = await this.theaterService.find(id);
+
+        if (!theater || theater.status === 0)
+            UtilsExceptionMessageCommon.showMessageError("Theater not exist.");
+
+        response.setData(new TheaterResponse(theater));
         return res.status(HttpStatus.OK).send(response);
     }
 }

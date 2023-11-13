@@ -8,7 +8,7 @@ export class UtilsExceptionMessageCommon {
                 HttpStatus.BAD_REQUEST,
                 msg
             ),
-            HttpStatus.OK
+            HttpStatus.BAD_REQUEST
         );
     }
 
