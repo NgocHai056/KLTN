@@ -120,7 +120,7 @@ export class RoomController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(RoomResponse.mapToList(await this.roomService.findByCondition({ theater_id: user.theater_id })));
+        response.setData(RoomResponse.mapToList((await this.roomService.findByCondition({ theater_id: user.theater_id })).filter(x => x.status !== 0)));
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -133,7 +133,7 @@ export class RoomController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(RoomResponse.mapToList(await this.roomService.findAll()));
+        response.setData(RoomResponse.mapToList((await this.roomService.findAll()).filter((x => x.status !== 0))));
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -147,7 +147,12 @@ export class RoomController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(new RoomResponse(await this.roomService.find(id)));
+        const room = await this.roomService.find(id);
+
+        if (!room || room.status === 0)
+            UtilsExceptionMessageCommon.showMessageError("Room not exist.");
+
+        response.setData(new RoomResponse(room));
         return res.status(HttpStatus.OK).send(response);
     }
 }
