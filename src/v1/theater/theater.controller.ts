@@ -62,7 +62,7 @@ export class TheaterController {
         if (!theater)
             UtilsExceptionMessageCommon.showMessageError("Theater not exist.");
 
-        theater.status = 0;
+        Object.assign(theater, theaterDto);
 
         response.setData(new TheaterResponse(await this.theaterService.update(id, theater)));
         return res.status(HttpStatus.OK).send(response);
