@@ -84,7 +84,7 @@ export class ShowtimeController {
             .getShowTimes(
                 /** Lấy danh sách room theo theater_id */
                 (await this.facadeService.getRoomsByTheaterId(showtimeDto.theater_id)).map(room => room.id),
-                showtimeDto.time)
+                showtimeDto.movie_id, showtimeDto.time)
         );
         return res.status(HttpStatus.OK).send(response);
     }

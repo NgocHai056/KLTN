@@ -92,11 +92,16 @@ export class ShowtimeService extends BaseService<Showtime> {
      * @param time      The input user enters to filter out movies by date
      * @returns         Returs list of movie contains showtime
      */
-    async getShowTimes(roomIds: string[], time: string): Promise<ShowtimeByDayResponse[]> {
-        const query = {
-            room_id: { $in: roomIds },
-            time: time,
+    async getShowTimes(roomIds: string[], movieId: string, time: string): Promise<ShowtimeByDayResponse[]> {
+        const query: any = {
+            room_id: { $in: roomIds }
         };
+
+        if (movieId)
+            query.movie_id = movieId;
+
+        if (time)
+            query.time = time;
 
         const showtimes = await this.showtimeRepository.find(query).exec();
 

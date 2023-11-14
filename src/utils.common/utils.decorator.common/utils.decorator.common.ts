@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import {
 	isArray,
+	isEmail,
 	isNotEmpty,
 	isString,
 	registerDecorator,
@@ -49,13 +50,7 @@ export function ValidateNested(
 				validate(value: any, args: ValidationArguments) {
 
 					if (typeof value === 'undefined') {
-						throw new HttpException(
-							new ExceptionResponseDetail(
-								HttpStatus.BAD_REQUEST,
-								`[${args.property}] should not be empty.`
-							),
-							HttpStatus.OK
-						);
+						UtilsExceptionMessageCommon.showMessageError(`[${args.property}] should not be empty.`);
 					}
 
 					if (Array.isArray(value)) {
@@ -114,14 +109,9 @@ export function IsValidTimeFormat(validationOptions?: ValidationOptions) {
 						return hoursInt >= 0 && hoursInt <= 23 && minutesInt >= 0 && minutesInt <= 59;
 					}
 				},
-				defaultMessage: (validationArguments?: ValidationArguments): string => {
-					throw new HttpException(
-						new ExceptionResponseDetail(
-							HttpStatus.BAD_REQUEST,
-							`[${validationArguments.property}] is not in correct format HH:mm.`
-						),
-						HttpStatus.OK
-					);
+				defaultMessage: (validationArguments?: ValidationArguments) => {
+					return UtilsExceptionMessageCommon.showMessageError(`[${validationArguments.property}] is not in correct format HH:mm.`);
+
 				},
 			},
 		});
@@ -145,19 +135,50 @@ export function IsDateAfterNow(validationOptions?: ValidationOptions) {
 					return new Date(value) > new Date();
 				},
 				defaultMessage: (validationArguments?: ValidationArguments): string => {
-					throw new HttpException(
-						new ExceptionResponseDetail(
-							HttpStatus.BAD_REQUEST,
-							`The date in [${validationArguments.property}] should be before the current date.`
-						),
-						HttpStatus.OK
-					);
+					return UtilsExceptionMessageCommon.showMessageError(`The date in [${validationArguments.property}] should be before the current date.`);
 				},
 			},
 		});
 	};
 }
 
+export function IsEmail(validationOptions?: ValidationOptions) {
+	return (object: unknown, propertyName: string) => {
+		registerDecorator({
+			name: "isEmail",
+			target: object.constructor,
+			propertyName,
+			options: validationOptions,
+			validator: {
+				validate: (value: any): boolean =>
+					isEmail(value) && isString(value) && isNotEmpty(value.trim()),
+				defaultMessage: (validationArguments?: ValidationArguments): string => {
+					return UtilsExceptionMessageCommon.showMessageErrorWithData(`[${validationArguments.property}] must be an email.`, { "email": `[${validationArguments.property}] must be an email.` });
+				},
+			},
+		});
+	};
+}
+
+export function IsStrongPassword(validationOptions?: ValidationOptions) {
+	return (object: Record<string, any>, propertyName: string) => {
+		registerDecorator({
+			name: 'isStrongPassword',
+			target: object.constructor,
+			propertyName,
+			options: validationOptions,
+			validator: {
+				validate: (value: any): boolean => {
+					const strongPasswordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[#@$!%*?&])[A-Za-z\d#@$!%*?&]{8,}$/;
+					return strongPasswordRegex.test(value);
+				},
+				defaultMessage: (validationArguments?: ValidationArguments): string => {
+					return UtilsExceptionMessageCommon.showMessageErrorWithData("Invalid password. Must contain at least 8 characters, including uppercase letters, lowercase letters, numbers and special characters.", { "password": `[${validationArguments.property}] Invalid password. Must contain at least 8 characters, including uppercase letters, lowercase letters, numbers and special characters.` });
+				},
+			},
+		});
+	};
+}
 
 export function IsNotEmptyString(validationOptions?: ValidationOptions) {
 	return (object: unknown, propertyName: string) => {
@@ -170,13 +191,7 @@ export function IsNotEmptyString(validationOptions?: ValidationOptions) {
 				validate: (value: any): boolean =>
 					isString(value) && isNotEmpty(value.trim()),
 				defaultMessage: (validationArguments?: ValidationArguments): string => {
-					throw new HttpException(
-						new ExceptionResponseDetail(
-							HttpStatus.BAD_REQUEST,
-							`[${validationArguments.property}] cannot be empty.`
-						),
-						HttpStatus.OK
-					);
+					return UtilsExceptionMessageCommon.showMessageError(`[${validationArguments.property}] cannot be empty.`);
 				},
 			},
 		});
@@ -194,13 +209,7 @@ export function IsNotEmpty(validationOptions?: ValidationOptions) {
 				validate: (value: any): boolean =>
 					typeof value === "string" && value.trim().length > 0,
 				defaultMessage: (validationArguments?: ValidationArguments): string => {
-					throw new HttpException(
-						new ExceptionResponseDetail(
-							HttpStatus.BAD_REQUEST,
-							`[${validationArguments.property}] cannot be empty.`
-						),
-						HttpStatus.OK
-					);
+					return UtilsExceptionMessageCommon.showMessageError(`[${validationArguments.property}] cannot be empty.`);
 				},
 			},
 		});
@@ -223,36 +232,7 @@ export function IsInt(validationOptions?: ValidationOptions) {
 				},
 
 				defaultMessage: (validationArguments?: ValidationArguments): string => {
-					throw new HttpException(
-						new ExceptionResponseDetail(
-							HttpStatus.BAD_REQUEST,
-							`[${validationArguments.property}] must be an integer!`
-						),
-						HttpStatus.OK
-					);
-				},
-			},
-		});
-	};
-}
-
-export function MaxLength20(validationOptions?: ValidationOptions) {
-	return (object: unknown, propertyName: string) => {
-		registerDecorator({
-			name: "maxLength20",
-			target: object.constructor,
-			propertyName,
-			options: validationOptions,
-			validator: {
-				validate: (value: any): boolean => !(value.length > 20) || !value,
-				defaultMessage: (validationArguments?: ValidationArguments): string => {
-					throw new HttpException(
-						new ExceptionResponseDetail(
-							HttpStatus.BAD_REQUEST,
-							`[${validationArguments.property}] cannot exceed 20 characters in ${propertyName}!`
-						),
-						HttpStatus.OK
-					);
+					return UtilsExceptionMessageCommon.showMessageError(`[${validationArguments.property}] must be an integer!`);
 				},
 			},
 		});
@@ -269,13 +249,7 @@ export function IsEmptyArray(validationOptions?: ValidationOptions) {
 			validator: {
 				validate: (value: any): boolean => !(value.length == 0),
 				defaultMessage: (validationArguments?: ValidationArguments): string => {
-					throw new HttpException(
-						new ExceptionResponseDetail(
-							HttpStatus.BAD_REQUEST,
-							`[${validationArguments.property}] cannot be empty!`
-						),
-						HttpStatus.OK
-					);
+					return UtilsExceptionMessageCommon.showMessageError(`[${validationArguments.property}] cannot be empty!`);
 				},
 			},
 		});
@@ -293,13 +267,7 @@ export function Min(validationOptions?: ValidationOptions) {
 				validate: (value: any): boolean =>
 					(!isNaN(value) || Number.isInteger(value)) && (value > 0),
 				defaultMessage: (validationArguments?: ValidationArguments): string => {
-					throw new HttpException(
-						new ExceptionResponseDetail(
-							HttpStatus.BAD_REQUEST,
-							`[${validationArguments.property}] Must be an integer and greater than 0!`
-						),
-						HttpStatus.OK
-					);
+					return UtilsExceptionMessageCommon.showMessageError(`[${validationArguments.property}] Must be an integer and greater than 0!`);
 				},
 			},
 		});
