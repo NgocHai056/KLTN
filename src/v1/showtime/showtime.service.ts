@@ -11,6 +11,7 @@ import { SeatStatus } from 'src/utils.common/utils.enum/seat-status.enum';
 import * as moment from 'moment-timezone';
 import { GenreService } from '../genre/genre.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { FacadeService } from '../facade-theater/facade.service';
 
 @Injectable()
 export class ShowtimeService extends BaseService<Showtime> {
@@ -92,16 +93,11 @@ export class ShowtimeService extends BaseService<Showtime> {
      * @param time      The input user enters to filter out movies by date
      * @returns         Returs list of movie contains showtime
      */
-    async getShowTimes(roomIds: string[], movieId: string, time: string): Promise<ShowtimeByDayResponse[]> {
-        const query: any = {
-            room_id: { $in: roomIds }
+    async getShowTimes(roomIds: string[], time: string): Promise<ShowtimeByDayResponse[]> {
+        const query = {
+            room_id: { $in: roomIds },
+            time: time
         };
-
-        if (movieId)
-            query.movie_id = movieId;
-
-        if (time)
-            query.time = time;
 
         const showtimes = await this.showtimeRepository.find(query).exec();
 
@@ -133,6 +129,63 @@ export class ShowtimeService extends BaseService<Showtime> {
 
             return showtimeResponse;
         });
+    }
+
+    async findAllByTheater(roomIds: string[], movieId: string, time: string) {
+        const query: any = {
+            room_id: { $in: roomIds }
+        }
+
+        if (movieId)
+            query.movie_id = movieId;
+
+        if (time)
+            query.time = time;
+
+        return await this.showtimeRepository.aggregate([
+            { $match: query },
+            {
+                $addFields: {
+                    movie_id: { $toObjectId: '$movie_id' } // Chuyển đổi movie_id từ chuỗi sang ObjectId
+                }
+            },
+            {
+                $addFields: {
+                    room_id: { $toObjectId: '$room_id' } // Chuyển đổi room_id từ chuỗi sang ObjectId
+                }
+            },
+            {
+                $lookup: {
+                    from: 'movies', // Tên của collection movies
+                    localField: 'movie_id',
+                    foreignField: '_id',
+                    as: 'movieInfo'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'rooms', // Tên của collection rooms
+                    localField: 'room_id',
+                    foreignField: '_id',
+                    as: 'roomInfo'
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    room_id: 1,
+                    movie_id: 1,
+                    time: 1,
+                    showtime: 1,
+                    seat_array: 1,
+                    created_at: 1,
+                    updated_at: 1,
+                    __v: 1,
+                    movie_name: { $arrayElemAt: ['$movieInfo.name', 0] }, // Lấy name từ movieInfo
+                    room_name: { $arrayElemAt: ['$roomInfo.room_number', 0] } // Lấy name từ roomInfo
+                }
+            }
+        ]);
     }
 
     async getShowTimeByMovie(roomIds: string[], movieId: string): Promise<ShowtimeByDayResponse[]> {

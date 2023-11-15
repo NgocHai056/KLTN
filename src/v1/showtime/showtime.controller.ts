@@ -71,6 +71,25 @@ export class ShowtimeController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @Get()
+    @Roles(Role.MANAGER, Role.ADMIN)
+    @ApiOperation({ summary: "API lấy danh sách tất cả lịch chiếu theo rạp chiếu phim" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async findAll(
+        @Query() showtimeDto: GetShowtimeDto,
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(await this.showtimeService
+            .findAllByTheater(
+                /** Lấy danh sách room theo theater_id */
+                (await this.facadeService.getRoomsByTheaterId(showtimeDto.theater_id)).map(room => room.id),
+                showtimeDto.movie_id, showtimeDto.time)
+        );
+        return res.status(HttpStatus.OK).send(response);
+    }
+
     @Get('/times')
     @ApiOperation({ summary: "API xem lịch chiếu theo ngày" })
     @UsePipes(new ValidationPipe({ transform: true }))
@@ -84,7 +103,7 @@ export class ShowtimeController {
             .getShowTimes(
                 /** Lấy danh sách room theo theater_id */
                 (await this.facadeService.getRoomsByTheaterId(showtimeDto.theater_id)).map(room => room.id),
-                showtimeDto.movie_id, showtimeDto.time)
+                showtimeDto.time)
         );
         return res.status(HttpStatus.OK).send(response);
     }

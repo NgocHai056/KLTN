@@ -113,7 +113,8 @@ export class AppModule implements NestModule {
  * 15. Tạo mã QR gửi cùng khi đặt vé thành công hỗ trợ quét nhanh vé khi tới quầy
  * 16. Xử lý lưu ảnh vào DB thay vì lưu link
  * 17. Socket lúc người dùng chọn ghế
- * 
+ * 18. Khi tắt room chưa check name.
+ * 19. Phim đang chiếu mà không có lịch chiếu nào.
  * 
  * Tính năng: 
  * - Chẳng hạn như đề xuất phim tương tự, hiển thị thông báo 
