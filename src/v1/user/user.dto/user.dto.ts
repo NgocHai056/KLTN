@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsEnum, IsOptional, IsPhoneNumber, Matches } from "class-validator";
+import { IsDateString, IsEmail, IsEnum, IsOptional, IsPhoneNumber, Matches } from "class-validator";
 import { IsNotEmptyString } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { Role } from "src/utils.common/utils.enum/role.enum";
 
@@ -56,5 +56,21 @@ export class UserDto {
     @IsNotEmptyString()
     @IsOptional()
     theater_id: string;
+
+    @ApiProperty({
+        example: "2023-06-06",
+        description: "Date of birth"
+    })
+    @IsDateString()
+    @IsOptional()
+    readonly date_of_birth?: string;
+
+    @ApiProperty({
+        example: "Female",
+        description: "Gender of user"
+    })
+    @IsNotEmptyString()
+    @IsOptional()
+    readonly gender?: string;
 
 }

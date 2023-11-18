@@ -36,7 +36,7 @@ export class User extends Document {
     @Prop()
     status: number;
 
-    @Prop({ required: true, expires: '10m' })
+    @Prop({ expires: '10m' })
     expireAt: Date;
 
     @Prop({ default: () => new Date() })
