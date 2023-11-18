@@ -104,6 +104,19 @@ export class UserController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @Get()
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: "API get list user" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async getAll(
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(await this.userService.findAll());
+        return res.status(HttpStatus.OK).send(response);
+    }
+
     @Get("/:id")
     @ApiOperation({ summary: "API get user by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
