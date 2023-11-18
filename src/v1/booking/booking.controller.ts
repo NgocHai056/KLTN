@@ -78,7 +78,7 @@ export class BookingController {
             UtilsExceptionMessageCommon.showMessageError("You cannot book the same chair!");
         }
 
-        response.setData(await this.bookingService.createBooking(bookingDto, user, showtime[0].room_id, room.room_number, movie));
+        response.setData(await this.bookingService.createBooking(bookingDto, user, room.theater_id, showtime[0].room_id, room.room_number, movie));
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -105,14 +105,19 @@ export class BookingController {
     }
 
     @Get()
+    @Roles(Role.MANAGER, Role.ADMIN)
     @ApiOperation({ summary: "API hiển thị list vé của người dùng." })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findAll(
-        @Res() res: Response
+        @Res() res: Response,
+        @GetUser() user: UserModel
     ) {
         let response: ResponseData = new ResponseData();
 
         const bookings = await this.bookingService.findAll();
+
+        if (user.role === Role.MANAGER)
+            bookings.filter(booking => booking.theater_id === user.theater_id)
 
         bookings.forEach(booking =>
             booking.time = UtilsDate.formatDateVNToString(new Date(booking.time))

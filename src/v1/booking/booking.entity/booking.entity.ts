@@ -8,6 +8,9 @@ export class Booking extends Document {
     theater_name: string;
 
     @Prop()
+    theater_id: string;
+
+    @Prop()
     user_id: string;
 
     @Prop()

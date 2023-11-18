@@ -22,17 +22,8 @@ export class UserService extends BaseService<User> {
         /** Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu */
         const hashedPassword: string = await bcrypt.hash(userDto.password, await bcrypt.genSalt());
 
-        return await this.create(
-            {
-                name: userDto.name,
-                email: userDto.email,
-                phone: userDto.phone,
-                password: hashedPassword,
-                status: UserStatus.ACTIVATED,
-                role: userDto.role,
-                theater_id: userDto.theater_id
-            }
-        );
+        userDto.password = hashedPassword;
+        return await this.create({ ...userDto, status: UserStatus.ACTIVATED });
     }
 
     async getAll(keySearch: string) {

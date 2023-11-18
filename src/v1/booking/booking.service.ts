@@ -25,7 +25,7 @@ export class BookingService extends BaseService<Booking> {
     }
 
     async createBooking(
-        bookingDto: BookingDto, user: UserModel, roomId: string, roomNumber: string, movie: Movie) {
+        bookingDto: BookingDto, user: UserModel, theaterId: string, roomId: string, roomNumber: string, movie: Movie) {
 
         /** Lấy danh sách giá tiền theo loại ghế sau đó map vào theo từng cặp key : value */
         const ticketPrice = await this.ticketPriceService.findByCondition({ type: { $in: bookingDto.seats.map(seat => seat.seat_type).flat() } });
@@ -60,7 +60,7 @@ export class BookingService extends BaseService<Booking> {
         await this.seatService.createManySeat(roomId, bookingDto.movie_id, bookingDto.time, bookingDto.showtime, seatArray);
 
         const createdItem = new this.bookingRepository({
-            theater_name: bookingDto.theater_name,
+            theater_name: bookingDto.theater_name, theater_id: theaterId,
             user_id: user.id, email: user.email, user_name: user.name,
             movie_id: bookingDto.movie_id,
             movie_name: movie.name,
