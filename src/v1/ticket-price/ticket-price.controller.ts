@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Post, Query, Req, Res, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Query, Req, Res, UsePipes, ValidationPipe } from '@nestjs/common';
 import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
 import { ResponseData } from 'src/utils.common/utils.response.common/utils.response.common';
 import { Response } from "express";
@@ -17,13 +17,41 @@ export class TicketPriceController {
     @Roles(Role.ADMIN)
     @ApiOperation({ summary: "Create ticket price" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async register(
+    async create(
         @Body() ticketPriceDto: TicketPriceDto,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
 
         response.setData(await this.ticketPriceService.create(ticketPriceDto));
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Post("/:id/update")
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: "Update ticket price" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async update(
+        @Param("id") id: string,
+        @Body() ticketPriceDto: TicketPriceDto,
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(await this.ticketPriceService.update(id, ticketPriceDto));
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Get()
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: "Get all ticket price" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async getAll(
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(await this.ticketPriceService.findAll());
         return res.status(HttpStatus.OK).send(response);
     }
 }
