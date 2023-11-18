@@ -88,6 +88,8 @@ export class AppModule implements NestModule {
 
 
 /**
+ * https://github.com/wyaadarsh/Grokking-OOD/blob/master/object-oriented-design-case-studies/design-a-movie-ticket-booking-system.md#system-requirements
+ * 
  * 1. Xử lý trạng thái chưa hoàn tất booking mà đã giữ ghế                      #DONE
  * 2. Kiểm tra tạo khoảng cách giữa các suất chiếu, validate showtime           #DONE
  * 3. Chỉ cho tạo lịch chiếu từ ngày hiện tại + T4                              #DONE  

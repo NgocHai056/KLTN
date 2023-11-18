@@ -5,6 +5,7 @@ import {
     HttpStatus,
     Param,
     Post,
+    Query,
     Res,
     UsePipes,
     ValidationPipe
@@ -109,11 +110,12 @@ export class UserController {
     @ApiOperation({ summary: "API get list user" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async getAll(
+        @Query("key_search") keySearch: string,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(await this.userService.findAll());
+        response.setData((await this.userService.getAll(keySearch)).filter(user => user.role !== Role.ADMIN));
         return res.status(HttpStatus.OK).send(response);
     }
 

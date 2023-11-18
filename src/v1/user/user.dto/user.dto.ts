@@ -42,7 +42,6 @@ export class UserDto {
         example: 1,
         description: "USER = 0, MANAGER = 1, ADMIN = 2"
     })
-    @IsNotEmptyString()
     @IsEnum(Role, {
         message: "Role must be one of the values: 0, 1, 2",
     })

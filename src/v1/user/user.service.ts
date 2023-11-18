@@ -35,6 +35,57 @@ export class UserService extends BaseService<User> {
         );
     }
 
+    async getAll(keySearch: string) {
+        const query: any = {};
+
+        if (keySearch !== '') {
+            if (!isNaN(Number(keySearch))) {
+                query.role = Number(keySearch);
+            } else {
+                query.$or = [
+                    { name: { $regex: new RegExp(keySearch, 'i') } },
+                    { email: { $regex: new RegExp(keySearch, 'i') } },
+                    { phone: { $regex: new RegExp(keySearch, 'i') } },
+                    { gender: { $regex: new RegExp(keySearch, 'i') } }
+                ];
+            }
+        };
+
+        return await this.userRepository.aggregate([
+            { $match: query },
+            {
+                $addFields: {
+                    theater_id: { $toObjectId: '$theater_id' } // Chuyển đổi movie_id từ chuỗi sang ObjectId
+                }
+            },
+            {
+                $lookup: {
+                    from: 'theaters', // Tên của collection theaters
+                    localField: 'theater_id',
+                    foreignField: '_id',
+                    as: 'theaterInfo'
+                }
+            },
+            { $sort: { "role": 1 } },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    email: 1,
+                    phone: 1,
+                    role: 1,
+                    date_of_birth: 1,
+                    gender: 1,
+                    status: 1,
+                    created_at: 1,
+                    updated_at: 1,
+                    __v: 1,
+                    theater_name: { $arrayElemAt: ['$theaterInfo.name', 0] }, // Lấy name từ theaterInfo
+                }
+            }
+        ]);
+    }
+
     async updatePassword(userId: string, userDto: UpdatePasswordDto): Promise<User> {
 
         /** Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu */
