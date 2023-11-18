@@ -82,7 +82,11 @@ export class AuthService {
 
         const user: User = users.pop();
 
-        if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
+        if (!user || user.status === UserStatus.STOP_WORKING)
+            UtilsExceptionMessageCommon.showMessageError("User not exist.");
+
+
+        if (!(await bcrypt.compare(loginDto.password, user.password))) {
             UtilsExceptionMessageCommon.showMessageError("Username or password incorrect.");
         }
 

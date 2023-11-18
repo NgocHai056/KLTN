@@ -170,6 +170,7 @@ export class ShowtimeService extends BaseService<Showtime> {
                     as: 'roomInfo'
                 }
             },
+            { $sort: { "time": -1, "showtime": -1 } },
             {
                 $project: {
                     _id: 1,
@@ -209,8 +210,6 @@ export class ShowtimeService extends BaseService<Showtime> {
         /** Map showtime and showtime_id follow each movie */
 
         const showtimeResponse = new ShowtimeByDayResponse(movie);
-
-        let timeMap = {};
 
         showtimeResponse.times =
             showtimes.reduce((acc, showtime) => {

@@ -153,7 +153,7 @@ export function IsEmail(validationOptions?: ValidationOptions) {
 				validate: (value: any): boolean =>
 					isEmail(value) && isString(value) && isNotEmpty(value.trim()),
 				defaultMessage: (validationArguments?: ValidationArguments): string => {
-					return UtilsExceptionMessageCommon.showMessageErrorWithData(`[${validationArguments.property}] must be an email.`, { "email": `[${validationArguments.property}] must be an email.` });
+					return UtilsExceptionMessageCommon.showMessageErrorWithData(`[${validationArguments.property}] must be an email.`, { "email": `[${validationArguments.property}] must be an email.` }, HttpStatus.UNPROCESSABLE_ENTITY);
 				},
 			},
 		});
@@ -173,7 +173,7 @@ export function IsStrongPassword(validationOptions?: ValidationOptions) {
 					return strongPasswordRegex.test(value);
 				},
 				defaultMessage: (validationArguments?: ValidationArguments): string => {
-					return UtilsExceptionMessageCommon.showMessageErrorWithData("Invalid password. Must contain at least 8 characters, including uppercase letters, lowercase letters, numbers and special characters.", { "password": `[${validationArguments.property}] Invalid password. Must contain at least 8 characters, including uppercase letters, lowercase letters, numbers and special characters.` });
+					return UtilsExceptionMessageCommon.showMessageErrorWithData("Invalid password. Must contain at least 8 characters, including uppercase letters, lowercase letters, numbers and special characters.", { "password": `[${validationArguments.property}] Invalid password. Must contain at least 8 characters, including uppercase letters, lowercase letters, numbers and special characters.` }, HttpStatus.UNPROCESSABLE_ENTITY);
 				},
 			},
 		});

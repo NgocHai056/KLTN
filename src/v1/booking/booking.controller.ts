@@ -104,6 +104,24 @@ export class BookingController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @Get()
+    @ApiOperation({ summary: "API hiển thị list vé của người dùng." })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async findAll(
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        const bookings = await this.bookingService.findAll();
+
+        bookings.forEach(booking =>
+            booking.time = UtilsDate.formatDateVNToString(new Date(booking.time))
+        );
+
+        response.setData(bookings);
+        return res.status(HttpStatus.OK).send(response);
+    }
+
     @Get("/:id")
     @ApiOperation({ summary: "API get booking by id" })
     @UsePipes(new ValidationPipe({ transform: true }))

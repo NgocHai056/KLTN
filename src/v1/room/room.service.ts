@@ -21,6 +21,15 @@ export class RoomService extends BaseService<Room> {
         return room;
     }
 
+    async checkExistRoomAndTheater(id: string, theaterId: string): Promise<Room> {
+        const room = await this.findByCondition({ _id: id, theater_id: theaterId });
+
+        if (room.length === 0) {
+            UtilsExceptionMessageCommon.showMessageError("Rooms do not exist!");
+        }
+        return room.pop();
+    }
+
     async getRoomsByTheaterId(theaterId: string) {
         return await this.roomRepository.find({ theater_id: theaterId }).exec();
     }

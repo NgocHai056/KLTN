@@ -6,15 +6,20 @@ import { TheaterService } from 'src/v1/theater/theater.service';
 @Injectable()
 export class FacadeService {
     constructor(
-        private readonly theaterService: TheaterService,
         private readonly roomService: RoomService,
         private readonly movieService: MovieService,
     ) { }
 
     async checkTheaterRoomAndMovieExistence(theaterId: string, roomId: string, movieId: string) {
-        await this.theaterService.checkExisting(theaterId);
-        await this.roomService.checkExisting(roomId);
+        await this.roomService.checkExistRoomAndTheater(roomId, theaterId);
         await this.movieService.checkExisting(movieId);
+    }
+
+    async checkRoomAndMovieExistence(roomId: string, movieId: string) {
+        if (roomId)
+            await this.roomService.checkExisting(roomId);
+        if (movieId)
+            await this.movieService.checkExisting(movieId);
     }
 
     async getRoomsByTheaterId(theaterId: string) {

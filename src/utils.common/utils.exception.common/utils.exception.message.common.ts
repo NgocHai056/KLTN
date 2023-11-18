@@ -12,14 +12,14 @@ export class UtilsExceptionMessageCommon {
         );
     }
 
-    public static showMessageErrorWithData(msg: string, data: object): string {
+    public static showMessageErrorWithData(msg: string, data: object, httpStatus: HttpStatus): string {
         throw new HttpException(
             new ExceptionResponseDetail(
                 HttpStatus.BAD_REQUEST,
                 msg,
                 data
             ),
-            HttpStatus.BAD_REQUEST
+            httpStatus
         );
     }
 

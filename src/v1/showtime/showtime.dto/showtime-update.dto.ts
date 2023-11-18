@@ -1,21 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDateString } from "class-validator";
+import { IsDateString, IsOptional } from "class-validator";
 import { IsDateAfterNow, IsNotEmptyString, IsValidTimeFormat, Min } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { UtilsBaseExceptionLangValidator } from "src/utils.common/utils.exception.lang.common/utils.base.exception.lang.validator";
 
-export class ShowtimeDto {
-    @ApiProperty({
-        example: "65201ff37ec42032a6e41b68",
-        description: "Id rạp chiếu phim"
-    })
-    @IsNotEmptyString()
-    theater_id: string;
-
+export class ShowtimeUpdateDto {
     @ApiProperty({
         example: "652a1a14464026525552677c",
         description: "Id phòng chiếu phim"
     })
     @IsNotEmptyString()
+    @IsOptional()
     room_id: string;
 
     @ApiProperty({
@@ -23,6 +17,7 @@ export class ShowtimeDto {
         description: "Id phim"
     })
     @IsNotEmptyString()
+    @IsOptional()
     movie_id: string;
 
     @ApiProperty({
@@ -32,6 +27,7 @@ export class ShowtimeDto {
         description: UtilsBaseExceptionLangValidator.exceptionStringDate(),
     })
     @IsDateString()
+    @IsOptional()
     readonly time: string = '';
 
     @ApiProperty({
@@ -41,5 +37,6 @@ export class ShowtimeDto {
         description: UtilsBaseExceptionLangValidator.exceptionStringDate(),
     })
     @IsValidTimeFormat()
+    @IsOptional()
     readonly showtime: string = '';
 }

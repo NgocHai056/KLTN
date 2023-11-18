@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsPhoneNumber, Matches } from "class-validator";
+import { IsEmail, IsEnum, IsOptional, IsPhoneNumber, Matches } from "class-validator";
 import { IsNotEmptyString } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { Role } from "src/utils.common/utils.enum/role.enum";
 
 export class UserDto {
     @ApiProperty({
@@ -36,5 +37,24 @@ export class UserDto {
     @IsEmail()
     @IsNotEmptyString()
     readonly email: string;
+
+    @ApiProperty({
+        example: 1,
+        description: "USER = 0, MANAGER = 1, ADMIN = 2"
+    })
+    @IsNotEmptyString()
+    @IsEnum(Role, {
+        message: "Role must be one of the values: 0, 1, 2",
+    })
+    @IsOptional()
+    role: number;
+
+    @ApiProperty({
+        example: "65203b82210d84d5c627f8b1",
+        description: "Theater ID"
+    })
+    @IsNotEmptyString()
+    @IsOptional()
+    theater_id: string;
 
 }
