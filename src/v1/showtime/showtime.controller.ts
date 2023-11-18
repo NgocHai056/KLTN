@@ -79,7 +79,7 @@ export class ShowtimeController {
         const checkShowtime = await this.showtimeService
             .findByCondition({ room_id: showtime.room_id, movie_id: showtime.movie_id, time: showtime.time, showtime: showtime.showtime });
 
-        if (checkShowtime)
+        if (checkShowtime.length !== 0)
             UtilsExceptionMessageCommon.showMessageError("Update showtime failed. Because showtimes overlapped.");
 
         response.setData(await this.showtimeService.update(id, showtime));
