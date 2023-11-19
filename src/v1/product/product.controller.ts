@@ -54,7 +54,7 @@ export class ProductController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(await this.productService.deleteMany(productIds));
+        response.setData(await this.productService.deleteMany(productIds) ? "Delete successful" : "Unsuccessful");
 
         return res.status(HttpStatus.OK).send(response);
     }

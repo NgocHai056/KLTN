@@ -54,16 +54,16 @@ export class BannerController {
         return res.status(HttpStatus.OK).send(response);
     }
 
-    @Post("/:id/delete")
+    @Post("/delete")
     @ApiOperation({ summary: "API delete banner" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async delete(
-        @Param("id") id: string,
+        @Body() ids: string[],
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(await this.bannerService.delete(id));
+        response.setData(await this.bannerService.deleteMany(ids) ? "Delete successful" : "Unsuccessful");
         return res.status(HttpStatus.OK).send(response);
     }
 
