@@ -24,6 +24,8 @@ import { UserUpdateDto } from "./user.dto/user-update.dto";
 import { UserDto } from "./user.dto/user.dto";
 import { UserResponse } from "./user.response/user.response";
 import { UserService } from './user.service';
+import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { UserModel } from "./user.entity/user.model";
 
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/user' })
@@ -81,12 +83,12 @@ export class UserController {
         return res.status(HttpStatus.OK).send(response);
     }
 
-    @Post("/:id/change-password")
+    @Post("/change-password")
     @ApiOperation({ summary: "API update user by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async updatePassword(
-        @Param("id") userId: string,
         @Body() updateUserDto: UpdatePasswordDto,
+        @GetUser() userModel: UserModel,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
@@ -94,12 +96,12 @@ export class UserController {
         if (updateUserDto.new_password !== updateUserDto.password_confirm)
             UtilsExceptionMessageCommon.showMessageError("Confirmation password does not match.");
 
-        const user = await this.userService.find(userId);
+        const user = await this.userService.find(userModel.id);
 
         if (!user)
             UtilsExceptionMessageCommon.showMessageError("User not exist.");
 
-        const data = await this.userService.updatePassword(userId, updateUserDto);
+        const data = await this.userService.updatePassword(userModel.id, updateUserDto);
 
         response.setData(data ? new UserResponse(data) : []);
         return res.status(HttpStatus.OK).send(response);
