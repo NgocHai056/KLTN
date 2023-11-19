@@ -43,4 +43,33 @@ export class ProductController {
 
         return res.status(HttpStatus.OK).send(response);
     }
+
+    @Post("/delete")
+    @Roles(Role.MANAGER, Role.ADMIN)
+    @ApiOperation({ summary: "API delete products" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async delete(
+        @Body() productIds: string[],
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(await this.productService.deleteMany(productIds));
+
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Get()
+    @Roles(Role.MANAGER, Role.ADMIN)
+    @ApiOperation({ summary: "API get list product" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async getAll(
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(await this.productService.findAll())
+
+        return res.status(HttpStatus.OK).send(response);
+    }
 }

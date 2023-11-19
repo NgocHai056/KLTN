@@ -13,6 +13,9 @@ export class Product extends Document {
     @Prop()
     price: number;
 
+    @Prop()
+    type: number;
+
     @Prop({ type: Date, default: Date.now })
     created_at: Date;
 

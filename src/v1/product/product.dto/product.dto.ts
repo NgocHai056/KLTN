@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Max } from 'class-validator';
+import { IsEnum, Max } from 'class-validator';
 import { IsNotEmptyString, Min } from 'src/utils.common/utils.decorator.common/utils.decorator.common';
+import { ComboType } from 'src/utils.common/utils.enum/combo-type.enum';
 
 export class ProductDto {
 
@@ -25,4 +26,13 @@ export class ProductDto {
     @Min()
     @Max(200000)
     price: number;
+
+    @ApiProperty({
+        example: 1,
+        description: "/** 1: Combo, 2: Nước, 3: Bắp*/"
+    })
+    @IsEnum(ComboType, {
+        message: "type must be one of the values: 1, 2, 3",
+    })
+    type: number;
 }

@@ -28,6 +28,12 @@ export class UserResponse {
     email: string;
 
     @ApiProperty({
+        example: 1,
+        description: "Role"
+    })
+    role: number;
+
+    @ApiProperty({
         example: "05/06/2001",
         description: "Date of birth"
     })
@@ -50,6 +56,7 @@ export class UserResponse {
         this.name = entity.name;
         this.phone = entity.phone;
         this.email = entity.email;
+        this.role = entity.role;
         this.date_of_birth = entity.date_of_birth ? UtilsDate.formatDateVNToString(new Date(entity.date_of_birth)) : "";
         this.gender = entity.gender;
         this.theater_id = entity.theater_id;

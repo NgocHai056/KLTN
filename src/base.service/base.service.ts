@@ -48,6 +48,10 @@ export default abstract class BaseService<T extends Document> {
         return await this.model.findByIdAndRemove(id).exec();
     }
 
+    async deleteMany(ids: string[]): Promise<boolean> {
+        return (await this.model.deleteMany({ _id: { $in: ids } }).exec()).deletedCount > 0;
+    }
+
     protected async validateObjectId(id: string, msg: string) {
         if (typeof (id) !== "string" || !id.match(/^[0-9a-fA-F]{24}$/)) {
 

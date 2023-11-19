@@ -24,8 +24,8 @@ export class ComboService extends BaseService<Combo> {
         const combos = await this.findAll();
 
         return [
-            ...products.map(({ id, name, description, price }) => ({ id, name, description, price, type: ComboType.ITEM })),
-            ...combos.map(({ id, name, description, price }) => ({ id, name, description, price, type: ComboType.COMBO }))
+            ...products.map(({ id, name, description, price }) => ({ _id: id, name, description, price, type: ComboType.DRINK })),
+            ...combos.map(({ id, name, description, price }) => ({ _id: id, name, description, price, type: ComboType.COMBO }))
         ]
     }
 
@@ -58,7 +58,7 @@ export class ComboService extends BaseService<Combo> {
 
         const filteredCombos = bookingComboDto.filter(combo => combo.combo_type === ComboType.COMBO);
 
-        const filteredItems = bookingComboDto.filter(item => item.combo_type === ComboType.ITEM);
+        const filteredItems = bookingComboDto.filter(item => item.combo_type === ComboType.DRINK);
 
         const comboMap = new Map(bookingComboDto.map(combo => [combo.combo_id, combo]));
 
