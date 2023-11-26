@@ -77,12 +77,23 @@ export class UserService extends BaseService<User> {
         ]);
     }
 
-    async updatePassword(userId: string, userDto: UpdatePasswordDto): Promise<User> {
+    async updatePassword(userId: string, password: string): Promise<User> {
 
         /** Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu */
-        const hashedPassword: string = await bcrypt.hash(userDto.new_password, await bcrypt.genSalt());
+        const hashedPassword: string = await bcrypt.hash(password, await bcrypt.genSalt());
 
         return await this.update(userId, { password: hashedPassword })
+    }
+
+    async findByEmail(email: string) {
+        /** 'i' để tìm kiếm không phân biệt chữ hoa chữ thường */
+        return await this.userRepository.find(
+            {
+                $or: [
+                    { email: { $regex: new RegExp('^' + email + '$', 'i') } }
+                ]
+            }
+        ).exec();
     }
 
     async checkExisting(email: string, phone: string) {
@@ -90,7 +101,7 @@ export class UserService extends BaseService<User> {
         const user = await this.userRepository.find(
             {
                 $or: [
-                    { email: { $regex: new RegExp(email, 'i') } },
+                    { email: { $regex: new RegExp('^' + email + '$', 'i') } },
                     { phone: phone }
                 ]
             }

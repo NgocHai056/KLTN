@@ -35,7 +35,7 @@ export class GenreController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        if ((await this.genreService.findByCondition({ name: { $regex: new RegExp(genreDto.name, 'i') } })).length > 0) {
+        if ((await this.genreService.findByCondition({ name: { $regex: new RegExp('^' + genreDto.name + '$', 'i') } })).length > 0) {
             UtilsExceptionMessageCommon.showMessageError("The category name already exists!");
         }
 

@@ -15,8 +15,8 @@ export class OtpService extends BaseService<OTP> {
         /** 'i' để tìm kiếm không phân biệt chữ hoa chữ thường */
         await this.otpRepository.find({
             $and: [
-                { email: { $regex: new RegExp(email, 'i') } },
-                { code: { $regex: new RegExp(otp, 'i') } },
+                { email: { $regex: new RegExp('^' + email + '$', 'i') } },
+                { code: { $regex: new RegExp('^' + otp + '$', 'i') } },
             ]
         }).exec();
 

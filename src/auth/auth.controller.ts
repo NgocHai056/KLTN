@@ -11,6 +11,7 @@ import { LoginDto } from './auth.dto/login.dto';
 import { VerifyDto } from './auth.dto/verify.dto';
 import { UserModel } from 'src/v1/user/user.entity/user.model';
 import { GetUser } from 'src/utils.common/utils.decorator.common/utils.decorator.common';
+import { ForgotPasswordDto } from 'src/v1/user/user.dto/user-forgot-password.dto';
 
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'oauth' })
@@ -68,6 +69,32 @@ export class AuthController {
         let response: ResponseData = new ResponseData();
 
         response.setData(await this.authService.logout(user));
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Post("/forgot-password")
+    @ApiOperation({ summary: "API forgot password" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async forgotPassword(
+        @Body() email: string,
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData({ _id: (await this.authService.forgot(email)).id });
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Post("/forgot-password-confirm")
+    @ApiOperation({ summary: "API forgot password" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async forgotPasswordConfirm(
+        @Body() forgotDto: ForgotPasswordDto,
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(new UserResponse(await this.authService.forgotConfirm(forgotDto.user_id, forgotDto)));
         return res.status(HttpStatus.OK).send(response);
     }
 

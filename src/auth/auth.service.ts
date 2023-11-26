@@ -1,19 +1,20 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { MailService } from 'src/mail/mail.service';
+import { OtpService } from 'src/otp/otp.service';
+import { Role } from 'src/utils.common/utils.enum/role.enum';
+import { UserStatus } from 'src/utils.common/utils.enum/user-status.enum';
+import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
 import { JwtToken } from 'src/utils.common/utils.jwt-token.common/utils.jwt-token.common';
 import { JwtTokenInterFace } from 'src/utils.common/utils.jwt-token.common/utils.jwt-token.interface.common';
+import { TheaterService } from 'src/v1/theater/theater.service';
+import { ForgotPasswordDto } from 'src/v1/user/user.dto/user-forgot-password.dto';
 import { UserDto } from 'src/v1/user/user.dto/user.dto';
 import { User } from 'src/v1/user/user.entity/user.entity';
+import { UserModel } from 'src/v1/user/user.entity/user.model';
+import { UserResponse } from 'src/v1/user/user.response/user.response';
 import { UserService } from 'src/v1/user/user.service';
 import { LoginDto } from './auth.dto/login.dto';
-import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
-import { MailService } from 'src/mail/mail.service';
-import { UserResponse } from 'src/v1/user/user.response/user.response';
-import { OtpService } from 'src/otp/otp.service';
-import { UserStatus } from 'src/utils.common/utils.enum/user-status.enum';
-import { UserModel } from 'src/v1/user/user.entity/user.model';
-import { TheaterService } from 'src/v1/theater/theater.service';
-import { Role } from 'src/utils.common/utils.enum/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -28,12 +29,7 @@ export class AuthService {
         /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
         await this.userService.checkExisting(user.email, user.phone);
 
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-        /** Send code to email for confirmation */
-        await this.mailService.sendConfirmation(user.email, 'Welcome to NHCinema! Please validate you address…', './confirmation', { name: user.name, code });
-
-        await this.otpService.create({ code, email: user.email, expireAt: new Date(Date.now() + 5 * 60 * 1000) });
+        this.genCodeAndSendOtp(user.email, user.name, "'Welcome to NHCinema! Please validate you address…'", './confirmation');
 
         /** Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu */
         const hashedPassword: string = await bcrypt.hash(user.password, await bcrypt.genSalt());
@@ -76,9 +72,39 @@ export class AuthService {
         return this.commonResponse('Verify successfully.', data.access_token, data.refresh_token, data);
     }
 
+    async forgot(email: string): Promise<User> {
+        const user = await this.userService.findByEmail(email);
+
+        if (user.length === 0)
+            UtilsExceptionMessageCommon.showMessageError("Email not exist.");
+
+        this.genCodeAndSendOtp(user[0].email, user[0].name, "Regenerate password for NHCinema account", "./forgot-password");
+
+        return user[0];
+    }
+
+    async forgotConfirm(userId: string, updateUserDto: ForgotPasswordDto) {
+
+        if (updateUserDto.password !== updateUserDto.password_confirm)
+            UtilsExceptionMessageCommon.showMessageError("Confirmation password does not match.");
+
+        return await this.userService.updatePassword(userId, updateUserDto.password);
+
+    }
+
+    async genCodeAndSendOtp(email: string, name: string, msg: string, template: string) {
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+        /** Send code to email for confirmation */
+        await this.mailService.sendConfirmation(email, msg, template, { name: name, code });
+
+        await this.otpService.create({ code, email: email, expireAt: new Date(Date.now() + 5 * 60 * 1000) });
+
+    }
+
     async login(loginDto: LoginDto) {
 
-        const users = await this.userService.findByCondition({ email: { $regex: new RegExp(loginDto.email, 'i') } });
+        const users = await this.userService.findByCondition({ email: { $regex: new RegExp('^' + loginDto.email + '$', 'i') } });
 
         const user: User = users.pop();
 

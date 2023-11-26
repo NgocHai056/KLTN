@@ -93,7 +93,8 @@ export class BookingDto {
         example: [
             {
                 combo_id: "654b8f8617fb16cd5e0da7f9",
-                combo_type: 1
+                combo_type: 1,
+                quantity: 2
             }
         ],
         description: "Loại thức ăn đồ uống đặt kèm."

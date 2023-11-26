@@ -26,6 +26,7 @@ import { UserResponse } from "./user.response/user.response";
 import { UserService } from './user.service';
 import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { UserModel } from "./user.entity/user.model";
+import { ForgotPasswordDto } from "./user.dto/user-forgot-password.dto";
 
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/user' })
@@ -101,7 +102,7 @@ export class UserController {
         if (!user)
             UtilsExceptionMessageCommon.showMessageError("User not exist.");
 
-        const data = await this.userService.updatePassword(userModel.id, updateUserDto);
+        const data = await this.userService.updatePassword(userModel.id, updateUserDto.new_password);
 
         response.setData(data ? new UserResponse(data) : []);
         return res.status(HttpStatus.OK).send(response);
