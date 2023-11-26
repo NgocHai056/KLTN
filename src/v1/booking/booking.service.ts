@@ -34,7 +34,7 @@ export class BookingService extends BaseService<Booking> {
             UtilsExceptionMessageCommon.showMessageError("Ticket booking failed!");
 
 
-        const combos = await this.comboServie.calculatePriceCombo(bookingDto.combos);
+        const combos = await this.comboServie.calculatePriceProduct(bookingDto.combos);
 
         let totalAmount = 0;
 

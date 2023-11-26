@@ -54,6 +54,23 @@ export class ComboService extends BaseService<Combo> {
         return await this.create(data);
     }
 
+    async calculatePriceProduct(bookingComboDto: BookingComboDto[]) {
+
+        const comboMap = new Map(bookingComboDto.map(combo => [combo.combo_id, combo]));
+
+        const comboDetails = (combos) => combos.map(({ id, name, description, price }) => ({
+            name,
+            description,
+            price,
+            quantity: comboMap.get(id).quantity,
+        }));
+
+        return [
+            ...comboDetails(await this.productService.findByIds(bookingComboDto.flatMap(x => x.combo_id))),
+
+        ];
+    }
+
     async calculatePriceCombo(bookingComboDto: BookingComboDto[]) {
 
         const filteredCombos = bookingComboDto.filter(combo => combo.combo_type === ComboType.COMBO);
