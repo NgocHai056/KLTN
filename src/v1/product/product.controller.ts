@@ -35,7 +35,7 @@ export class ProductController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        if ((await this.productService.findByCondition({ name: { $regex: new RegExp(productDto.name, 'i') } })).length > 0) {
+        if ((await this.productService.findByCondition({ name: { $regex: new RegExp('^' + productDto.name + '$', 'i') } })).length > 0) {
             UtilsExceptionMessageCommon.showMessageError("The product name already exists!");
         }
 
