@@ -1,8 +1,7 @@
-import { HttpException, HttpStatus } from "@nestjs/common";
-import { ExceptionResponseDetail } from "../utils.exception.common/utils.exception.common";
-import { JwtTokenInterFace } from "./utils.jwt-token.interface.common";
+import { HttpStatus } from "@nestjs/common";
 import * as jwt from "jsonwebtoken";
 import { UtilsExceptionMessageCommon } from "../utils.exception.common/utils.exception.message.common";
+import { JwtTokenInterFace } from "./utils.jwt-token.interface.common";
 
 export class JwtToken {
 

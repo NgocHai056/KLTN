@@ -22,7 +22,7 @@ async function bootstrap() {
                         HttpStatus.BAD_REQUEST,
                         Object.values(validationErrors[0].constraints)[0]
                     ),
-                    HttpStatus.OK
+                    HttpStatus.BAD_REQUEST
                 );
             },
         })

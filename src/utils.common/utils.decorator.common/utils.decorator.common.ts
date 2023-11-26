@@ -1,22 +1,19 @@
 import {
 	createParamDecorator,
 	ExecutionContext,
-	HttpException,
-	HttpStatus,
+	HttpStatus
 } from "@nestjs/common";
+import { plainToClass } from "class-transformer";
 import {
-	isArray,
 	isEmail,
 	isNotEmpty,
 	isString,
 	registerDecorator,
 	validateSync,
 	ValidationArguments,
-	ValidationOptions,
+	ValidationOptions
 } from "class-validator";
-import { ExceptionResponseDetail } from "../utils.exception.common/utils.exception.common";
 import { UtilsExceptionMessageCommon } from "../utils.exception.common/utils.exception.message.common";
-import { plainToClass } from "class-transformer";
 
 export const GetUser = createParamDecorator(
 	async (data: unknown, ctx: ExecutionContext) => {
