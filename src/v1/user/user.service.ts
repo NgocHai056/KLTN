@@ -87,13 +87,7 @@ export class UserService extends BaseService<User> {
 
     async findByEmail(email: string) {
         /** 'i' để tìm kiếm không phân biệt chữ hoa chữ thường */
-        return await this.userRepository.find(
-            {
-                $or: [
-                    { email: { $regex: new RegExp('^' + email + '$', 'i') } }
-                ]
-            }
-        ).exec();
+        return await this.findByCondition({ email: { $regex: new RegExp(email, 'i') } });
     }
 
     async checkExisting(email: string, phone: string) {

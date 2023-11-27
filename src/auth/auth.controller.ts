@@ -76,12 +76,12 @@ export class AuthController {
     @ApiOperation({ summary: "API forgot password" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async forgotPassword(
-        @Body() email: string,
+        @Body() body: string,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData({ _id: (await this.authService.forgot(email)).id });
+        response.setData({ _id: (await this.authService.forgot(body['email'])).id });
         return res.status(HttpStatus.OK).send(response);
     }
 
