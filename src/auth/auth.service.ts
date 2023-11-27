@@ -85,7 +85,7 @@ export class AuthService {
 
     async forgotConfirm(userId: string, updateUserDto: ForgotPasswordDto) {
 
-        if (updateUserDto.password !== updateUserDto.password_confirm)
+        if (updateUserDto.password !== updateUserDto.confirm_password)
             UtilsExceptionMessageCommon.showMessageError("Confirmation password does not match.");
 
         return await this.userService.updatePassword(userId, updateUserDto.password);

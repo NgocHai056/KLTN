@@ -33,5 +33,5 @@ export class ForgotPasswordDto {
     })
     @IsNotEmptyString()
     @IsStrongPassword()
-    password_confirm: string;
+    confirm_password: string;
 }

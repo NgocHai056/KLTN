@@ -27,5 +27,5 @@ export class UpdatePasswordDto {
     })
     @IsNotEmptyString()
     @IsStrongPassword()
-    password_confirm: string;
+    confirm_password: string;
 }

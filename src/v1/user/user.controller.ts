@@ -94,7 +94,7 @@ export class UserController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        if (updateUserDto.new_password !== updateUserDto.password_confirm)
+        if (updateUserDto.new_password !== updateUserDto.confirm_password)
             UtilsExceptionMessageCommon.showMessageError("Confirmation password does not match.");
 
         const user = await this.userService.find(userModel.id);
