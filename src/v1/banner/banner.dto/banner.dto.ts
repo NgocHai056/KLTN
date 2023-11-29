@@ -8,11 +8,4 @@ export class BannerDto {
     })
     @IsNotEmptyString()
     readonly title: string;
-
-    @ApiProperty({
-        example: "File",
-        description: "File of the banner"
-    })
-    @IsNotEmptyString()
-    readonly file: string;
 }

@@ -9,7 +9,10 @@ import {
     ParseIntPipe,
     Res,
     UsePipes,
-    ValidationPipe
+    ValidationPipe,
+    UseInterceptors,
+    UploadedFile,
+    UploadedFiles
 } from "@nestjs/common";
 
 import { Response } from "express";
@@ -25,12 +28,15 @@ import { Movie } from "./movie.entity/movie.entity";
 import { GetMoviesDto } from "./movie.dto/get.movies.dto";
 import { MovieStatus } from "src/utils.common/utils.enum/movie-status.enum";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
+import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
+import { FirebaseService } from "src/firebase/firebase.service";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'unauth/movie' })
 export class MovieController {
     constructor(
         private readonly movieService: MovieService,
-        private readonly genreService: GenreService
+        private readonly genreService: GenreService,
+        private readonly firebaseService: FirebaseService
     ) { }
 
     @Get()
@@ -56,17 +62,34 @@ export class MovieController {
     @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API create movie" })
     @UsePipes(new ValidationPipe({ transform: true }))
+    @UseInterceptors(FileFieldsInterceptor([
+        { name: 'poster', maxCount: 1 },
+        { name: 'thumbnail', maxCount: 1 },
+    ]))
     async create(
+        @UploadedFiles() files: Record<string, any>,
         @Body() movieDto: MovieDto,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
 
-        if (!await this.genreService.findByIds(movieDto.genres)) {
+        if (!files['poster'])
+            UtilsExceptionMessageCommon.showMessageError("Poster is required.")
+
+        if (!files['thumbnail'])
+            UtilsExceptionMessageCommon.showMessageError("Thumbnail is required.")
+
+        const genreDto = movieDto.genres.replace(/\s/g, '').split(',');
+        if (!await this.genreService.findByIds(genreDto)) {
             UtilsExceptionMessageCommon.showMessageError("Category does not exist!");
         }
 
-        response.setData(await this.movieService.create(movieDto));
+        const posterUrl = await this.firebaseService.uploadImageToFirebase(files['poster'][0]);
+        const thumbnailUrl = await this.firebaseService.uploadImageToFirebase(files['thumbnail'][0]);
+
+        const { genres, ...rest } = movieDto;
+
+        response.setData(await this.movieService.create({ ...rest, genres: genreDto, poster: posterUrl, thumbnail: thumbnailUrl }));
 
         return res.status(HttpStatus.OK).send(response);
     }
@@ -82,7 +105,7 @@ export class MovieController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        if (!await this.genreService.findByIds(movieDto.genres)) {
+        if (!await this.genreService.findByIds(movieDto.genres.replace(/\s/g, '').split(','))) {
             UtilsExceptionMessageCommon.showMessageError("Category does not exist!");
         }
 

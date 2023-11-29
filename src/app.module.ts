@@ -25,6 +25,7 @@ import { QrCodeModule } from './qr-code/qr-code.module';
 import { ComboModule } from './v1/combo/combo.module';
 import { ProductModule } from './v1/product/product.module';
 import { ProductInventoryModule } from './v1/product-inventory/product-inventory.module';
+import { FirebaseModule } from './firebase/firebase.module';
 
 
 @Module({
@@ -62,7 +63,8 @@ import { ProductInventoryModule } from './v1/product-inventory/product-inventory
         QrCodeModule,
         ComboModule,
         ProductModule,
-        ProductInventoryModule
+        ProductInventoryModule,
+        FirebaseModule
     ],
     providers: [
         {

@@ -22,11 +22,8 @@ export class MovieDto {
         example: ["1", "2"],
         description: "Thể loại phim"
     })
-    @IsArray()
-    @ArrayNotEmpty()
-    @ArrayUnique()
-    @IsString({ each: true })
-    genres: string[];
+    @IsNotEmptyString()
+    genres: string;
 
     @ApiProperty({
         example: "2D",
@@ -82,20 +79,6 @@ export class MovieDto {
     })
     @IsNotEmptyString()
     description: string;
-
-    @ApiProperty({
-        example: "",
-        description: "Ảnh của phim"
-    })
-    @IsString()
-    poster: string;
-
-    @ApiProperty({
-        example: "",
-        description: "Ảnh nền của trailer"
-    })
-    @IsString()
-    thumbnail: string;
 
     @ApiProperty({
         example: "",
