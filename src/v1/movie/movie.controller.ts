@@ -98,18 +98,33 @@ export class MovieController {
     @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API update movie" })
     @UsePipes(new ValidationPipe({ transform: true }))
+    @UseInterceptors(FileFieldsInterceptor([
+        { name: 'poster', maxCount: 1 },
+        { name: 'thumbnail', maxCount: 1 },
+    ]))
     async update(
         @Param("id") id: string,
+        @UploadedFiles() files: Record<string, any>,
         @Body() movieDto: MovieDto,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
 
-        if (!await this.genreService.findByIds(movieDto.genres.replace(/\s/g, '').split(','))) {
+        const genreDto = movieDto.genres.replace(/\s/g, '').split(',');
+
+        if (!await this.genreService.findByIds(genreDto)) {
             UtilsExceptionMessageCommon.showMessageError("Category does not exist!");
         }
 
-        response.setData(await this.movieService.update(id, movieDto));
+        if (files['poster'])
+            Object.assign(movieDto, { poster: await this.firebaseService.uploadImageToFirebase(files['poster'][0]), ...movieDto });
+
+        if (files['thumbnail'])
+            Object.assign(movieDto, { thumbnail: await this.firebaseService.uploadImageToFirebase(files['thumbnail'][0]), ...movieDto });
+
+        const { genres, ...rest } = movieDto;
+
+        response.setData(await this.movieService.update(id, { ...rest, genres: genreDto }));
 
         return res.status(HttpStatus.OK).send(response);
     }
