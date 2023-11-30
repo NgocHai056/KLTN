@@ -27,7 +27,7 @@ export class FirebaseService {
             const bucket = this.storage.bucket();
 
             /** Tạo đường dẫn lưu trữ trên Firebase */
-            const firebaseFilePath = `images%2F${Date.now()}_${file.originalname}`;
+            const firebaseFilePath = `${Date.now()}_${file.originalname}`;
 
             /** Upload file lên Firebase Storage từ buffer */
             await bucket.file(firebaseFilePath).save(file.buffer, {
