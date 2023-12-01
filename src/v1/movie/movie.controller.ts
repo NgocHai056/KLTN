@@ -152,4 +152,25 @@ export class MovieController {
         response.setData(result);
         return res.status(HttpStatus.OK).send(response);
     }
+
+    @Post("/delete")
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: "API delete movie" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async delete(
+        @Body() ids: string[],
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+        const movies = await this.movieService.findByIds(ids);
+
+        if (movies.length !== ids.length)
+            UtilsExceptionMessageCommon.showMessageError("Delete movie failed!");
+
+        response.setData(await this.movieService.updateMany(
+            { _id: { $in: ids } },
+            { $set: { status: MovieStatus.STOP_SHOWING } }
+        ) ? { msg: "Update successful." } : { msg: "Update failed." });
+        return res.status(HttpStatus.OK).send(response);
+    }
 }

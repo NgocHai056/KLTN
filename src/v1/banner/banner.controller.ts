@@ -92,6 +92,10 @@ export class BannerController {
         let response: ResponseData = new ResponseData();
 
         response.setData(await this.bannerService.deleteMany(ids) ? "Delete successful" : "Unsuccessful");
+
+        const banners = await this.bannerService.findByIds(ids);
+
+        banners.forEach(banner => this.firebaseService.deleteFileFromFirebaseStorage(banner.file))
         return res.status(HttpStatus.OK).send(response);
     }
 

@@ -71,6 +71,19 @@ export class GenreController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @Get()
+    @ApiOperation({ summary: "API get list genre" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async findAll(
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(await this.genreService.findAll());
+
+        return res.status(HttpStatus.OK).send(response);
+    }
+
     @Get("/:id")
     @ApiOperation({ summary: "API get genre by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
