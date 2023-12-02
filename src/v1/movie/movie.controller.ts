@@ -58,6 +58,21 @@ export class MovieController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @Get("/admin")
+    @Roles(Role.ADMIN, Role.MANAGER)
+    @ApiOperation({ summary: "API lấy danh sách phim cho admin" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async getForAdmin(
+        @Query() movieDto: GetMoviesDto,
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(await this.movieService.findMovies(movieDto.genre_id, +movieDto.status, movieDto.key_search));
+
+        return res.status(HttpStatus.OK).send(response);
+    }
+
     @Post()
     @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API create movie" })

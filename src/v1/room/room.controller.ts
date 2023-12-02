@@ -125,7 +125,7 @@ export class RoomController {
     }
 
     @Get("")
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.MANAGER)
     @ApiOperation({ summary: "API get all room for admin" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async getAll(
@@ -133,7 +133,7 @@ export class RoomController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(RoomResponse.mapToList((await this.roomService.findAll()).filter((x => x.status !== 0))));
+        response.setData(RoomResponse.mapToList(await this.roomService.findAll()));
         return res.status(HttpStatus.OK).send(response);
     }
 

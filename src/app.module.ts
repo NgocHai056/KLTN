@@ -84,7 +84,9 @@ export class AppModule implements NestModule {
             .forRoutes(
                 { path: '/v1/oauth/*', method: RequestMethod.GET },
                 { path: "/v1/auth/*", method: RequestMethod.ALL },
-                { path: '/v1/unauth/*', method: RequestMethod.POST });
+                { path: '/v1/unauth/*', method: RequestMethod.POST },
+                { path: '/v1/unauth/*/admin', method: RequestMethod.GET }
+            );
     }
 }
 
