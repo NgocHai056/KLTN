@@ -104,6 +104,7 @@ export class MovieService extends BaseService<Movie> {
                     status: { $first: "$status" },
                     created_at: { $first: "$created_at" },
                     updated_at: { $first: "$updated_at" },
+                    genre_ids: { $push: "$genre_info._id" },
                     genres: { $push: "$genre_info.name" } /** Tạo mảng thể loại mới*/
                 }
             },

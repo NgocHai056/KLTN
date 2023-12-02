@@ -95,6 +95,19 @@ export class TheaterController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @Get("/admin")
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: "API get list theater for admin" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async findAllAdmin(
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(TheaterResponse.mapToList(await this.theaterService.findAll()));
+        return res.status(HttpStatus.OK).send(response);
+    }
+
     @Get("/:id")
     @ApiOperation({ summary: "API get theater by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
