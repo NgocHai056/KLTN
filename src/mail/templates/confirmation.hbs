@@ -1,37 +1,60 @@
 <div class="container">
-    <h3>Hey {{ name }},</h3>
-    <h3>Thanks for starting the new NHCinema account creation process. We want to make sure it's really you. Please enter the following verification code when prompted.</h3>
-    <h3>Verification code:</h3>
+  <h3>Hey <span style="color: #ea3b92">{{ name }}</span>,</h3>
+  <h3>
+    Thanks for starting the new <span class="logo">NHCinema</span> account
+    creation process. We want to make sure it's really you. Please enter the
+    following verification code when prompted.
+  </h3>
+  <div class="verify-box">
+    <h3 class="verify-title">Verification code:</h3>
     <div class="verification-code">{{ code }}</div>
-    <p class="note">If you don’t want to create an account, you can ignore this message.</p>
+  </div>
+  <p class="note">
+    If you don’t want to create an account, you can ignore this message.
+  </p>
 </div>
 
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        color: #444;
-    }
+  body {
+    font-family: Arial, sans-serif;
+    color: #444;
+  }
 
-    .container {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-    }
+  .logo {
+    background: linear-gradient(to right, #ea3b92, #640d9a);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
 
-    h3 {
-        color: #444;
-        font-size: 18px;
-    }
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
 
-    .verification-code {
-        margin-top: 20px;
-        font-size: 24px;
-        color: #000;
-    }
+  .verify-box {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+  }
 
-    .note {
-        margin-top: 20px;
-    }
+  .verify-title {
+    color: #444;
+    font-size: 18px;
+  }
+
+  .verification-code {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #ea3b92;
+  }
+
+  .note {
+    margin-top: 20px;
+  }
 </style>
