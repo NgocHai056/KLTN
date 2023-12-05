@@ -4,6 +4,7 @@ import {
     Get,
     HttpStatus,
     Param,
+    ParseIntPipe,
     Post,
     Query,
     Res,
@@ -27,6 +28,7 @@ import { UserService } from './user.service';
 import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { UserModel } from "./user.entity/user.model";
 import { ForgotPasswordDto } from "./user.dto/user-forgot-password.dto";
+import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
 
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/user' })
@@ -113,12 +115,17 @@ export class UserController {
     @ApiOperation({ summary: "API get list user" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async getAll(
-        @Query("key_search") keySearch: string,
+        @Query("role", ParseIntPipe) role: number,
+        @Query() pagination: PaginationAndSearchDto,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
+        console.log(role);
 
-        response.setData((await this.userService.getAll(keySearch)).filter(user => user.role !== Role.ADMIN));
+        const result = await this.userService.getAll(pagination, role);
+        response.setData(result.data);
+        response.setTotalRecord(result.total_record);
+
         return res.status(HttpStatus.OK).send(response);
     }
 

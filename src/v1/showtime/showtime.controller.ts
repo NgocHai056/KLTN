@@ -26,6 +26,7 @@ import { ShowtimeDto } from "./showtime.dto/showtime.dto";
 import { ShowtimeResponse } from "./showtime.response/showtime.response";
 import { ShowtimeService } from './showtime.service';
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
+import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'unauth/showtime' })
 export class ShowtimeController {
@@ -132,17 +133,21 @@ export class ShowtimeController {
     @ApiOperation({ summary: "API lấy danh sách tất cả lịch chiếu theo rạp chiếu phim" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findAll(
+        @Query() pagination: PaginationAndSearchDto,
         @Query() showtimeDto: GetShowtimeDto,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(await this.showtimeService
+        const result = await this.showtimeService
             .findAllByTheater(
                 /** Lấy danh sách room theo theater_id */
                 (await this.facadeService.getRoomsByTheaterId(showtimeDto.theater_id)).map(room => room.id),
-                showtimeDto.movie_id, showtimeDto.time)
-        );
+                showtimeDto.movie_id, showtimeDto.time, pagination)
+
+        response.setData(result.data);
+        response.setTotalRecord(result.total_record)
+
         return res.status(HttpStatus.OK).send(response);
     }
 

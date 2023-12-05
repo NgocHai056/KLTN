@@ -12,12 +12,15 @@ import * as moment from 'moment-timezone';
 import { GenreService } from '../genre/genre.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { FacadeService } from '../facade-theater/facade.service';
+import { RoomService } from '../room/room.service';
+import { PaginationAndSearchDto } from 'src/utils.common/utils.pagination/pagination-and-search.dto';
 
 @Injectable()
 export class ShowtimeService extends BaseService<Showtime> {
     constructor(
         private readonly movieService: MovieService,
         private readonly genreService: GenreService,
+        private readonly roomService: RoomService,
         @InjectModel(Showtime.name) private readonly showtimeRepository: Model<Showtime>) {
         super(showtimeRepository);
     }
@@ -131,7 +134,7 @@ export class ShowtimeService extends BaseService<Showtime> {
         });
     }
 
-    async findAllByTheater(roomIds: string[], movieId: string, time: string) {
+    async findAllByTheater(roomIds: string[], movieId: string, time: string, pagination: PaginationAndSearchDto) {
         const query: any = {
             room_id: { $in: roomIds }
         }
@@ -142,7 +145,7 @@ export class ShowtimeService extends BaseService<Showtime> {
         if (time)
             query.time = time;
 
-        return await this.showtimeRepository.aggregate([
+        const aggregationPipeline = [
             { $match: query },
             {
                 $addFields: {
@@ -186,7 +189,9 @@ export class ShowtimeService extends BaseService<Showtime> {
                     room_name: { $arrayElemAt: ['$roomInfo.room_number', 0] } // Lấy name từ roomInfo
                 }
             }
-        ]);
+        ];
+
+        return await this.findAllForPagination(+pagination.page, +pagination.page_size, aggregationPipeline);
     }
 
     async getShowTimeByMovie(roomIds: string[], movieId: string): Promise<ShowtimeByDayResponse[]> {
@@ -298,6 +303,13 @@ export class ShowtimeService extends BaseService<Showtime> {
         }
 
         return showtimes;
+    }
+
+    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    async autoCreateShowtime() {
+        const rooms = await this.roomService.findByCondition({ status: {} })
+        const movies = await this.movieService.findMovieBeforeDateRelease();
+
     }
 
     @Cron(CronExpression.EVERY_5_MINUTES)

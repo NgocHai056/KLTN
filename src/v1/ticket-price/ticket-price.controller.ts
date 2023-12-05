@@ -6,6 +6,7 @@ import { TicketPriceService } from './ticket-price.service';
 import { ApiOperation } from '@nestjs/swagger';
 import { TicketPriceDto } from './ticket-price.dto/ticket-price.dto';
 import { Role, Roles } from 'src/utils.common/utils.enum/role.enum';
+import { PaginationAndSearchDto } from 'src/utils.common/utils.pagination/pagination-and-search.dto';
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/ticket-price' })
 export class TicketPriceController {
@@ -47,11 +48,15 @@ export class TicketPriceController {
     @ApiOperation({ summary: "Get all ticket price" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async getAll(
+        @Query() pagination: PaginationAndSearchDto,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(await this.ticketPriceService.findAll());
+        const result = await this.ticketPriceService.findAllForPagination(+pagination.page, +pagination.page_size);
+        response.setData(result.data);
+        response.setTotalRecord(result.total_record);
+
         return res.status(HttpStatus.OK).send(response);
     }
 }

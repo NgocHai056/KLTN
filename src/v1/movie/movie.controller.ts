@@ -30,6 +30,7 @@ import { MovieStatus } from "src/utils.common/utils.enum/movie-status.enum";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { FirebaseService } from "src/firebase/firebase.service";
+import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'unauth/movie' })
 export class MovieController {
@@ -44,16 +45,18 @@ export class MovieController {
     @UsePipes(new ValidationPipe({ transform: true }))
     async get(
         @Query() movieDto: GetMoviesDto,
+        @Query() pagination: PaginationAndSearchDto,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
 
-        let movies = await this.movieService.findMovies(movieDto.genre_id, +movieDto.status, movieDto.key_search);
+        let movies = await this.movieService.findMovies([movieDto.genre_id], +movieDto.status, pagination);
 
         /** Lấy danh sách phim trừ những phim đã ngừng chiếu(status = 0) */
-        movies = movies.filter(movie => movie.status !== MovieStatus.STOP_SHOWING);
+        movies.data = movies.data.filter(movie => movie.status !== MovieStatus.STOP_SHOWING);
 
-        response.setData(movies);
+        response.setData(movies.data);
+        response.setTotalRecord(movies.total_record);
 
         return res.status(HttpStatus.OK).send(response);
     }
@@ -64,11 +67,15 @@ export class MovieController {
     @UsePipes(new ValidationPipe({ transform: true }))
     async getForAdmin(
         @Query() movieDto: GetMoviesDto,
+        @Query() pagination: PaginationAndSearchDto,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(await this.movieService.findMovies(movieDto.genre_id, +movieDto.status, movieDto.key_search));
+        const result = await this.movieService.findMovies(movieDto.genres.replace(/\s/g, '').split(','), +movieDto.status, pagination, true);
+
+        response.setData(result.data);
+        response.setTotalRecord(result.total_record);
 
         return res.status(HttpStatus.OK).send(response);
     }

@@ -6,13 +6,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { FacadeModule } from 'src/v1/facade-theater/facade.module';
 import { MovieModule } from '../movie/movie.module';
 import { GenreModule } from '../genre/genre.module';
+import { RoomModule } from '../room/room.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Showtime.name, schema: ShowtimeSchema }]),
     FacadeModule,
     MovieModule,
-    GenreModule
+    GenreModule,
+    RoomModule
   ],
   providers: [ShowtimeService],
   controllers: [ShowtimeController],

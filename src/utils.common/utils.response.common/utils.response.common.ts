@@ -3,11 +3,13 @@ import { HttpStatus } from "@nestjs/common";
 export class ResponseData {
     private status: HttpStatus;
     private message: string;
+    private total_record: number;
     private data: Object
 
-    constructor(status: number = null, message: string = null, data?: Object) {
+    constructor(status: number = null, message: string = null, data?: Object, totalRecord?: number) {
         this.status = status ? + status : + HttpStatus.OK;
         this.message = message ? message : "SUCCESS";
+        this.total_record = totalRecord ? +totalRecord : 0;
         this.data = data ? data : null;
     }
 
@@ -48,5 +50,13 @@ export class ResponseData {
 
     public setData(data: Object): void {
         this.data = data;
+    }
+
+    public getTotalRecord(): Object {
+        return this.total_record;
+    }
+
+    public setTotalRecord(totalRecord: number): void {
+        this.total_record = totalRecord ? +totalRecord : 0;
     }
 }

@@ -26,12 +26,43 @@ export default abstract class BaseService<T extends Document> {
     }
 
     async findByCondition(condition: any): Promise<T[]> {
-        const data = await this.model.find(condition).exec();
-        return data;
+        return await this.model.find(condition).exec();
+    }
+
+    async findByConditionWithLimit(condition: any, limit: number): Promise<T[]> {
+        return await this.model.find(condition).limit(limit).exec();
     }
 
     async findAll(): Promise<T[]> {
         return await this.model.find().exec();
+    }
+
+    async findAllForPagination(page: number = 1, limit: number = 999, condition?): Promise<{ data: T[], total_record: number }> {
+        if (condition)
+            return (await this.model.aggregate([...condition, ...this.paginationPipeline(page, limit)]).exec())[0];
+        return (await this.model.aggregate(this.paginationPipeline(page, limit)).exec())[0];
+    }
+
+    protected paginationPipeline = (page: number = 1, limit: number = 999) => {
+        return [
+            {
+                $facet: {
+                    data: [
+                        { $skip: (page - 1) * limit },
+                        { $limit: limit }
+                    ],
+                    total_record: [
+                        { $count: 'count' }
+                    ]
+                }
+            },
+            {
+                $project: {
+                    data: 1,
+                    total_record: { $arrayElemAt: ['$total_record.count', 0] }
+                }
+            }
+        ];
     }
 
     async update(id: string, updateDto: any): Promise<T> {

@@ -4,6 +4,7 @@ import { Movie } from './movie.entity/movie.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
+import { PaginationAndSearchDto } from 'src/utils.common/utils.pagination/pagination-and-search.dto';
 
 @Injectable()
 export class MovieService extends BaseService<Movie> {
@@ -23,15 +24,20 @@ export class MovieService extends BaseService<Movie> {
         return movie;
     }
 
-    async findMovies(
-        genreId?: string,
-        status?: number,
-        keySearch?: string,
-    ): Promise<Movie[]> {
+    async findMovieBeforeDateRelease(): Promise<Movie[]> {
+        return await this.findByConditionWithLimit({ release: { $lte: new Date() } }, 10);
+    }
+
+    async findMovies(genres: string[], status: number, pagination: PaginationAndSearchDto, isAdmin: boolean = false) {
         const query: any = {};
 
-        if (genreId !== '')
-            query.genres = { $in: [genreId] };
+        if (genres.length !== 0 && genres[0] !== '')
+            query.genres = { $in: genres };
+
+        if (!isAdmin)
+            query.status = {
+                $ne: 0
+            }
 
         if (status === 1)
             query.release = {
@@ -41,6 +47,8 @@ export class MovieService extends BaseService<Movie> {
             query.release = {
                 $gt: new Date()
             }
+
+        const keySearch = pagination.key_search;
 
         if (keySearch !== '') {
             if (!isNaN(Number(keySearch))) {
@@ -57,7 +65,7 @@ export class MovieService extends BaseService<Movie> {
             }
         }
 
-        return await this.movieModel.aggregate([
+        const aggregationPipeline = [
             { $match: query },
             { $unwind: "$genres" /** Tách các thể loại thành từng dòng riêng biệt */ },
             {
@@ -124,7 +132,14 @@ export class MovieService extends BaseService<Movie> {
                         }
                     }
                 }
+            },
+            {
+                $sort: {
+                    name: 1
+                }
             }
-        ]);
+        ];
+
+        return await this.findAllForPagination(+pagination.page, +pagination.page_size, aggregationPipeline);
     }
 }

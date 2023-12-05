@@ -8,6 +8,8 @@ import { UpdatePasswordDto } from './user.dto/user-update-password.dto';
 import * as bcrypt from 'bcrypt';
 import { UserDto } from './user.dto/user.dto';
 import { UserStatus } from 'src/utils.common/utils.enum/user-status.enum';
+import { Role } from 'src/utils.common/utils.enum/role.enum';
+import { PaginationAndSearchDto } from 'src/utils.common/utils.pagination/pagination-and-search.dto';
 
 @Injectable()
 export class UserService extends BaseService<User> {
@@ -26,23 +28,37 @@ export class UserService extends BaseService<User> {
         return await this.create({ ...userDto, status: UserStatus.ACTIVATED });
     }
 
-    async getAll(keySearch: string) {
+    async getAll(pagination: PaginationAndSearchDto, role?: number) {
         const query: any = {};
 
-        if (keySearch !== '') {
-            if (!isNaN(Number(keySearch))) {
-                query.role = Number(keySearch);
-            } else {
-                query.$or = [
-                    { name: { $regex: new RegExp(keySearch, 'i') } },
-                    { email: { $regex: new RegExp(keySearch, 'i') } },
-                    { phone: { $regex: new RegExp(keySearch, 'i') } },
-                    { gender: { $regex: new RegExp(keySearch, 'i') } }
-                ];
+        if (role && role >= 0)
+            query.$and =
+                [{
+                    role: {
+                        $ne: Role.ADMIN
+                    }
+                }, {
+                    role: role
+                }]
+        else
+            query.role = {
+                $ne: Role.ADMIN
             }
-        };
 
-        return await this.userRepository.aggregate([
+
+        const keySearch = pagination.key_search;
+        if (keySearch !== '') {
+            query.$or = [
+                { name: { $regex: new RegExp(keySearch, 'i') } },
+                { email: { $regex: new RegExp(keySearch, 'i') } },
+                { phone: { $regex: new RegExp(keySearch, 'i') } },
+                { gender: { $regex: new RegExp(keySearch, 'i') } }
+            ];
+
+        };
+        console.log(query);
+
+        const aggregationPipeline = [
             { $match: query },
             {
                 $addFields: {
@@ -74,7 +90,9 @@ export class UserService extends BaseService<User> {
                     theater_name: { $arrayElemAt: ['$theaterInfo.name', 0] }, // Lấy name từ theaterInfo
                 }
             }
-        ]);
+        ];
+
+        return await this.findAllForPagination(+pagination.page, +pagination.page_size, aggregationPipeline);
     }
 
     async updatePassword(userId: string, password: string): Promise<User> {

@@ -5,6 +5,7 @@ import {
     HttpStatus,
     Param,
     Post,
+    Query,
     Res,
     UsePipes,
     ValidationPipe
@@ -22,6 +23,7 @@ import { RoomResponse } from "./room.response/room.response";
 import { RoomService } from './room.service';
 import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { UserModel } from "../user/user.entity/user.model";
+import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/room' })
 export class RoomController {
@@ -129,11 +131,15 @@ export class RoomController {
     @ApiOperation({ summary: "API get all room for admin" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async getAll(
+        @Query() pagination: PaginationAndSearchDto,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(RoomResponse.mapToList(await this.roomService.findAll()));
+        const result = await this.roomService.findAllForPagination(+pagination.page, +pagination.page_size);
+        response.setData(result.data);
+        response.setTotalRecord(result.total_record);
+
         return res.status(HttpStatus.OK).send(response);
     }
 

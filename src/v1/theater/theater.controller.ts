@@ -8,7 +8,8 @@ import {
     ParseIntPipe,
     Res,
     UsePipes,
-    ValidationPipe
+    ValidationPipe,
+    Query
 } from "@nestjs/common";
 
 import { Response } from "express";
@@ -20,6 +21,7 @@ import { ResponseData } from "src/utils.common/utils.response.common/utils.respo
 import { TheaterResponse } from "./theater.response/theater.response";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
+import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'unauth/theater' })
 export class TheaterController {
@@ -100,11 +102,15 @@ export class TheaterController {
     @ApiOperation({ summary: "API get list theater for admin" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findAllAdmin(
+        @Query() pagination: PaginationAndSearchDto,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
 
-        response.setData(TheaterResponse.mapToList(await this.theaterService.findAll()));
+        const result = await this.theaterService.findAllForPagination(+pagination.page, +pagination.page_size);
+        response.setData(result.data);
+        response.setTotalRecord(result.total_record);
+
         return res.status(HttpStatus.OK).send(response);
     }
 
