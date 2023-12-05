@@ -29,6 +29,7 @@ import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator
 import { UserModel } from "./user.entity/user.model";
 import { ForgotPasswordDto } from "./user.dto/user-forgot-password.dto";
 import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
+import { GetUserDto } from "./user.dto/get-user.dto";
 
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/user' })
@@ -115,14 +116,13 @@ export class UserController {
     @ApiOperation({ summary: "API get list user" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async getAll(
-        @Query("role", ParseIntPipe) role: number,
+        @Query() userDto: GetUserDto,
         @Query() pagination: PaginationAndSearchDto,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
-        console.log(role);
 
-        const result = await this.userService.getAll(pagination, role);
+        const result = await this.userService.getAll(pagination, +userDto.role);
         response.setData(result.data);
         response.setTotalRecord(result.total_record);
 

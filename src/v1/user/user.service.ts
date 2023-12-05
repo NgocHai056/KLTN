@@ -31,7 +31,7 @@ export class UserService extends BaseService<User> {
     async getAll(pagination: PaginationAndSearchDto, role?: number) {
         const query: any = {};
 
-        if (role && role >= 0)
+        if (role !== -1)
             query.$and =
                 [{
                     role: {
@@ -56,7 +56,6 @@ export class UserService extends BaseService<User> {
             ];
 
         };
-        console.log(query);
 
         const aggregationPipeline = [
             { $match: query },

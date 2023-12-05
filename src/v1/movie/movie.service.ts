@@ -51,18 +51,14 @@ export class MovieService extends BaseService<Movie> {
         const keySearch = pagination.key_search;
 
         if (keySearch !== '') {
-            if (!isNaN(Number(keySearch))) {
-                query.rating = Number(keySearch);
-            } else {
-                query.$or = [
-                    { name: { $regex: new RegExp(keySearch, 'i') } },
-                    { title: { $regex: new RegExp(keySearch, 'i') } },
-                    { duration: { $regex: new RegExp(keySearch, 'i') } },
-                    { director: { $regex: new RegExp(keySearch, 'i') } },
-                    { performer: { $regex: new RegExp(keySearch, 'i') } },
-                    { description: { $regex: new RegExp(keySearch, 'i') } },
-                ];
-            }
+            query.$or = [
+                { name: { $regex: new RegExp(keySearch, 'i') } },
+                { title: { $regex: new RegExp(keySearch, 'i') } },
+                { duration: { $regex: new RegExp(keySearch, 'i') } },
+                { director: { $regex: new RegExp(keySearch, 'i') } },
+                { performer: { $regex: new RegExp(keySearch, 'i') } },
+                { description: { $regex: new RegExp(keySearch, 'i') } },
+            ];
         }
 
         const aggregationPipeline = [
