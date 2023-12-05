@@ -107,7 +107,7 @@ export class TheaterController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        const result = await this.theaterService.findAllForPagination(+pagination.page, +pagination.page_size);
+        const result = await this.theaterService.findAllForPagination(+pagination.page, +pagination.page_size, [{ title: { $regex: new RegExp(pagination.key_search, 'i') } }]);
         response.setData(result.data);
         response.setTotalRecord(result.total_record);
 

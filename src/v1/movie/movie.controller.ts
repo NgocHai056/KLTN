@@ -52,9 +52,6 @@ export class MovieController {
 
         let movies = await this.movieService.findMovies([movieDto.genre_id], +movieDto.status, pagination);
 
-        /** Lấy danh sách phim trừ những phim đã ngừng chiếu(status = 0) */
-        movies.data = movies.data.filter(movie => movie.status !== MovieStatus.STOP_SHOWING);
-
         response.setData(movies.data);
         response.setTotalRecord(movies.total_record);
 
@@ -94,6 +91,9 @@ export class MovieController {
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();
+
+        if (await this.movieService.findByCondition({ name: movieDto.name }))
+            UtilsExceptionMessageCommon.showMessageError("Name of movie is exist.")
 
         if (!files['poster'])
             UtilsExceptionMessageCommon.showMessageError("Poster is required.")
@@ -144,9 +144,9 @@ export class MovieController {
         if (files['thumbnail'])
             Object.assign(movieDto, { thumbnail: await this.firebaseService.uploadImageToFirebase(files['thumbnail'][0]), ...movieDto });
 
-        const { genres, ...rest } = movieDto;
+        const { genres, status, ...rest } = movieDto;
 
-        response.setData(await this.movieService.update(id, { ...rest, genres: genreDto }));
+        response.setData(await this.movieService.update(id, { ...rest, status: +status, genres: genreDto }));
 
         return res.status(HttpStatus.OK).send(response);
     }

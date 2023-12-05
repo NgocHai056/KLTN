@@ -307,8 +307,10 @@ export class ShowtimeService extends BaseService<Showtime> {
 
     @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
     async autoCreateShowtime() {
-        const rooms = await this.roomService.findByCondition({ status: {} })
+        const rooms = await this.roomService.findByCondition({ status: { $ne: 0 } })
         const movies = await this.movieService.findMovieBeforeDateRelease();
+
+        console.log(rooms);
 
     }
 

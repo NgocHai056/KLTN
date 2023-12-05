@@ -21,6 +21,7 @@ import { ProductDto } from "./product.dto/product.dto";
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
+import { GetProductDto } from "./product.dto/get-product.dto";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'unauth/product' })
 export class ProductController {
@@ -66,7 +67,7 @@ export class ProductController {
     @ApiOperation({ summary: "API get list product" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async getAll(
-        @Query("type", ParseIntPipe) type: number,
+        @Query() productDto: GetProductDto,
         @Query() pagination: PaginationAndSearchDto,
         @Res() res: Response
     ) {
@@ -74,8 +75,8 @@ export class ProductController {
 
         const query: any = {};
 
-        if (type)
-            query.type = type;
+        if (productDto.type)
+            query.type = productDto.type;
 
         const result = await this.productService.findAllForPagination(+pagination.page, +pagination.page_size, [{ $match: query }]);
         response.setData(result.data);

@@ -91,8 +91,5 @@ export class MovieDto {
         example: "",
         description: "Danh sách phim theo trạng thái: đang chiếu, sắp chiếu,... Mặc định 0 là dừng chiếu, 1 là đang chiếu"
     })
-    @IsEnum(MovieStatus, {
-        message: "status must be one of the values: 0, 1",
-    })
     status: number = 1;
 }
