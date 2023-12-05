@@ -14,6 +14,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { FacadeService } from '../facade-theater/facade.service';
 import { RoomService } from '../room/room.service';
 import { PaginationAndSearchDto } from 'src/utils.common/utils.pagination/pagination-and-search.dto';
+import { showtimeAraay } from 'src/utils.common/utils.enum/showtime.const';
 
 @Injectable()
 export class ShowtimeService extends BaseService<Showtime> {
@@ -307,11 +308,56 @@ export class ShowtimeService extends BaseService<Showtime> {
 
     @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
     async autoCreateShowtime() {
+
+        const nextDate = moment().add(4, 'days');
+
         const rooms = await this.roomService.findByCondition({ status: { $ne: 0 } })
         const movies = await this.movieService.findMovieBeforeDateRelease();
 
-        console.log(rooms);
 
+        const showtimeRoom = {};
+
+        rooms.forEach((room) => {
+            showtimeRoom[room.theater_id] = {};
+            showtimeAraay.forEach((showtime) => {
+                showtimeRoom[room.theater_id][showtime] = [];
+            });
+        });
+
+        const createShowtime = (roomId: string, movieId: string, time: string, showtime: string) => {
+            return {
+                room_id: roomId,
+                movie_id: movieId,
+                time: time,
+                showtime: showtime,
+                seat_array: [], /** Chèn phần tử mới vào mảng `seat_array`*/
+            }
+        }
+
+        rooms.forEach(room => {
+            const randomNumber = Math.floor(Math.random() * 7) + 1;
+            for (let i = 0; i < randomNumber; i++) {
+
+                const randomTime = showtimeAraay[Math.floor(Math.random() * showtimeAraay.length)];
+                const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+
+
+                const showtimeExist = showtimeRoom[room.theater_id][randomTime].some(
+                    (show) => show.movie_id === randomMovie.id
+                );
+
+                if (!showtimeExist) {
+                    showtimeRoom[room.theater_id][randomTime].push(createShowtime(room.id, randomMovie.id, nextDate.format("YYYY-MM-DD"), randomTime));
+                }
+
+            }
+        })
+
+        const allShowtimes = Object.values(showtimeRoom).flatMap(roomSchedule => {
+            return Object.values(roomSchedule).flat();
+        });
+
+        return await this.showtimeRepository.insertMany(allShowtimes);
     }
 
     @Cron(CronExpression.EVERY_5_MINUTES)

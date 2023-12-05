@@ -5,6 +5,7 @@ import {
     HttpStatus,
     Param,
     Post,
+    Query,
     Res,
     UsePipes,
     ValidationPipe
@@ -25,6 +26,7 @@ import { ShowtimeService } from "../showtime/showtime.service";
 import { UserModel } from "../user/user.entity/user.model";
 import { BookingDto } from "./booking.dto/booking.dto";
 import { BookingService } from "./booking.service";
+import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/booking' })
 export class BookingController {
@@ -109,21 +111,24 @@ export class BookingController {
     @ApiOperation({ summary: "API hiển thị list vé của người dùng." })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findAll(
+        @Query() pagination: PaginationAndSearchDto,
         @Res() res: Response,
         @GetUser() user: UserModel
     ) {
         let response: ResponseData = new ResponseData();
 
-        const bookings = await this.bookingService.findAll();
+        const bookings = await this.bookingService.findAllForPagination(+pagination.page, +pagination.page_size);
 
         if (user.role === Role.MANAGER)
-            bookings.filter(booking => booking.theater_id === user.theater_id)
+            bookings.data.filter(booking => booking.theater_id === user.theater_id)
 
-        bookings.forEach(booking =>
+        bookings.data.forEach(booking =>
             booking.time = UtilsDate.formatDateVNToString(new Date(booking.time))
         );
 
-        response.setData(bookings);
+        response.setData(bookings.data);
+        response.setTotalRecord(bookings.total_record);
+
         return res.status(HttpStatus.OK).send(response);
     }
 
