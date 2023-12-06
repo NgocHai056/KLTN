@@ -25,7 +25,7 @@ export class MovieService extends BaseService<Movie> {
     }
 
     async findMovieBeforeDateRelease(): Promise<Movie[]> {
-        return await this.findByConditionWithLimit({ release: { $lte: new Date() } }, 10);
+        return await this.movieModel.find({ release: { $lte: new Date() } }).sort({ release: -1 }).limit(5).exec();
     }
 
     async findMovies(genres: string[], status: number, pagination: PaginationAndSearchDto, isAdmin: boolean = false) {
