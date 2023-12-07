@@ -306,7 +306,7 @@ export class ShowtimeService extends BaseService<Showtime> {
         return showtimes;
     }
 
-    @Cron(CronExpression.EVERY_DAY_AT_1AM)
+    @Cron(CronExpression.EVERY_DAY_AT_NOON)
     async autoCreateShowtime() {
 
         const nextDate = moment().add(4, 'days');
