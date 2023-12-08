@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UtilsExceptionMessageCommon } from 'src/utils.common/utils.exception.common/utils.exception.message.common';
 import { PaginationAndSearchDto } from 'src/utils.common/utils.pagination/pagination-and-search.dto';
+import { MovieStatus } from 'src/utils.common/utils.enum/movie-status.enum';
 
 @Injectable()
 export class MovieService extends BaseService<Movie> {
@@ -25,7 +26,7 @@ export class MovieService extends BaseService<Movie> {
     }
 
     async findMovieBeforeDateRelease(): Promise<Movie[]> {
-        return await this.movieModel.find({ release: { $lte: new Date() } }).sort({ release: -1 }).limit(5).exec();
+        return await this.movieModel.find({ status: { $ne: MovieStatus.STOP_SHOWING }, release: { $lte: new Date() } }).sort({ release: -1 }).limit(5).exec();
     }
 
     async findMovies(genres: string[], status: number, pagination: PaginationAndSearchDto, isAdmin: boolean = false) {
