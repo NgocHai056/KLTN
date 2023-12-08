@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { ArrayNotEmpty, IsArray } from "class-validator";
-import { IsInt, ValidateNested } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { IsInt, IsNotEmptyString, ValidateNested } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 
 class TicketDto {
     @ApiProperty({
@@ -33,6 +33,13 @@ export class TicketPriceDto {
         description: "1: Ngày lễ, 0: Không phải ngày lễ"
     })
     is_holiday: number = 0;
+
+    @ApiProperty({
+        example: "2D",
+        description: "Định dạng"
+    })
+    @IsNotEmptyString()
+    format: string;
 
     @ApiProperty({
         example: [{

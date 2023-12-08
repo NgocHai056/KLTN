@@ -10,6 +10,9 @@ export class TicketPrice extends Document {
     @Prop()
     is_holiday: number;
 
+    @Prop()
+    format: string;
+
     @Prop([{
         seat_type: Number,
         price: Number

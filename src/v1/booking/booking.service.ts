@@ -29,7 +29,7 @@ export class BookingService extends BaseService<Booking> {
 
         const dayOfWeek = new Date().getDay();
         /** Lấy danh sách giá tiền theo loại ghế sau đó map vào theo từng cặp key : value */
-        const ticketPrice = await this.ticketPriceService.findByCondition({ day_of_week: dayOfWeek });
+        const ticketPrice = await this.ticketPriceService.findByCondition({ day_of_week: dayOfWeek, format: movie.format });
 
         if (ticketPrice.length === 0)
             UtilsExceptionMessageCommon.showMessageError("Ticket booking failed!");
