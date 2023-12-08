@@ -128,6 +128,21 @@ export class ShowtimeController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @Post('/auto-create')
+    @Roles(Role.MANAGER, Role.ADMIN)
+    @ApiOperation({ summary: "API sao chép lịch chiếu của toàn bộ ngày cụ thể {time} truyền vào!" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async autoCreateShowtimes(
+        @Body() showtimeDto: CopyShowtimeDto,
+        @Res() res: Response
+    ) {
+        let response: ResponseData = new ResponseData();
+
+        response.setData(await this.showtimeService.autoCreateShowtime());
+
+        return res.status(HttpStatus.OK).send(response);
+    }
+
     @Get()
     @Roles(Role.MANAGER, Role.ADMIN)
     @ApiOperation({ summary: "API lấy danh sách tất cả lịch chiếu theo rạp chiếu phim" })

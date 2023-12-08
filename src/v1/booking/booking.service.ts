@@ -27,8 +27,9 @@ export class BookingService extends BaseService<Booking> {
     async createBooking(
         bookingDto: BookingDto, user: UserModel, theaterId: string, roomId: string, roomNumber: string, movie: Movie) {
 
+        const dayOfWeek = new Date().getDay();
         /** Lấy danh sách giá tiền theo loại ghế sau đó map vào theo từng cặp key : value */
-        const ticketPrice = await this.ticketPriceService.findByCondition({ type: { $in: bookingDto.seats.map(seat => seat.seat_type).flat() } });
+        const ticketPrice = await this.ticketPriceService.findByCondition({ day_of_week: dayOfWeek });
 
         if (ticketPrice.length === 0)
             UtilsExceptionMessageCommon.showMessageError("Ticket booking failed!");
@@ -41,9 +42,9 @@ export class BookingService extends BaseService<Booking> {
         combos.forEach(combo => totalAmount += combo.price * combo.quantity)
 
         const priceMap = {};
-        ticketPrice.forEach(ticket => {
-            priceMap[ticket.type] = ticket.price;
-        });
+        ticketPrice[0].tickets.forEach(ticket => {
+            priceMap[ticket.seat_type] = ticket.price;
+        })
 
         /** Calculate total amount and format new object for seat_array of schema booking */
         const seats = bookingDto.seats.map(seat => {
