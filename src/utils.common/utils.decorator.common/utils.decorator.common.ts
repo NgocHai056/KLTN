@@ -170,7 +170,8 @@ export function IsStrongPassword(validationOptions?: ValidationOptions) {
 					return strongPasswordRegex.test(value);
 				},
 				defaultMessage: (validationArguments?: ValidationArguments): string => {
-					return UtilsExceptionMessageCommon.showMessageErrorWithData("Invalid password. Must contain at least 8 characters, including uppercase letters, lowercase letters, numbers and special characters.", { "password": `[${validationArguments.property}] Invalid password. Must contain at least 8 characters, including uppercase letters, lowercase letters, numbers and special characters.` }, HttpStatus.UNPROCESSABLE_ENTITY);
+					const propertyName = validationArguments.property;
+					return UtilsExceptionMessageCommon.showMessageErrorWithData("Invalid password. Must contain at least 8 characters, including uppercase letters, lowercase letters, numbers and special characters.", { [propertyName]: `[${validationArguments.property}] Invalid password. Must contain at least 8 characters, including uppercase letters, lowercase letters, numbers and special characters.` }, HttpStatus.UNPROCESSABLE_ENTITY);
 				},
 			},
 		});

@@ -10,7 +10,6 @@ export class UpdatePasswordDto {
     })
     @IsNotEmptyString()
     @IsStrongPassword()
-    @IsOptional()
     password: string;
 
     @ApiProperty({

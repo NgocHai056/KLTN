@@ -92,13 +92,17 @@ export class MovieController {
         let response: ResponseData = new ResponseData();
 
         if ((await this.movieService.findByCondition({ name: movieDto.name })).length !== 0)
-            UtilsExceptionMessageCommon.showMessageError("Name of movie is exist.")
+            UtilsExceptionMessageCommon.showMessageError("Name of movie is exist!")
+
+        if (Number.isNaN(Number(movieDto.duration)))
+            UtilsExceptionMessageCommon.showMessageError("Duration must be number!")
+
 
         if (!files['poster'])
-            UtilsExceptionMessageCommon.showMessageError("Poster is required.")
+            UtilsExceptionMessageCommon.showMessageError("Poster is required!")
 
         if (!files['thumbnail'])
-            UtilsExceptionMessageCommon.showMessageError("Thumbnail is required.")
+            UtilsExceptionMessageCommon.showMessageError("Thumbnail is required!")
 
         const genreDto = movieDto.genres.replace(/\s/g, '').split(',');
         if (!await this.genreService.findByIds(genreDto)) {
@@ -136,6 +140,9 @@ export class MovieController {
         if (!await this.genreService.findByIds(genreDto)) {
             UtilsExceptionMessageCommon.showMessageError("Category does not exist!");
         }
+
+        if (movieDto.duration && Number.isNaN(Number(movieDto.duration)))
+            UtilsExceptionMessageCommon.showMessageError("Duration must be number!")
 
         if (files['poster'])
             Object.assign(movieDto, { poster: await this.firebaseService.uploadImageToFirebase(files['poster'][0]), ...movieDto });

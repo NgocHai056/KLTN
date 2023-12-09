@@ -4,7 +4,6 @@ import {
     Get,
     HttpStatus,
     Param,
-    ParseIntPipe,
     Post,
     Query,
     Res,
@@ -14,23 +13,22 @@ import {
 import { ApiOperation } from "@nestjs/swagger";
 
 
+import * as bcrypt from 'bcrypt';
 import { Response } from "express";
+import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 import { UserStatus } from "src/utils.common/utils.enum/user-status.enum";
 import { VersionEnum } from "src/utils.common/utils.enum/utils.version.enum";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
+import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
+import { GetUserDto } from "./user.dto/get-user.dto";
 import { UpdatePasswordDto } from "./user.dto/user-update-password.dto";
 import { UserUpdateDto } from "./user.dto/user-update.dto";
 import { UserDto } from "./user.dto/user.dto";
+import { UserModel } from "./user.entity/user.model";
 import { UserResponse } from "./user.response/user.response";
 import { UserService } from './user.service';
-import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
-import { UserModel } from "./user.entity/user.model";
-import { ForgotPasswordDto } from "./user.dto/user-forgot-password.dto";
-import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
-import { GetUserDto } from "./user.dto/get-user.dto";
-
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'auth/user' })
 export class UserController {
@@ -104,6 +102,9 @@ export class UserController {
 
         if (!user)
             UtilsExceptionMessageCommon.showMessageError("User not exist.");
+
+        if (!await bcrypt.compare(updateUserDto.password, user.password))
+            UtilsExceptionMessageCommon.showMessageError("Password incorrect.");
 
         const data = await this.userService.updatePassword(userModel.id, updateUserDto.new_password);
 
