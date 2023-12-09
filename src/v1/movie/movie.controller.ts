@@ -1,42 +1,41 @@
 import {
+    Body,
     Controller,
     Get,
-    Post,
-    Body,
-    Query,
     HttpStatus,
     Param,
-    ParseIntPipe,
+    Post,
+    Query,
     Res,
-    UsePipes,
-    ValidationPipe,
+    UploadedFiles,
     UseInterceptors,
-    UploadedFile,
-    UploadedFiles
+    UsePipes,
+    ValidationPipe
 } from "@nestjs/common";
 
-import { Response } from "express";
+import { FileFieldsInterceptor } from "@nestjs/platform-express";
 import { ApiOperation } from '@nestjs/swagger';
-import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
-import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
-import { MovieService } from "./movie.service";
-import { MovieResponse } from "./movie.response/movie.response";
-import { GenreService } from "../genre/genre.service";
-import { MovieDto } from "./movie.dto/movie.dto";
-import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
-import { Movie } from "./movie.entity/movie.entity";
-import { GetMoviesDto } from "./movie.dto/get.movies.dto";
+import { Response } from "express";
+import { FirebaseService } from "src/firebase/firebase.service";
 import { MovieStatus } from "src/utils.common/utils.enum/movie-status.enum";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
-import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
-import { FirebaseService } from "src/firebase/firebase.service";
+import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
+import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
+import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
+import { GenreService } from "../genre/genre.service";
+import { GetMoviesDto } from "./movie.dto/get.movies.dto";
+import { MovieDto } from "./movie.dto/movie.dto";
+import { MovieResponse } from "./movie.response/movie.response";
+import { MovieService } from "./movie.service";
+import { ShowtimeService } from "../showtime/showtime.service";
 
 @Controller({ version: VersionEnum.V1.toString(), path: 'unauth/movie' })
 export class MovieController {
     constructor(
         private readonly movieService: MovieService,
         private readonly genreService: GenreService,
+        private readonly showtimeService: ShowtimeService,
         private readonly firebaseService: FirebaseService
     ) { }
 
@@ -92,7 +91,7 @@ export class MovieController {
     ) {
         let response: ResponseData = new ResponseData();
 
-        if (await this.movieService.findByCondition({ name: movieDto.name }))
+        if ((await this.movieService.findByCondition({ name: movieDto.name })).length !== 0)
             UtilsExceptionMessageCommon.showMessageError("Name of movie is exist.")
 
         if (!files['poster'])
@@ -183,11 +182,24 @@ export class MovieController {
         @Body() ids: string[],
         @Res() res: Response
     ) {
+        if (ids.length === 0)
+            UtilsExceptionMessageCommon.showMessageError("Delete movie failed!");
+
         let response: ResponseData = new ResponseData();
         const movies = await this.movieService.findByIds(ids);
 
         if (movies.length !== ids.length)
             UtilsExceptionMessageCommon.showMessageError("Delete movie failed!");
+
+        /** Get the list of showtimes to check if the movie is in that showtime  */
+        const showtimes = await this.showtimeService.getFutureShowtime();
+
+        const movieShowtimes = showtimes.flatMap(showtime => showtime.movie_id);
+
+        const exist = ids.filter(id => movieShowtimes.includes(id));
+
+        if (exist.length !== 0)
+            UtilsExceptionMessageCommon.showMessageError(`${movies.filter(movie => exist.includes(movie.id)).map(movie => movie.name)} Cannot delete because this movie is already scheduled`);
 
         response.setData(await this.movieService.updateMany(
             { _id: { $in: ids } },

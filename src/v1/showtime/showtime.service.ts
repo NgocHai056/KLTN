@@ -360,8 +360,7 @@ export class ShowtimeService extends BaseService<Showtime> {
         return await this.showtimeRepository.insertMany(allShowtimes);
     }
 
-    @Cron(CronExpression.EVERY_5_MINUTES)
-    async handleCron() {
+    async getFutureShowtime() {
         const currentDate = moment();
 
         const nextDate = moment().add(4, 'days');
@@ -373,7 +372,13 @@ export class ShowtimeService extends BaseService<Showtime> {
             }
         };
 
-        const showtimes = await this.showtimeRepository.find(query).exec();
+        return await this.showtimeRepository.find(query).exec();
+    }
+
+    @Cron(CronExpression.EVERY_5_MINUTES)
+    async handleCron() {
+
+        const showtimes = await this.getFutureShowtime();
 
         const currentTime = new Date();
 

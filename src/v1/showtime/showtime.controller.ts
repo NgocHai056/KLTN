@@ -102,8 +102,12 @@ export class ShowtimeController {
         if (!showtime)
             UtilsExceptionMessageCommon.showMessageError("Showtime not exist.");
 
-        if (new Date(showtime.time) < new Date())
-            UtilsExceptionMessageCommon.showMessageError("Cannot delete showtime with time smaller than current date.");
+        const currentDate = new Date();
+
+        currentDate.setDate(currentDate.getDate() + 4);
+
+        if (new Date(showtime.time) < currentDate)
+            UtilsExceptionMessageCommon.showMessageError("Cannot delete showtime with time smaller than current date + 4 days.");
 
         response.setData(await this.showtimeService.delete(id));
         return res.status(HttpStatus.OK).send(response);
@@ -130,10 +134,8 @@ export class ShowtimeController {
 
     @Post('/auto-create')
     @Roles(Role.MANAGER, Role.ADMIN)
-    @ApiOperation({ summary: "API sao chép lịch chiếu của toàn bộ ngày cụ thể {time} truyền vào!" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async autoCreateShowtimes(
-        @Body() showtimeDto: CopyShowtimeDto,
         @Res() res: Response
     ) {
         let response: ResponseData = new ResponseData();

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ShowtimeService } from './showtime.service';
 import { ShowtimeController } from './showtime.controller';
 import { Showtime, ShowtimeSchema } from './showtime.entity/showtime.entity';
@@ -12,7 +12,7 @@ import { RoomModule } from '../room/room.module';
   imports: [
     MongooseModule.forFeature([{ name: Showtime.name, schema: ShowtimeSchema }]),
     FacadeModule,
-    MovieModule,
+    forwardRef(() => MovieModule),
     GenreModule,
     RoomModule
   ],
