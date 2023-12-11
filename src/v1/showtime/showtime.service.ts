@@ -335,7 +335,7 @@ export class ShowtimeService extends BaseService<Showtime> {
         }
 
         rooms.forEach(room => {
-            const randomNumber = Math.floor(Math.random() * 7) + 1;
+            const randomNumber = Math.floor(Math.random() * 6) + 2;
             for (let i = 0; i < randomNumber; i++) {
 
                 const randomTime = showtimeAraay[Math.floor(Math.random() * showtimeAraay.length)];
