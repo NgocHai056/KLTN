@@ -76,7 +76,12 @@ export class ProductController {
         const query: any = {};
 
         if (productDto.type)
-            query.type = productDto.type;
+            query.type = +productDto.type;
+
+        if (pagination.key_search)
+            query.$or = [
+                { name: { $regex: new RegExp(pagination.key_search, 'i') } }
+            ]
 
         const result = await this.productService.findAllForPagination(+pagination.page, +pagination.page_size, [{ $match: query }]);
         response.setData(result.data);
