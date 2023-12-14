@@ -62,6 +62,7 @@ export class UserController {
         if (!user)
             UtilsExceptionMessageCommon.showMessageError("User not exist.");
 
+        user.access_token = "";
         response.setData(new UserResponse(await this.userService.update(user.id, { status: UserStatus.STOP_WORKING })));
         return res.status(HttpStatus.OK).send(response);
     }
