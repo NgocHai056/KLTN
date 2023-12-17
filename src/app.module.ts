@@ -26,6 +26,7 @@ import { ComboModule } from './v1/combo/combo.module';
 import { ProductModule } from './v1/product/product.module';
 import { ProductInventoryModule } from './v1/product-inventory/product-inventory.module';
 import { FirebaseModule } from './firebase/firebase.module';
+import { StatisticalModule } from './v1/statistical/statistical.module';
 
 
 @Module({
@@ -64,7 +65,8 @@ import { FirebaseModule } from './firebase/firebase.module';
         ComboModule,
         ProductModule,
         ProductInventoryModule,
-        FirebaseModule
+        FirebaseModule,
+        StatisticalModule
     ],
     providers: [
         {

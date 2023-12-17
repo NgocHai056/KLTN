@@ -12,6 +12,7 @@ import { BookingDto } from './booking.dto/booking.dto';
 import { Booking } from './booking.entity/booking.entity';
 import { UserModel } from '../user/user.entity/user.model';
 import { ComboService } from '../combo/combo.service';
+import { BookingStatisticDto } from '../statistical/statistic.dto/booking-statistic.dto';
 
 @Injectable()
 export class BookingService extends BaseService<Booking> {
@@ -19,9 +20,9 @@ export class BookingService extends BaseService<Booking> {
         private readonly ticketPriceService: TicketPriceService,
         private readonly seatService: SeatService,
         private readonly comboServie: ComboService,
-        @InjectModel(Booking.name) private readonly bookingRepository: Model<Booking>
+        @InjectModel(Booking.name) private readonly bookingModel: Model<Booking>
     ) {
-        super(bookingRepository);
+        super(bookingModel);
     }
 
     async createBooking(
@@ -60,7 +61,7 @@ export class BookingService extends BaseService<Booking> {
 
         await this.seatService.createManySeat(roomId, bookingDto.movie_id, bookingDto.time, bookingDto.showtime, seatArray);
 
-        const createdItem = new this.bookingRepository({
+        const createdItem = new this.bookingModel({
             theater_name: bookingDto.theater_name, theater_id: theaterId,
             user_id: user.id, email: user.email, user_name: user.name,
             movie_id: bookingDto.movie_id,
@@ -102,4 +103,148 @@ export class BookingService extends BaseService<Booking> {
             }
         );
     }
+
+    private commonMatch = (theaterId: string, roomId: string, movieId: string, startOfDate: Date, endOfDate: Date) => {
+
+        const query: any = {
+            created_at: { $gte: startOfDate, $lte: endOfDate },
+            payment_status: 1, /** Trạng thái thanh toán đã hoàn thành*/
+        };
+
+        if (theaterId)
+            query.theater_id = theaterId
+
+        if (roomId)
+            query.room_id = roomId
+
+        if (movieId)
+            query.movie_id = movieId
+
+        return query;
+    }
+
+    async calculateRevenueByHourInDay(revenueDto: BookingStatisticDto) {
+
+        const hourData = Array.from({ length: 24 }, (_, index) => ({ date: index, total_revenue: 0 }));
+
+        const startOfDay = new Date(revenueDto.time);
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date(revenueDto.time);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const query = this.commonMatch(revenueDto.theater_id, revenueDto.room_id, revenueDto.movie_id, startOfDay, endOfDay);
+
+        const result = await this.bookingModel.aggregate([
+            {
+                $match: query
+            },
+            {
+                $project: {
+                    hour: { $hour: { $add: ['$created_at', 7 * 60 * 60 * 1000] } },
+                    totalAmount: '$total_amount'
+                }
+            },
+            {
+                $group: {
+                    _id: { hour: '$hour' },
+                    totalRevenue: { $sum: '$totalAmount' }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    date: '$_id.hour',
+                    total_revenue: '$totalRevenue'
+                }
+            },
+            {
+                $sort: { '_id.hour': 1 }
+            }
+        ]);
+
+        return hourData.map(day => {
+            const match = result.find(item => item.date === day.date);
+            return match ? match : day;
+        });
+
+    }
+
+    async calculateRevenueByDayInMonth(revenueDto: BookingStatisticDto, date: Date): Promise<any> {
+
+        const daysInMonth = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 0)).getDate(); // Lấy số ngày trong tháng
+        const monthlyData = Array.from({ length: daysInMonth }, (_, index) => ({ date: index + 1, total_revenue: 0 })); // Tạo mảng có số phần tử bằng số ngày trong tháng, ban đầu có giá trị 0 cho mỗi ngày
+
+        const startOfMonth = new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1));
+        const endOfMonth = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 0));
+
+        const query = this.commonMatch(revenueDto.theater_id, revenueDto.room_id, revenueDto.movie_id, startOfMonth, endOfMonth);
+
+        const result = await this.bookingModel.aggregate([
+            {
+                $match: query
+            },
+            {
+                $group: {
+                    _id: { $dayOfMonth: '$created_at' },
+                    totalRevenue: { $sum: '$total_amount' }
+                }
+            },
+            {
+                $sort: { '_id': 1 }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    date: '$_id',
+                    total_revenue: '$totalRevenue'
+                }
+            }
+        ]);
+
+        return monthlyData.map(day => {
+            const match = result.find(item => item.date === day.date);
+            return match ? match : day;
+        });
+
+    }
+
+
+    async calculateRevenueByMonthInYear(revenueDto: BookingStatisticDto, year: number) {
+        const yearlyData = Array.from({ length: 12 }, (_, index) => ({ date: index + 1, total_revenue: 0 }));
+
+        const startDate = new Date(year, 0, 1); // Ngày bắt đầu của năm
+        const endDate = new Date(year + 1, 0, 0); // Ngày kết thúc của năm
+
+        const query = this.commonMatch(revenueDto.theater_id, revenueDto.room_id, revenueDto.movie_id, startDate, endDate);
+
+        const result = await this.bookingModel.aggregate([
+            {
+                $match: query
+            },
+            {
+                $group: {
+                    _id: { $month: '$created_at' },
+                    totalRevenue: { $sum: '$total_amount' }
+                }
+            },
+            {
+                $sort: { '_id': 1 }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    date: '$_id',
+                    total_revenue: '$totalRevenue'
+                }
+            }
+        ]);
+
+        return yearlyData.map(day => {
+            const match = result.find(item => item.date === day.date);
+            return match ? match : day;
+        });
+
+    }
+
 }
