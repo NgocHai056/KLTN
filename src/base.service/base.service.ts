@@ -43,6 +43,10 @@ export default abstract class BaseService<T extends Document> {
         return (await this.model.aggregate(this.paginationPipeline(page, limit)).exec())[0];
     }
 
+    async countDocuments(): Promise<number> {
+        return await this.model.countDocuments().exec();
+    }
+
     protected paginationPipeline = (page: number = 1, limit: number = 999) => {
         return [
             {

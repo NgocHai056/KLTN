@@ -125,7 +125,7 @@ export class BookingService extends BaseService<Booking> {
 
     async calculateRevenueByHourInDay(revenueDto: BookingStatisticDto) {
 
-        const hourData = Array.from({ length: 24 }, (_, index) => ({ date: index, total_revenue: 0 }));
+        const hourData = Array.from({ length: 24 }, (_, index) => ({ date: index, value: 0 }));
 
         const startOfDay = new Date(revenueDto.time);
         startOfDay.setHours(0, 0, 0, 0);
@@ -155,7 +155,7 @@ export class BookingService extends BaseService<Booking> {
                 $project: {
                     _id: 0,
                     date: '$_id.hour',
-                    total_revenue: '$totalRevenue'
+                    value: '$totalRevenue'
                 }
             },
             {
@@ -173,7 +173,7 @@ export class BookingService extends BaseService<Booking> {
     async calculateRevenueByDayInMonth(revenueDto: BookingStatisticDto, date: Date): Promise<any> {
 
         const daysInMonth = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 0)).getDate(); // Lấy số ngày trong tháng
-        const monthlyData = Array.from({ length: daysInMonth }, (_, index) => ({ date: index + 1, total_revenue: 0 })); // Tạo mảng có số phần tử bằng số ngày trong tháng, ban đầu có giá trị 0 cho mỗi ngày
+        const monthlyData = Array.from({ length: daysInMonth }, (_, index) => ({ date: index + 1, value: 0 })); // Tạo mảng có số phần tử bằng số ngày trong tháng, ban đầu có giá trị 0 cho mỗi ngày
 
         const startOfMonth = new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1));
         const endOfMonth = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 0));
@@ -197,7 +197,7 @@ export class BookingService extends BaseService<Booking> {
                 $project: {
                     _id: 0,
                     date: '$_id',
-                    total_revenue: '$totalRevenue'
+                    value: '$totalRevenue'
                 }
             }
         ]);
@@ -211,7 +211,7 @@ export class BookingService extends BaseService<Booking> {
 
 
     async calculateRevenueByMonthInYear(revenueDto: BookingStatisticDto, year: number) {
-        const yearlyData = Array.from({ length: 12 }, (_, index) => ({ date: index + 1, total_revenue: 0 }));
+        const yearlyData = Array.from({ length: 12 }, (_, index) => ({ date: index + 1, value: 0 }));
 
         const startDate = new Date(year, 0, 1); // Ngày bắt đầu của năm
         const endDate = new Date(year + 1, 0, 0); // Ngày kết thúc của năm
@@ -235,7 +235,7 @@ export class BookingService extends BaseService<Booking> {
                 $project: {
                     _id: 0,
                     date: '$_id',
-                    total_revenue: '$totalRevenue'
+                    value: '$totalRevenue'
                 }
             }
         ]);
@@ -247,4 +247,55 @@ export class BookingService extends BaseService<Booking> {
 
     }
 
+    async getOverallStatistics(theaterId?: string) {
+
+        const query: any = {};
+
+        if (theaterId)
+            query.theater_id = theaterId
+
+        return await this.bookingModel.aggregate([
+            {
+                $match: query
+            },
+            {
+                $group: {
+                    _id: null,
+                    total_revenue: { $sum: '$total_amount' }
+                }
+            }
+        ]);
+
+    }
+
+    async getStatisticByMovie(theaterId?: string) {
+
+        const query: any = {};
+
+        if (theaterId)
+            query.theater_id = theaterId
+
+        return await this.bookingModel.aggregate([
+            {
+                $match: query
+            },
+            {
+                $group: {
+                    _id: '$movie_id',
+                    movie_name: { $first: '$movie_name' },
+                    total_revenue: { $sum: '$total_amount' }, // Tính tổng doanh thu
+                    total_booking: { $sum: 1 } // Đếm số lượng booking
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    movie_name: 1,
+                    total_revenue: 1,
+                    total_booking: 1
+                }
+            }
+        ]);
+
+    }
 }
