@@ -10,16 +10,16 @@ import {
     UploadedFiles,
     UseInterceptors,
     UsePipes,
-    ValidationPipe
+    ValidationPipe,
 } from "@nestjs/common";
 
 import { FileFieldsInterceptor } from "@nestjs/platform-express";
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation } from "@nestjs/swagger";
 import { Response } from "express";
 import { FirebaseService } from "src/firebase/firebase.service";
 import { MovieStatus } from "src/utils.common/utils.enum/movie-status.enum";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
-import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
+import { VersionEnum } from "src/utils.common/utils.enum/utils.version.enum";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
@@ -30,14 +30,14 @@ import { MovieResponse } from "./movie.response/movie.response";
 import { MovieService } from "./movie.service";
 import { ShowtimeService } from "../showtime/showtime.service";
 
-@Controller({ version: VersionEnum.V1.toString(), path: 'unauth/movie' })
+@Controller({ version: VersionEnum.V1.toString(), path: "unauth/movie" })
 export class MovieController {
     constructor(
         private readonly movieService: MovieService,
         private readonly genreService: GenreService,
         private readonly showtimeService: ShowtimeService,
-        private readonly firebaseService: FirebaseService
-    ) { }
+        private readonly firebaseService: FirebaseService,
+    ) {}
 
     @Get()
     @ApiOperation({ summary: "API lấy danh sách phim" })
@@ -45,11 +45,15 @@ export class MovieController {
     async get(
         @Query() movieDto: GetMoviesDto,
         @Query() pagination: PaginationAndSearchDto,
-        @Res() res: Response
+        @Res() res: Response,
     ) {
         let response: ResponseData = new ResponseData();
 
-        let movies = await this.movieService.findMovies([movieDto.genre_id], +movieDto.status, pagination);
+        let movies = await this.movieService.findMovies(
+            [movieDto.genre_id],
+            +movieDto.status,
+            pagination,
+        );
 
         response.setData(movies.data);
         response.setTotalRecord(movies.total_record);
@@ -64,11 +68,16 @@ export class MovieController {
     async getForAdmin(
         @Query() movieDto: GetMoviesDto,
         @Query() pagination: PaginationAndSearchDto,
-        @Res() res: Response
+        @Res() res: Response,
     ) {
         let response: ResponseData = new ResponseData();
 
-        const result = await this.movieService.findMovies(movieDto.genres.replace(/\s/g, '').split(','), +movieDto.status, pagination, true);
+        const result = await this.movieService.findMovies(
+            movieDto.genres.replace(/\s/g, "").split(","),
+            +movieDto.status,
+            pagination,
+            true,
+        );
 
         response.setData(result.data);
         response.setTotalRecord(result.total_record);
@@ -80,41 +89,64 @@ export class MovieController {
     @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API create movie" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    @UseInterceptors(FileFieldsInterceptor([
-        { name: 'poster', maxCount: 1 },
-        { name: 'thumbnail', maxCount: 1 },
-    ]))
+    @UseInterceptors(
+        FileFieldsInterceptor([
+            { name: "poster", maxCount: 1 },
+            { name: "thumbnail", maxCount: 1 },
+        ]),
+    )
     async create(
         @UploadedFiles() files: Record<string, any>,
         @Body() movieDto: MovieDto,
-        @Res() res: Response
+        @Res() res: Response,
     ) {
         let response: ResponseData = new ResponseData();
 
-        if ((await this.movieService.findByCondition({ name: movieDto.name })).length !== 0)
-            UtilsExceptionMessageCommon.showMessageError("Name of movie is exist!")
+        if (
+            (await this.movieService.findByCondition({ name: movieDto.name }))
+                .length !== 0
+        )
+            UtilsExceptionMessageCommon.showMessageError(
+                "Name of movie is exist!",
+            );
 
         if (Number.isNaN(Number(movieDto.duration)))
-            UtilsExceptionMessageCommon.showMessageError("Duration must be number!")
+            UtilsExceptionMessageCommon.showMessageError(
+                "Duration must be number!",
+            );
 
+        if (!files["poster"])
+            UtilsExceptionMessageCommon.showMessageError("Poster is required!");
 
-        if (!files['poster'])
-            UtilsExceptionMessageCommon.showMessageError("Poster is required!")
+        if (!files["thumbnail"])
+            UtilsExceptionMessageCommon.showMessageError(
+                "Thumbnail is required!",
+            );
 
-        if (!files['thumbnail'])
-            UtilsExceptionMessageCommon.showMessageError("Thumbnail is required!")
-
-        const genreDto = movieDto.genres.replace(/\s/g, '').split(',');
-        if (!await this.genreService.findByIds(genreDto)) {
-            UtilsExceptionMessageCommon.showMessageError("Category does not exist!");
+        const genreDto = movieDto.genres.replace(/\s/g, "").split(",");
+        if (!(await this.genreService.findByIds(genreDto))) {
+            UtilsExceptionMessageCommon.showMessageError(
+                "Category does not exist!",
+            );
         }
 
-        const posterUrl = await this.firebaseService.uploadImageToFirebase(files['poster'][0]);
-        const thumbnailUrl = await this.firebaseService.uploadImageToFirebase(files['thumbnail'][0]);
+        const posterUrl = await this.firebaseService.uploadImageToFirebase(
+            files["poster"][0],
+        );
+        const thumbnailUrl = await this.firebaseService.uploadImageToFirebase(
+            files["thumbnail"][0],
+        );
 
         const { genres, ...rest } = movieDto;
 
-        response.setData(await this.movieService.create({ ...rest, genres: genreDto, poster: posterUrl, thumbnail: thumbnailUrl }));
+        response.setData(
+            await this.movieService.create({
+                ...rest,
+                genres: genreDto,
+                poster: posterUrl,
+                thumbnail: thumbnailUrl,
+            }),
+        );
 
         return res.status(HttpStatus.OK).send(response);
     }
@@ -123,61 +155,59 @@ export class MovieController {
     @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API update movie" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    @UseInterceptors(FileFieldsInterceptor([
-        { name: 'poster', maxCount: 1 },
-        { name: 'thumbnail', maxCount: 1 },
-    ]))
+    @UseInterceptors(
+        FileFieldsInterceptor([
+            { name: "poster", maxCount: 1 },
+            { name: "thumbnail", maxCount: 1 },
+        ]),
+    )
     async update(
         @Param("id") id: string,
         @UploadedFiles() files: Record<string, any>,
         @Body() movieDto: MovieDto,
-        @Res() res: Response
+        @Res() res: Response,
     ) {
         let response: ResponseData = new ResponseData();
 
-        const genreDto = movieDto.genres.replace(/\s/g, '').split(',');
+        const genreDto = movieDto.genres.replace(/\s/g, "").split(",");
 
-        if (!await this.genreService.findByIds(genreDto)) {
-            UtilsExceptionMessageCommon.showMessageError("Category does not exist!");
+        if (!(await this.genreService.findByIds(genreDto))) {
+            UtilsExceptionMessageCommon.showMessageError(
+                "Category does not exist!",
+            );
         }
 
         if (movieDto.duration && Number.isNaN(Number(movieDto.duration)))
-            UtilsExceptionMessageCommon.showMessageError("Duration must be number!")
+            UtilsExceptionMessageCommon.showMessageError(
+                "Duration must be number!",
+            );
 
-        if (files['poster'])
-            Object.assign(movieDto, { poster: await this.firebaseService.uploadImageToFirebase(files['poster'][0]), ...movieDto });
+        if (files["poster"])
+            Object.assign(movieDto, {
+                poster: await this.firebaseService.uploadImageToFirebase(
+                    files["poster"][0],
+                ),
+                ...movieDto,
+            });
 
-        if (files['thumbnail'])
-            Object.assign(movieDto, { thumbnail: await this.firebaseService.uploadImageToFirebase(files['thumbnail'][0]), ...movieDto });
+        if (files["thumbnail"])
+            Object.assign(movieDto, {
+                thumbnail: await this.firebaseService.uploadImageToFirebase(
+                    files["thumbnail"][0],
+                ),
+                ...movieDto,
+            });
 
         const { genres, status, ...rest } = movieDto;
 
-        response.setData(await this.movieService.update(id, { ...rest, status: +status, genres: genreDto }));
+        response.setData(
+            await this.movieService.update(id, {
+                ...rest,
+                status: +status,
+                genres: genreDto,
+            }),
+        );
 
-        return res.status(HttpStatus.OK).send(response);
-    }
-
-    @Get("/:id")
-    @ApiOperation({ summary: "API get movie by id" })
-    @UsePipes(new ValidationPipe({ transform: true }))
-    async findOne(
-        @Param("id") id: string,
-        @Res() res: Response
-    ) {
-        let response: ResponseData = new ResponseData();
-
-        let movie = await this.movieService.find(id);
-
-        if (!movie || movie.status === MovieStatus.STOP_SHOWING) {
-            UtilsExceptionMessageCommon.showMessageError("Movie does not exist!");
-        }
-
-        let result = new MovieResponse(movie);
-        let genres = await this.genreService.findByIds(movie.genres);
-
-        result.genres = genres.map(genre => genre.name).join(', ');
-
-        response.setData(result);
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -185,33 +215,106 @@ export class MovieController {
     @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API delete movie" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async delete(
-        @Body() ids: string[],
-        @Res() res: Response
-    ) {
+    async delete(@Body() ids: string[], @Res() res: Response) {
         if (ids.length === 0)
-            UtilsExceptionMessageCommon.showMessageError("Delete movie failed!");
+            UtilsExceptionMessageCommon.showMessageError(
+                "Delete movie failed!",
+            );
 
         let response: ResponseData = new ResponseData();
         const movies = await this.movieService.findByIds(ids);
 
         if (movies.length !== ids.length)
-            UtilsExceptionMessageCommon.showMessageError("Delete movie failed!");
+            UtilsExceptionMessageCommon.showMessageError(
+                "Delete movie failed!",
+            );
 
         /** Get the list of showtimes to check if the movie is in that showtime  */
         const showtimes = await this.showtimeService.getFutureShowtime();
 
-        const movieShowtimes = showtimes.flatMap(showtime => showtime.movie_id);
+        const movieShowtimes = showtimes.flatMap(
+            (showtime) => showtime.movie_id,
+        );
 
-        const exist = ids.filter(id => movieShowtimes.includes(id));
+        const exist = ids.filter((id) => movieShowtimes.includes(id));
 
         if (exist.length !== 0)
-            UtilsExceptionMessageCommon.showMessageError(`${movies.filter(movie => exist.includes(movie.id)).map(movie => movie.name)} Cannot delete because this movie is already scheduled`);
+            UtilsExceptionMessageCommon.showMessageError(
+                `${movies
+                    .filter((movie) => exist.includes(movie.id))
+                    .map(
+                        (movie) => movie.name,
+                    )} Cannot delete because this movie is already scheduled`,
+            );
 
-        response.setData(await this.movieService.updateMany(
-            { _id: { $in: ids } },
-            { $set: { status: MovieStatus.STOP_SHOWING } }
-        ) ? { msg: "Update successful." } : { msg: "Update failed." });
+        response.setData(
+            (await this.movieService.updateMany(
+                { _id: { $in: ids } },
+                { $set: { status: MovieStatus.STOP_SHOWING } },
+            ))
+                ? { msg: "Update successful." }
+                : { msg: "Update failed." },
+        );
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Get("/most-view")
+    @ApiOperation({ summary: "API to retrieve the most sold movies" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async getMovieByShowtime(@Res() res: Response) {
+        let response: ResponseData = new ResponseData();
+
+        const movieIds = await this.showtimeService.findLatestUniqueMovies();
+
+        const soldedMovies = await this.movieService.findByIds(movieIds);
+
+        const presentMovies =
+            await this.movieService.findDocumentsExceptIds(movieIds);
+
+        let movies = [...soldedMovies, ...presentMovies];
+
+        const genres = await this.genreService.findAll();
+
+        const genreMap = {};
+        genres.forEach((genre) => {
+            genreMap[genre.id] = genre.name;
+        });
+
+        const mapGenreName = (genreId) => {
+            return genreMap[genreId] || "";
+        };
+
+        // Map genre names for each data item
+        const mappedData = movies.map((item) => {
+            item.genres = item.genres.map(mapGenreName);
+
+            return item;
+        });
+
+        response.setData(mappedData);
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Get("/:id")
+    @ApiOperation({ summary: "API get movie by id" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async findOne(@Param("id") id: string, @Res() res: Response) {
+        let response: ResponseData = new ResponseData();
+
+        let movie = await this.movieService.find(id);
+
+        if (!movie || movie.status === MovieStatus.STOP_SHOWING) {
+            UtilsExceptionMessageCommon.showMessageError(
+                "Movie does not exist!",
+            );
+        }
+
+        let result = new MovieResponse(movie);
+        let genres = await this.genreService.findByIds(movie.genres);
+
+        result.genres = genres.map((genre) => genre.name).join(", ");
+
+        response.setData(result);
         return res.status(HttpStatus.OK).send(response);
     }
 }

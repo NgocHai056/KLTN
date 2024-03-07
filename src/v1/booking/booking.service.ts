@@ -5,15 +5,16 @@ import BaseService from "src/base.service/base.service";
 import { PaymentStatus } from "src/utils.common/utils.enum/payment-status.enum";
 import { SeatStatus } from "src/utils.common/utils.enum/seat-status.enum";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
+import { ComboService } from "../combo/combo.service";
+import { MemberService } from "../member/member.service";
 import { Movie } from "../movie/movie.entity/movie.entity";
+import { MovieService } from "../movie/movie.service";
 import { SeatService } from "../seat/seat.service";
+import { BookingStatisticDto } from "../statistical/statistic.dto/booking-statistic.dto";
 import { TicketPriceService } from "../ticket-price/ticket-price.service";
+import { UserModel } from "../user/user.entity/user.model";
 import { BookingDto } from "./booking.dto/booking.dto";
 import { Booking } from "./booking.entity/booking.entity";
-import { UserModel } from "../user/user.entity/user.model";
-import { ComboService } from "../combo/combo.service";
-import { BookingStatisticDto } from "../statistical/statistic.dto/booking-statistic.dto";
-import { MemberService } from "../member/member.service";
 
 @Injectable()
 export class BookingService extends BaseService<Booking> {
@@ -21,6 +22,7 @@ export class BookingService extends BaseService<Booking> {
         private readonly ticketPriceService: TicketPriceService,
         private readonly seatService: SeatService,
         private readonly comboServie: ComboService,
+        private readonly movieService: MovieService,
         private readonly memberService: MemberService,
         @InjectModel(Booking.name)
         private readonly bookingModel: Model<Booking>,
