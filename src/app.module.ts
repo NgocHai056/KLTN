@@ -33,6 +33,7 @@ import { ProductInventoryModule } from "./v1/product-inventory/product-inventory
 import { FirebaseModule } from "./firebase/firebase.module";
 import { StatisticalModule } from "./v1/statistical/statistical.module";
 import { MemberModule } from "./v1/member/member.module";
+import { SocketGateway } from "./socket/socket.gateway";
 
 @Module({
     imports: [
@@ -78,6 +79,7 @@ import { MemberModule } from "./v1/member/member.module";
             provide: APP_GUARD,
             useClass: AuthenticationMiddleware,
         },
+        SocketGateway,
     ],
 })
 export class AppModule implements NestModule {

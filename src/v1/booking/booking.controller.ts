@@ -189,9 +189,15 @@ export class BookingController {
         if (!booking)
             UtilsExceptionMessageCommon.showMessageError("Booking not found!");
 
+        const movie = await this.movieService.find(booking.movie_id);
+
         booking.time = UtilsDate.formatDateVNToString(new Date(booking.time));
 
-        response.setData(booking);
+        response.setData({
+            ...booking.toObject(),
+            movie_age: movie.age,
+            movie_poster: movie.poster,
+        });
         return res.status(HttpStatus.OK).send(response);
     }
 }
