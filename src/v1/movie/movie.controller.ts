@@ -29,6 +29,8 @@ import { MovieDto } from "./movie.dto/movie.dto";
 import { MovieResponse } from "./movie.response/movie.response";
 import { MovieService } from "./movie.service";
 import { ShowtimeService } from "../showtime/showtime.service";
+import { Movie } from "./movie.entity/movie.entity";
+import { UtilsDate } from "src/utils.common/utils.format-time.common/utils.format-time.common";
 
 @Controller({ version: VersionEnum.V1.toString(), path: "unauth/movie" })
 export class MovieController {
@@ -271,7 +273,7 @@ export class MovieController {
         const presentMovies =
             await this.movieService.findDocumentsExceptIds(movieIds);
 
-        let movies = [...soldedMovies, ...presentMovies];
+        let movies: Movie[] = [...soldedMovies, ...presentMovies];
 
         const genres = await this.genreService.findAll();
 
@@ -288,7 +290,10 @@ export class MovieController {
         const mappedData = movies.map((item) => {
             item.genres = item.genres.map(mapGenreName);
 
-            return item;
+            return {
+                ...item.toJSON(),
+                release: UtilsDate.formatDateVNToString(new Date(item.release)),
+            };
         });
 
         response.setData(mappedData);
