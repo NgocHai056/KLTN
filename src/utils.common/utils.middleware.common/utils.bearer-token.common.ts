@@ -1,4 +1,11 @@
-import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable, NestMiddleware } from "@nestjs/common";
+import {
+    CanActivate,
+    ExecutionContext,
+    HttpException,
+    HttpStatus,
+    Injectable,
+    NestMiddleware,
+} from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { ROLES_KEY, Role } from "../utils.enum/role.enum";
 import { NextFunction, Request, Response } from "express";
@@ -11,19 +18,16 @@ import { UserModel } from "src/v1/user/user.entity/user.model";
 
 @Injectable()
 export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
-
     constructor(
         private userService: UserService,
-        private reflector: Reflector
-    ) { }
+        private reflector: Reflector,
+    ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-
-        const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
-            context.getHandler(),
-            context.getClass(),
-
-        ]);
+        const requiredRoles = this.reflector.getAllAndOverride<Role[]>(
+            ROLES_KEY,
+            [context.getHandler(), context.getClass()],
+        );
 
         if (!requiredRoles) {
             return true;
@@ -36,7 +40,9 @@ export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
             if (privilege === Role.ADMIN) {
                 return true;
             } else if (!requiredRoles.some((role) => privilege === role)) {
-                UtilsExceptionMessageCommon.showMessageError("You do not have access to this functionality!");
+                UtilsExceptionMessageCommon.showMessageError(
+                    "You do not have access to this functionality!",
+                );
             }
         }
 
@@ -47,22 +53,33 @@ export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
         let bearerToken: string = req.headers.authorization;
 
         if (!bearerToken || bearerToken === "") {
-            UtilsExceptionMessageCommon.showMessageError("Check to see if you have passed the token!");
+            UtilsExceptionMessageCommon.showMessageError(
+                "Check to see if you have passed the token!",
+            );
         }
 
-        let decodeBearerTokenInterFace: JwtTokenInterFace = await new JwtToken().verifyBearerToken(bearerToken, process.env.ACCESS_TOKEN_SECRET);
+        let decodeBearerTokenInterFace: JwtTokenInterFace =
+            await new JwtToken().verifyBearerToken(
+                bearerToken,
+                process.env.ACCESS_TOKEN_SECRET,
+            );
 
         let user: User = await this.userService.find(
-            decodeBearerTokenInterFace.user_id
+            decodeBearerTokenInterFace.user_id,
         );
 
-        if (user.access_token !== decodeBearerTokenInterFace.jwt_token) {
-            UtilsExceptionMessageCommon.showMessageErrorAndStatus("Token is incorrect.", HttpStatus.UNAUTHORIZED);
+        if (
+            !user ||
+            user.access_token !== decodeBearerTokenInterFace.jwt_token
+        ) {
+            UtilsExceptionMessageCommon.showMessageErrorAndStatus(
+                "Token is incorrect.",
+                HttpStatus.UNAUTHORIZED,
+            );
         }
 
         req.user = new UserModel(user);
 
         next();
     }
-
 }
