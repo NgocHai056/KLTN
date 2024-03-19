@@ -34,6 +34,7 @@ import { FirebaseModule } from "./firebase/firebase.module";
 import { StatisticalModule } from "./v1/statistical/statistical.module";
 import { MemberModule } from "./v1/member/member.module";
 import { SocketGateway } from "./socket/socket.gateway";
+import { VersionEnum } from "./utils.common/utils.enum/utils.version.enum";
 
 @Module({
     imports: [
@@ -89,6 +90,11 @@ export class AppModule implements NestModule {
             .exclude(
                 { path: "/v1/oauth/*", method: RequestMethod.POST },
                 { path: "/v1/unauth/*", method: RequestMethod.GET },
+                {
+                    path: "/auth/payment/booking-confirm",
+                    method: RequestMethod.GET,
+                    version: VersionEnum.V1.toString(),
+                },
             )
             .forRoutes(
                 { path: "/v1/oauth/*", method: RequestMethod.GET },
