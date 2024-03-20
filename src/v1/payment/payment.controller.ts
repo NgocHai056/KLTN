@@ -55,7 +55,9 @@ export class PaymentController {
 
         const tmnCode = process.env.vnp_TmnCode;
         const vnpUrl = process.env.vnp_Url;
-        const returnUrl = process.env.vnp_ReturnUrl;
+        const returnUrl = "https://nh-cinema.vercel.app/payment-detail".concat(
+            paymentDto.return_url ? "-no-login" : "",
+        );
         const amount = booking.total_amount;
 
         let locale = paymentDto.language;
