@@ -1,51 +1,51 @@
 import {
+    Body,
     Controller,
     Get,
-    Post,
-    Body,
     HttpStatus,
     Param,
-    ParseIntPipe,
+    Post,
+    Query,
     Res,
     UsePipes,
     ValidationPipe,
-    Query
 } from "@nestjs/common";
 
+import { ApiOperation } from "@nestjs/swagger";
 import { Response } from "express";
-import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
-import { TheaterService } from './theater.service';
-import { ApiOperation } from '@nestjs/swagger';
-import { TheaterDto } from "./theater.dto/theater.dto";
-import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
-import { TheaterResponse } from "./theater.response/theater.response";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
+import { VersionEnum } from "src/utils.common/utils.enum/utils.version.enum";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
+import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
+import { TheaterDto } from "./theater.dto/theater.dto";
+import { TheaterResponse } from "./theater.response/theater.response";
+import { TheaterService } from "./theater.service";
 
-@Controller({ version: VersionEnum.V1.toString(), path: 'unauth/theater' })
+@Controller({ version: VersionEnum.V1.toString(), path: "unauth/theater" })
 export class TheaterController {
-    constructor(private theaterService: TheaterService) { }
+    constructor(private theaterService: TheaterService) {}
 
     @Post("/delete")
     @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API delete theater" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async delete(
-        @Body() theaterIds: string[],
-        @Res() res: Response
-    ) {
-        let response: ResponseData = new ResponseData();
+    async delete(@Body() theaterIds: string[], @Res() res: Response) {
+        const response: ResponseData = new ResponseData();
 
         const theaters = await this.theaterService.findByIds(theaterIds);
 
         if (theaters.length === 0)
             UtilsExceptionMessageCommon.showMessageError("Theater not exist.");
 
-        response.setData(await this.theaterService
-            .updateMany(
-                { _id: { $in: theaters.flatMap(x => x.id) } },
-                { $set: { status: 0 } }) ? { msg: "Update successful." } : { msg: "Update failed." });
+        response.setData(
+            (await this.theaterService.updateMany(
+                { _id: { $in: theaters.flatMap((x) => x.id) } },
+                { $set: { status: 0 } },
+            ))
+                ? { msg: "Update successful." }
+                : { msg: "Update failed." },
+        );
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -56,9 +56,9 @@ export class TheaterController {
     async update(
         @Param("id") id: string,
         @Body() theaterDto: TheaterDto,
-        @Res() res: Response
+        @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         const theater = await this.theaterService.find(id);
 
@@ -67,7 +67,9 @@ export class TheaterController {
 
         Object.assign(theater, theaterDto);
 
-        response.setData(new TheaterResponse(await this.theaterService.update(id, theater)));
+        response.setData(
+            new TheaterResponse(await this.theaterService.update(id, theater)),
+        );
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -75,25 +77,28 @@ export class TheaterController {
     @Roles(Role.ADMIN)
     @ApiOperation({ summary: "API create theater" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async create(
-        @Body() theaterDto: TheaterDto,
-        @Res() res: Response
-    ) {
-        let response: ResponseData = new ResponseData();
+    async create(@Body() theaterDto: TheaterDto, @Res() res: Response) {
+        const response: ResponseData = new ResponseData();
 
-        response.setData(new TheaterResponse(await this.theaterService.create(theaterDto)));
+        response.setData(
+            new TheaterResponse(await this.theaterService.create(theaterDto)),
+        );
         return res.status(HttpStatus.OK).send(response);
     }
 
     @Get("")
     @ApiOperation({ summary: "API get list theater" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async findAll(
-        @Res() res: Response
-    ) {
-        let response: ResponseData = new ResponseData();
+    async findAll(@Res() res: Response) {
+        const response: ResponseData = new ResponseData();
 
-        response.setData(TheaterResponse.mapToList((await this.theaterService.findAll()).filter(theater => theater.status !== 0)));
+        response.setData(
+            TheaterResponse.mapToList(
+                (await this.theaterService.findAll()).filter(
+                    (theater) => theater.status !== 0,
+                ),
+            ),
+        );
         return res.status(HttpStatus.OK).send(response);
     }
 
@@ -103,22 +108,26 @@ export class TheaterController {
     @UsePipes(new ValidationPipe({ transform: true }))
     async findAllAdmin(
         @Query() pagination: PaginationAndSearchDto,
-        @Res() res: Response
+        @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         const query: any = {};
 
         const keySearch = pagination.key_search;
 
-        if (keySearch !== '') {
+        if (keySearch !== "") {
             query.$or = [
-                { name: { $regex: new RegExp(keySearch, 'i') } },
-                { address: { $regex: new RegExp(keySearch, 'i') } },
+                { name: { $regex: new RegExp(keySearch, "i") } },
+                { address: { $regex: new RegExp(keySearch, "i") } },
             ];
         }
 
-        const result = await this.theaterService.findAllForPagination(+pagination.page, +pagination.page_size, [{ $match: query }]);
+        const result = await this.theaterService.findAllForPagination(
+            +pagination.page,
+            +pagination.page_size,
+            [{ $match: query }],
+        );
         response.setData(result.data);
         response.setTotalRecord(result.total_record);
 
@@ -128,11 +137,8 @@ export class TheaterController {
     @Get("/:id")
     @ApiOperation({ summary: "API get theater by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async findOne(
-        @Param("id") id: string,
-        @Res() res: Response
-    ) {
-        let response: ResponseData = new ResponseData();
+    async findOne(@Param("id") id: string, @Res() res: Response) {
+        const response: ResponseData = new ResponseData();
 
         const theater = await this.theaterService.find(id);
 

@@ -1,11 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDateString, IsOptional, IsPhoneNumber, IsString } from "class-validator";
+import { IsDateString, IsOptional, IsPhoneNumber } from "class-validator";
 import { IsNotEmptyString } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 
 export class UserUpdateDto {
     @ApiProperty({
         example: "Happy coding!",
-        description: ""
+        description: "",
     })
     @IsNotEmptyString()
     @IsOptional()
@@ -13,16 +13,16 @@ export class UserUpdateDto {
 
     @ApiProperty({
         example: "Happy coding!",
-        description: ""
+        description: "",
     })
     @IsNotEmptyString()
     @IsOptional()
-    @IsPhoneNumber('VN')
+    @IsPhoneNumber("VN")
     readonly phone?: string;
 
     @ApiProperty({
         example: "2023-06-06",
-        description: "Date of birth"
+        description: "Date of birth",
     })
     @IsDateString()
     @IsOptional()
@@ -30,10 +30,9 @@ export class UserUpdateDto {
 
     @ApiProperty({
         example: "Female",
-        description: "Gender of user"
+        description: "Gender of user",
     })
     @IsNotEmptyString()
     @IsOptional()
     readonly gender?: string;
-
 }

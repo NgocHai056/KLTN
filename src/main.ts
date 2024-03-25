@@ -1,9 +1,14 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { HttpException, HttpStatus, ValidationError, ValidationPipe, VersioningType } from '@nestjs/common';
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
+import {
+    HttpException,
+    HttpStatus,
+    ValidationError,
+    ValidationPipe,
+    VersioningType,
+} from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { ExceptionResponseDetail } from './utils.common/utils.exception.common/utils.exception.common';
-
+import { ExceptionResponseDetail } from "./utils.common/utils.exception.common/utils.exception.common";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -12,7 +17,7 @@ async function bootstrap() {
         type: VersioningType.URI,
     });
 
-    app.setGlobalPrefix("/api")
+    app.setGlobalPrefix("/api");
 
     app.useGlobalPipes(
         new ValidationPipe({
@@ -20,24 +25,22 @@ async function bootstrap() {
                 throw new HttpException(
                     new ExceptionResponseDetail(
                         HttpStatus.BAD_REQUEST,
-                        Object.values(validationErrors[0].constraints)[0]
+                        Object.values(validationErrors[0].constraints)[0],
                     ),
-                    HttpStatus.BAD_REQUEST
+                    HttpStatus.BAD_REQUEST,
                 );
             },
-        })
+        }),
     );
 
     const config = new DocumentBuilder()
         .setTitle("CINEMA VERSION 1")
-        .setDescription(
-            `Không biết mô tả sao nha ^.^`
-        )
+        .setDescription(`Không biết mô tả sao nha ^.^`)
         .setVersion("1.0")
         .setBasePath("api")
         .addBearerAuth(
             { type: "http", scheme: "bearer", bearerFormat: "JWT" },
-            "access-token"
+            "access-token",
         )
         .addBearerAuth()
         .build();
@@ -49,8 +52,6 @@ async function bootstrap() {
 
     await app.listen(process.env.PORT, "0.0.0.0");
 
-    console.log(
-        `Application is running on: ${await app.getUrl()}`
-    );
+    console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

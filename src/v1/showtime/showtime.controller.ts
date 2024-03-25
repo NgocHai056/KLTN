@@ -8,12 +8,12 @@ import {
     Query,
     Res,
     UsePipes,
-    ValidationPipe
+    ValidationPipe,
 } from "@nestjs/common";
 
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation } from "@nestjs/swagger";
 import { Response } from "express";
-import { VersionEnum } from 'src/utils.common/utils.enum/utils.version.enum';
+import { VersionEnum } from "src/utils.common/utils.enum/utils.version.enum";
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
 
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
@@ -24,36 +24,41 @@ import { GetShowtimeDto } from "./showtime.dto/get-time.dto";
 import { ShowtimeUpdateDto } from "./showtime.dto/showtime-update.dto";
 import { ShowtimeDto } from "./showtime.dto/showtime.dto";
 import { ShowtimeResponse } from "./showtime.response/showtime.response";
-import { ShowtimeService } from './showtime.service';
+import { ShowtimeService } from "./showtime.service";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
 
-@Controller({ version: VersionEnum.V1.toString(), path: 'unauth/showtime' })
+@Controller({ version: VersionEnum.V1.toString(), path: "unauth/showtime" })
 export class ShowtimeController {
     constructor(
         private readonly showtimeService: ShowtimeService,
-        private readonly facadeService: FacadeService
-    ) { }
+        private readonly facadeService: FacadeService,
+    ) {}
 
     @Post("")
     @Roles(Role.MANAGER, Role.ADMIN)
     @ApiOperation({ summary: "API tạo suất chiếu" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async create(
-        @Body() showtimeDto: ShowtimeDto,
-        @Res() res: Response
-    ) {
-        let response: ResponseData = new ResponseData();
+    async create(@Body() showtimeDto: ShowtimeDto, @Res() res: Response) {
+        const response: ResponseData = new ResponseData();
 
         /** Check if theater, room and movie have exist */
         await this.facadeService.checkTheaterRoomAndMovieExistence(
-            showtimeDto.theater_id, showtimeDto.room_id, showtimeDto.movie_id);
+            showtimeDto.theater_id,
+            showtimeDto.room_id,
+            showtimeDto.movie_id,
+        );
 
-        response.setData(await this.showtimeService.createShowtime(
-            showtimeDto.room_id, showtimeDto.movie_id, showtimeDto.time, showtimeDto.showtime));
+        response.setData(
+            await this.showtimeService.createShowtime(
+                showtimeDto.room_id,
+                showtimeDto.movie_id,
+                showtimeDto.time,
+                showtimeDto.showtime,
+            ),
+        );
         return res.status(HttpStatus.OK).send(response);
     }
-
 
     @Post("/:id/update")
     @Roles(Role.MANAGER, Role.ADMIN)
@@ -62,9 +67,9 @@ export class ShowtimeController {
     async update(
         @Param("id") id: string,
         @Body() showtimeDto: ShowtimeUpdateDto,
-        @Res() res: Response
+        @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         const showtime = await this.showtimeService.find(id);
 
@@ -73,15 +78,23 @@ export class ShowtimeController {
 
         /** Check if theater, room and movie have exist */
         await this.facadeService.checkRoomAndMovieExistence(
-            showtimeDto.room_id, showtimeDto.movie_id);
+            showtimeDto.room_id,
+            showtimeDto.movie_id,
+        );
 
         Object.assign(showtime, showtimeDto);
 
-        const checkShowtime = await this.showtimeService
-            .findByCondition({ room_id: showtime.room_id, movie_id: showtime.movie_id, time: showtime.time, showtime: showtime.showtime });
+        const checkShowtime = await this.showtimeService.findByCondition({
+            room_id: showtime.room_id,
+            movie_id: showtime.movie_id,
+            time: showtime.time,
+            showtime: showtime.showtime,
+        });
 
         if (checkShowtime.length !== 0)
-            UtilsExceptionMessageCommon.showMessageError("Update showtime failed. Because showtimes overlapped.");
+            UtilsExceptionMessageCommon.showMessageError(
+                "Update showtime failed. Because showtimes overlapped.",
+            );
 
         response.setData(await this.showtimeService.update(id, showtime));
         return res.status(HttpStatus.OK).send(response);
@@ -91,11 +104,8 @@ export class ShowtimeController {
     @Roles(Role.MANAGER, Role.ADMIN)
     @ApiOperation({ summary: "API xóa suất chiếu" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async delete(
-        @Param("id") id: string,
-        @Res() res: Response
-    ) {
-        let response: ResponseData = new ResponseData();
+    async delete(@Param("id") id: string, @Res() res: Response) {
+        const response: ResponseData = new ResponseData();
 
         const showtime = await this.showtimeService.find(id);
 
@@ -107,38 +117,48 @@ export class ShowtimeController {
         currentDate.setDate(currentDate.getDate() + 4);
 
         if (new Date(showtime.time) < currentDate)
-            UtilsExceptionMessageCommon.showMessageError("Cannot delete showtime with time smaller than current date + 4 days.");
+            UtilsExceptionMessageCommon.showMessageError(
+                "Cannot delete showtime with time smaller than current date + 4 days.",
+            );
 
         response.setData(await this.showtimeService.delete(id));
         return res.status(HttpStatus.OK).send(response);
     }
 
-    @Post('/copy-showtime')
+    @Post("/copy-showtime")
     @Roles(Role.MANAGER, Role.ADMIN)
-    @ApiOperation({ summary: "API sao chép lịch chiếu của toàn bộ ngày cụ thể {time} truyền vào!" })
+    @ApiOperation({
+        summary:
+            "API sao chép lịch chiếu của toàn bộ ngày cụ thể {time} truyền vào!",
+    })
     @UsePipes(new ValidationPipe({ transform: true }))
     async copyShowtimes(
         @Body() showtimeDto: CopyShowtimeDto,
-        @Res() res: Response
+        @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
-        response.setData(await this.showtimeService.copyShowtime(
-            /** Lấy danh sách room theo theater_id */
-            (await this.facadeService.getRoomsByTheaterId(showtimeDto.theater_id)).map(room => room.id),
-            showtimeDto.time, showtimeDto.target_time)
+        response.setData(
+            await this.showtimeService.copyShowtime(
+                /** Lấy danh sách room theo theater_id */
+                (
+                    await this.facadeService.getRoomsByTheaterId(
+                        showtimeDto.theater_id,
+                    )
+                ).map((room) => room.id),
+                showtimeDto.time,
+                showtimeDto.target_time,
+            ),
         );
 
         return res.status(HttpStatus.OK).send(response);
     }
 
-    @Post('/auto-create')
+    @Post("/auto-create")
     @Roles(Role.MANAGER, Role.ADMIN)
     @UsePipes(new ValidationPipe({ transform: true }))
-    async autoCreateShowtimes(
-        @Res() res: Response
-    ) {
-        let response: ResponseData = new ResponseData();
+    async autoCreateShowtimes(@Res() res: Response) {
+        const response: ResponseData = new ResponseData();
 
         response.setData(await this.showtimeService.autoCreateShowtime());
 
@@ -147,59 +167,74 @@ export class ShowtimeController {
 
     @Get()
     @Roles(Role.MANAGER, Role.ADMIN)
-    @ApiOperation({ summary: "API lấy danh sách tất cả lịch chiếu theo rạp chiếu phim" })
+    @ApiOperation({
+        summary: "API lấy danh sách tất cả lịch chiếu theo rạp chiếu phim",
+    })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findAll(
         @Query() pagination: PaginationAndSearchDto,
         @Query() showtimeDto: GetShowtimeDto,
-        @Res() res: Response
+        @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
-        const result = await this.showtimeService
-            .findAllByTheater(
-                /** Lấy danh sách room theo theater_id */
-                (await this.facadeService.getRoomsByTheaterId(showtimeDto.theater_id)).map(room => room.id),
-                showtimeDto.movie_id, showtimeDto.time, pagination)
+        const result = await this.showtimeService.findAllByTheater(
+            /** Lấy danh sách room theo theater_id */
+            (
+                await this.facadeService.getRoomsByTheaterId(
+                    showtimeDto.theater_id,
+                )
+            ).map((room) => room.id),
+            showtimeDto.movie_id,
+            showtimeDto.time,
+            pagination,
+        );
 
         response.setData(result.data);
-        response.setTotalRecord(result.total_record)
+        response.setTotalRecord(result.total_record);
 
         return res.status(HttpStatus.OK).send(response);
     }
 
-    @Get('/times')
+    @Get("/times")
     @ApiOperation({ summary: "API xem lịch chiếu theo ngày" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async getTimes(
-        @Query() showtimeDto: GetShowtimeDto,
-        @Res() res: Response
-    ) {
-        let response: ResponseData = new ResponseData();
+    async getTimes(@Query() showtimeDto: GetShowtimeDto, @Res() res: Response) {
+        const response: ResponseData = new ResponseData();
 
-        response.setData(await this.showtimeService
-            .getShowTimes(
+        response.setData(
+            await this.showtimeService.getShowTimes(
                 /** Lấy danh sách room theo theater_id */
-                (await this.facadeService.getRoomsByTheaterId(showtimeDto.theater_id)).map(room => room.id),
-                showtimeDto.time)
+                (
+                    await this.facadeService.getRoomsByTheaterId(
+                        showtimeDto.theater_id,
+                    )
+                ).map((room) => room.id),
+                showtimeDto.time,
+            ),
         );
         return res.status(HttpStatus.OK).send(response);
     }
 
-    @Get('/time-by-movie')
+    @Get("/time-by-movie")
     @ApiOperation({ summary: "API xem lịch chiếu theo phim" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async getTimesByMovieId(
         @Query() showtimeDto: GetShowtimeByMovieDto,
-        @Res() res: Response
+        @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
-        response.setData(await this.showtimeService
-            .getShowTimeByMovie(
+        response.setData(
+            await this.showtimeService.getShowTimeByMovie(
                 /** Lấy danh sách room theo theater_id */
-                (await this.facadeService.getRoomsByTheaterId(showtimeDto.theater_id)).map(room => room.id),
-                showtimeDto.movie_id)
+                (
+                    await this.facadeService.getRoomsByTheaterId(
+                        showtimeDto.theater_id,
+                    )
+                ).map((room) => room.id),
+                showtimeDto.movie_id,
+            ),
         );
         return res.status(HttpStatus.OK).send(response);
     }
@@ -207,21 +242,19 @@ export class ShowtimeController {
     @Get("/:id/seats")
     @ApiOperation({ summary: "API get showtime by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async findOne(
-        @Param("id") id: string,
-        @Res() res: Response
-    ) {
-        let response: ResponseData = new ResponseData();
+    async findOne(@Param("id") id: string, @Res() res: Response) {
+        const response: ResponseData = new ResponseData();
 
         const showtime = await this.showtimeService.find(id);
 
-        if (!showtime)
-            return res.status(HttpStatus.OK).send(response);
+        if (!showtime) return res.status(HttpStatus.OK).send(response);
 
         const data = await this.showtimeService.checkSeatStatus(showtime.id);
 
-        let showtimeResponse = new ShowtimeResponse(data);
-        showtimeResponse.room_number = (await this.facadeService.getRoom(showtimeResponse.room_id)).room_number;
+        const showtimeResponse = new ShowtimeResponse(data);
+        showtimeResponse.room_number = (
+            await this.facadeService.getRoom(showtimeResponse.room_id)
+        ).room_number;
         showtimeResponse.mapArraySeat(data.seat_array);
 
         response.setData(showtimeResponse);

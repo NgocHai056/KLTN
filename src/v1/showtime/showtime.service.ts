@@ -1,20 +1,19 @@
 import { Injectable } from "@nestjs/common";
-import BaseService from "src/base.service/base.service";
-import { Showtime } from "./showtime.entity/showtime.entity";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
-import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
-import { MovieService } from "../movie/movie.service";
-import { ShowtimeByDayResponse } from "./showtime.response/showtime-by-day.response";
-import { UtilsDate } from "src/utils.common/utils.format-time.common/utils.format-time.common";
-import { SeatStatus } from "src/utils.common/utils.enum/seat-status.enum";
-import * as moment from "moment-timezone";
-import { GenreService } from "../genre/genre.service";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { FacadeService } from "../facade-theater/facade.service";
-import { RoomService } from "../room/room.service";
-import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
+import * as moment from "moment-timezone";
+import { Model } from "mongoose";
+import BaseService from "src/base.service/base.service";
+import { SeatStatus } from "src/utils.common/utils.enum/seat-status.enum";
 import { showtimeAraay } from "src/utils.common/utils.enum/showtime.const";
+import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
+import { UtilsDate } from "src/utils.common/utils.format-time.common/utils.format-time.common";
+import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
+import { GenreService } from "../genre/genre.service";
+import { MovieService } from "../movie/movie.service";
+import { RoomService } from "../room/room.service";
+import { Showtime } from "./showtime.entity/showtime.entity";
+import { ShowtimeByDayResponse } from "./showtime.response/showtime-by-day.response";
 
 @Injectable()
 export class ShowtimeService extends BaseService<Showtime> {

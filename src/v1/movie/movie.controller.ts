@@ -49,9 +49,9 @@ export class MovieController {
         @Query() pagination: PaginationAndSearchDto,
         @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
-        let movies = await this.movieService.findMovies(
+        const movies = await this.movieService.findMovies(
             [movieDto.genre_id],
             +movieDto.status,
             pagination,
@@ -72,7 +72,7 @@ export class MovieController {
         @Query() pagination: PaginationAndSearchDto,
         @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         const result = await this.movieService.findMovies(
             movieDto.genres.replace(/\s/g, "").split(","),
@@ -102,7 +102,7 @@ export class MovieController {
         @Body() movieDto: MovieDto,
         @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         if (
             (await this.movieService.findByCondition({ name: movieDto.name }))
@@ -139,11 +139,9 @@ export class MovieController {
             files["thumbnail"][0],
         );
 
-        const { genres, ...rest } = movieDto;
-
         response.setData(
             await this.movieService.create({
-                ...rest,
+                ...movieDto,
                 genres: genreDto,
                 poster: posterUrl,
                 thumbnail: thumbnailUrl,
@@ -169,7 +167,7 @@ export class MovieController {
         @Body() movieDto: MovieDto,
         @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         const genreDto = movieDto.genres.replace(/\s/g, "").split(",");
 
@@ -200,12 +198,10 @@ export class MovieController {
                 ...movieDto,
             });
 
-        const { genres, status, ...rest } = movieDto;
-
         response.setData(
             await this.movieService.update(id, {
-                ...rest,
-                status: +status,
+                ...movieDto,
+                status: +movieDto.status,
                 genres: genreDto,
             }),
         );
@@ -223,7 +219,7 @@ export class MovieController {
                 "Delete movie failed!",
             );
 
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
         const movies = await this.movieService.findByIds(ids);
 
         if (movies.length !== ids.length)
@@ -264,7 +260,7 @@ export class MovieController {
     @ApiOperation({ summary: "API to retrieve the most sold movies" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async getMovieByShowtime(@Res() res: Response) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         const movieIds = await this.showtimeService.findLatestUniqueMovies();
 
@@ -273,7 +269,7 @@ export class MovieController {
         const presentMovies =
             await this.movieService.findDocumentsExceptIds(movieIds);
 
-        let movies: Movie[] = [...soldedMovies, ...presentMovies];
+        const movies: Movie[] = [...soldedMovies, ...presentMovies];
 
         const genres = await this.genreService.findAll();
 
@@ -304,9 +300,9 @@ export class MovieController {
     @ApiOperation({ summary: "API get movie by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findOne(@Param("id") id: string, @Res() res: Response) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
-        let movie = await this.movieService.find(id);
+        const movie = await this.movieService.find(id);
 
         if (!movie || movie.status === MovieStatus.STOP_SHOWING) {
             UtilsExceptionMessageCommon.showMessageError(
@@ -314,8 +310,8 @@ export class MovieController {
             );
         }
 
-        let result = new MovieResponse(movie);
-        let genres = await this.genreService.findByIds(movie.genres);
+        const result = new MovieResponse(movie);
+        const genres = await this.genreService.findByIds(movie.genres);
 
         result.genres = genres.map((genre) => genre.name).join(", ");
 

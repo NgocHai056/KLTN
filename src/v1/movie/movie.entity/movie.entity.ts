@@ -1,8 +1,7 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import * as mongoose from 'mongoose';
+import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
-@Schema({ collection: 'movies' })
+@Schema({ collection: "movies" })
 export class Movie extends Document {
     @Prop()
     name: string;
@@ -61,6 +60,6 @@ export class Movie extends Document {
 
 export const MovieSchema = SchemaFactory.createForClass(Movie);
 
-MovieSchema.pre('findOneAndUpdate', function () {
+MovieSchema.pre("findOneAndUpdate", function () {
     this.set({ updated_at: new Date() });
 });

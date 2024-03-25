@@ -1,7 +1,7 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
-@Schema({ collection: 'movie_reviews' })
+@Schema({ collection: "movie_reviews" })
 export class Review extends Document {
     @Prop()
     movie_id: string;
@@ -24,6 +24,6 @@ export class Review extends Document {
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);
 
-ReviewSchema.pre('findOneAndUpdate', function () {
+ReviewSchema.pre("findOneAndUpdate", function () {
     this.set({ updated_at: new Date() });
 });

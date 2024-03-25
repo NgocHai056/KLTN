@@ -1,12 +1,12 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
-@Schema({ collection: 'theaters' })
+@Schema({ collection: "theaters" })
 export class Theater extends Document {
     @Prop()
     name: string;
 
-    @Prop({ default: '' })
+    @Prop({ default: "" })
     address: string;
 
     @Prop({ type: Number, default: 1 })
@@ -21,6 +21,6 @@ export class Theater extends Document {
 
 export const TheaterSchema = SchemaFactory.createForClass(Theater);
 
-TheaterSchema.pre('findOneAndUpdate', function () {
+TheaterSchema.pre("findOneAndUpdate", function () {
     this.set({ updated_at: new Date() });
 });

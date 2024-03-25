@@ -38,7 +38,7 @@ export class PaymentController {
         @Req() req: Request,
         @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         const booking = await this.bookingService.find(paymentDto.booking_id);
 
@@ -94,7 +94,7 @@ export class PaymentController {
     @Get("/booking-confirm")
     @Roles(Role.USER)
     async handleVnpayIPN(@Query() vnpParams, @Res() res: Response) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         /** Handle information of booking */
         const data = await this.paymentService.handleVnpayIPN(vnpParams);

@@ -5,30 +5,28 @@ import {
     Query,
     Res,
     UsePipes,
-    ValidationPipe
+    ValidationPipe,
 } from "@nestjs/common";
 
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation } from "@nestjs/swagger";
 import { Response } from "express";
+import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { Role, Roles } from "src/utils.common/utils.enum/role.enum";
 import { VersionEnum } from "src/utils.common/utils.enum/utils.version.enum";
 import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
 import { BookingService } from "../booking/booking.service";
 import { MovieService } from "../movie/movie.service";
+import { UserModel } from "../user/user.entity/user.model";
 import { UserService } from "../user/user.service";
 import { BookingStatisticDto } from "./statistic.dto/booking-statistic.dto";
-import { UserModel } from "../user/user.entity/user.model";
-import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
-import { ShowtimeService } from "../showtime/showtime.service";
 
 @Controller({ version: VersionEnum.V1.toString(), path: "auth/statistical" })
 export class StatisticalController {
-
     constructor(
         private readonly bookingService: BookingService,
         private readonly movieService: MovieService,
         private readonly userService: UserService,
-    ) { }
+    ) {}
 
     @Get("/revenue")
     @Roles(Role.MANAGER, Role.ADMIN)
@@ -38,14 +36,28 @@ export class StatisticalController {
         @Query() revenueDto: BookingStatisticDto,
         @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         if (+revenueDto.report_type === 1)
-            response.setData(await this.bookingService.calculateRevenueByHourInDay(revenueDto));
+            response.setData(
+                await this.bookingService.calculateRevenueByHourInDay(
+                    revenueDto,
+                ),
+            );
         if (+revenueDto.report_type === 2)
-            response.setData(await this.bookingService.calculateRevenueByDayInMonth(revenueDto, new Date(revenueDto.time)));
+            response.setData(
+                await this.bookingService.calculateRevenueByDayInMonth(
+                    revenueDto,
+                    new Date(revenueDto.time),
+                ),
+            );
         if (+revenueDto.report_type === 3)
-            response.setData(await this.bookingService.calculateRevenueByMonthInYear(revenueDto, new Date(revenueDto.time).getFullYear()));
+            response.setData(
+                await this.bookingService.calculateRevenueByMonthInYear(
+                    revenueDto,
+                    new Date(revenueDto.time).getFullYear(),
+                ),
+            );
 
         return res.status(HttpStatus.OK).send(response);
     }
@@ -56,34 +68,40 @@ export class StatisticalController {
     @UsePipes(new ValidationPipe({ transform: true }))
     async getOverallStatistics(
         @Res() res: Response,
-        @GetUser() user: UserModel
+        @GetUser() user: UserModel,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
-        const booking = await this.bookingService.getOverallStatistics(user.theater_id);
+        const booking = await this.bookingService.getOverallStatistics(
+            user.theater_id,
+        );
 
-        const statisticByMovie = await this.bookingService.getStatisticByMovie(user.theater_id);
+        const statisticByMovie = await this.bookingService.getStatisticByMovie(
+            user.theater_id,
+        );
 
         const movies = await this.movieService.findAll();
 
-        const users = await this.userService.findByCondition({ role: Role.USER });
+        const users = await this.userService.findByCondition({
+            role: Role.USER,
+        });
 
         let result = {};
 
         if (user.role === Role.ADMIN)
             result = {
-                user_count: users.length
-            }
+                user_count: users.length,
+            };
 
-        response.setData(
-            {
-                total_revenue: booking.length > 0 ? booking[0].total_revenue : 0,
-                upcoming_movie: movies.filter(movie => movie.release > new Date()).length,
-                showing_movie: movies.filter(movie => movie.release <= new Date()).length,
-                ...result,
-                movie_statistic: statisticByMovie
-            }
-        );
+        response.setData({
+            total_revenue: booking.length > 0 ? booking[0].total_revenue : 0,
+            upcoming_movie: movies.filter((movie) => movie.release > new Date())
+                .length,
+            showing_movie: movies.filter((movie) => movie.release <= new Date())
+                .length,
+            ...result,
+            movie_statistic: statisticByMovie,
+        });
 
         return res.status(HttpStatus.OK).send(response);
     }

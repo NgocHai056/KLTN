@@ -1,5 +1,5 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from './user.entity';
+import { Column, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "./user.entity";
 
 export class UserModel {
     @PrimaryGeneratedColumn()
@@ -32,8 +32,8 @@ export class UserModel {
         this.phone = entity ? entity.phone : "";
         this.email = entity ? entity.email : "";
         this.role = entity ? entity.role : 0;
-        this.theater_id = entity ? entity.theater_id : "",
-            this.access_token = entity ? entity.access_token : "";
+        (this.theater_id = entity ? entity.theater_id : ""),
+            (this.access_token = entity ? entity.access_token : "");
         this.refresh_token = entity ? entity.refresh_token : "";
     }
 }

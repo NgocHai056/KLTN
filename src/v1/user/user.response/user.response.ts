@@ -5,49 +5,49 @@ import { UtilsDate } from "src/utils.common/utils.format-time.common/utils.forma
 export class UserResponse {
     @ApiProperty({
         example: "652030e3435a945071eff98d",
-        description: "Id user"
+        description: "Id user",
     })
     _id: string;
 
     @ApiProperty({
         example: "Happy coding!",
-        description: ""
+        description: "",
     })
     name: string;
 
     @ApiProperty({
         example: "Happy coding!",
-        description: ""
+        description: "",
     })
     phone: string;
 
     @ApiProperty({
         example: "Happy coding!",
-        description: ""
+        description: "",
     })
     email: string;
 
     @ApiProperty({
         example: 1,
-        description: "Role"
+        description: "Role",
     })
     role: number;
 
     @ApiProperty({
         example: "05/06/2001",
-        description: "Date of birth"
+        description: "Date of birth",
     })
     date_of_birth: string;
 
     @ApiProperty({
         example: "Male",
-        description: "Gender"
+        description: "Gender",
     })
     gender: string;
 
     @ApiProperty({
         example: "652410591da9eba4f2dd83cd",
-        description: "Theater ID"
+        description: "Theater ID",
     })
     theater_id: string;
 
@@ -57,7 +57,9 @@ export class UserResponse {
         this.phone = entity.phone;
         this.email = entity.email;
         this.role = entity.role;
-        this.date_of_birth = entity.date_of_birth ? UtilsDate.formatDateVNToString(new Date(entity.date_of_birth)) : "";
+        this.date_of_birth = entity.date_of_birth
+            ? UtilsDate.formatDateVNToString(new Date(entity.date_of_birth))
+            : "";
         this.gender = entity.gender;
         this.theater_id = entity.theater_id;
     }

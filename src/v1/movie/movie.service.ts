@@ -1,12 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import BaseService from "src/base.service/base.service";
-import { Movie } from "./movie.entity/movie.entity";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
+import BaseService from "src/base.service/base.service";
+import { MovieStatus } from "src/utils.common/utils.enum/movie-status.enum";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
-import { MovieStatus } from "src/utils.common/utils.enum/movie-status.enum";
-import { ShowtimeService } from "../showtime/showtime.service";
+import { Movie } from "./movie.entity/movie.entity";
 
 @Injectable()
 export class MovieService extends BaseService<Movie> {

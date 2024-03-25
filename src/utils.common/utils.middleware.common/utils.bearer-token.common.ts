@@ -1,20 +1,19 @@
 import {
     CanActivate,
     ExecutionContext,
-    HttpException,
     HttpStatus,
     Injectable,
     NestMiddleware,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { ROLES_KEY, Role } from "../utils.enum/role.enum";
 import { NextFunction, Request, Response } from "express";
-import { JwtTokenInterFace } from "../utils.jwt-token.common/utils.jwt-token.interface.common";
-import { JwtToken } from "../utils.jwt-token.common/utils.jwt-token.common";
-import { UserService } from "src/v1/user/user.service";
 import { User } from "src/v1/user/user.entity/user.entity";
-import { UtilsExceptionMessageCommon } from "../utils.exception.common/utils.exception.message.common";
 import { UserModel } from "src/v1/user/user.entity/user.model";
+import { UserService } from "src/v1/user/user.service";
+import { ROLES_KEY, Role } from "../utils.enum/role.enum";
+import { UtilsExceptionMessageCommon } from "../utils.exception.common/utils.exception.message.common";
+import { JwtToken } from "../utils.jwt-token.common/utils.jwt-token.common";
+import { JwtTokenInterFace } from "../utils.jwt-token.common/utils.jwt-token.interface.common";
 
 @Injectable()
 export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
@@ -50,7 +49,7 @@ export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
     }
 
     async use(req: Request, res: Response, next: NextFunction) {
-        let bearerToken: string = req.headers.authorization;
+        const bearerToken: string = req.headers.authorization;
 
         if (!bearerToken || bearerToken === "") {
             UtilsExceptionMessageCommon.showMessageError(
@@ -58,13 +57,13 @@ export class AuthenticationMiddleware implements NestMiddleware, CanActivate {
             );
         }
 
-        let decodeBearerTokenInterFace: JwtTokenInterFace =
+        const decodeBearerTokenInterFace: JwtTokenInterFace =
             await new JwtToken().verifyBearerToken(
                 bearerToken,
                 process.env.ACCESS_TOKEN_SECRET,
             );
 
-        let user: User = await this.userService.find(
+        const user: User = await this.userService.find(
             decodeBearerTokenInterFace.user_id,
         );
 

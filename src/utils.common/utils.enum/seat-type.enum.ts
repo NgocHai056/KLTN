@@ -3,5 +3,5 @@ export enum SeatType {
     NORMAL = 0,
     DOUBLE = 1,
     VIP = 2,
-    PRIORITIZE = 3
+    PRIORITIZE = 3,
 }

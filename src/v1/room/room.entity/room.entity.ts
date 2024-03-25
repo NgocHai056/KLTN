@@ -1,7 +1,7 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
-@Schema({ collection: 'rooms' })
+@Schema({ collection: "rooms" })
 export class Room extends Document {
     @Prop()
     theater_id: string;
@@ -24,6 +24,6 @@ export class Room extends Document {
 
 export const RoomSchema = SchemaFactory.createForClass(Room);
 
-RoomSchema.pre('findOneAndUpdate', function () {
+RoomSchema.pre("findOneAndUpdate", function () {
     this.set({ updated_at: new Date() });
 });

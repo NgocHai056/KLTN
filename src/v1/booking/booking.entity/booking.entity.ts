@@ -1,9 +1,8 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
-@Schema({ collection: 'bookings' })
+@Schema({ collection: "bookings" })
 export class Booking extends Document {
-
     @Prop()
     theater_name: string;
 
@@ -34,20 +33,29 @@ export class Booking extends Document {
     @Prop()
     room_number: string;
 
-    @Prop([{
-        seat_number: String,
-        seat_type: Number,
-        price: Number
-    }])
-    seats: { seat_number: string, seat_type: number, price: number }[];
+    @Prop([
+        {
+            seat_number: String,
+            seat_type: Number,
+            price: Number,
+        },
+    ])
+    seats: { seat_number: string; seat_type: number; price: number }[];
 
-    @Prop([{
-        name: String,
-        description: String,
-        price: Number,
-        quantity: Number
-    }])
-    combos: { name: string, description: string, price: number, quantity: number }[];
+    @Prop([
+        {
+            name: String,
+            description: String,
+            price: Number,
+            quantity: Number,
+        },
+    ])
+    combos: {
+        name: string;
+        description: string;
+        price: number;
+        quantity: number;
+    }[];
 
     @Prop()
     time: string;
@@ -67,7 +75,7 @@ export class Booking extends Document {
     @Prop({ type: Number, default: 0 })
     total_amount: number;
 
-    @Prop({ required: true, expires: '10m' })
+    @Prop({ required: true, expires: "10m" })
     expireAt: Date;
 
     @Prop({ type: Date, default: Date.now })
@@ -79,6 +87,6 @@ export class Booking extends Document {
 
 export const BookingSchema = SchemaFactory.createForClass(Booking);
 
-BookingSchema.pre('findOneAndUpdate', function () {
+BookingSchema.pre("findOneAndUpdate", function () {
     this.set({ updated_at: new Date() });
 });

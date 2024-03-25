@@ -1,15 +1,15 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
-@Schema({ collection: 'users' })
+@Schema({ collection: "users" })
 export class User extends Document {
     @Prop()
     name: string;
 
-    @Prop({ unique: true, default: '' })
+    @Prop({ unique: true, default: "" })
     email: string;
 
-    @Prop({ unique: true, default: '' })
+    @Prop({ unique: true, default: "" })
     phone: string;
 
     @Prop()
@@ -36,7 +36,7 @@ export class User extends Document {
     @Prop()
     status: number;
 
-    @Prop({ expires: '10m' })
+    @Prop({ expires: "10m" })
     expireAt: Date;
 
     @Prop({ default: () => new Date() })
@@ -48,6 +48,6 @@ export class User extends Document {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-UserSchema.pre('findOneAndUpdate', function () {
+UserSchema.pre("findOneAndUpdate", function () {
     this.set({ updated_at: new Date() });
 });

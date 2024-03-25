@@ -1,7 +1,6 @@
-import * as admin from 'firebase-admin';
-import * as path from 'path';
-import { Injectable } from '@nestjs/common';
-import { ServiceAccount } from 'firebase-admin';
+import { Injectable } from "@nestjs/common";
+import * as admin from "firebase-admin";
+import { ServiceAccount } from "firebase-admin";
 
 @Injectable()
 export class FirebaseService {
@@ -9,14 +8,14 @@ export class FirebaseService {
 
     constructor() {
         const adminConfig: ServiceAccount = {
-            "projectId": process.env.FIREBASE_PROJECT_ID,
-            "privateKey": process.env.FIREBASE_PRIVATE_KEY,
-            "clientEmail": process.env.FIREBASE_CLIENT_EMAIL,
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY,
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
         };
 
         admin.initializeApp({
             credential: admin.credential.cert(adminConfig),
-            storageBucket: process.env.STORAGE_BUCKET_URL
+            storageBucket: process.env.STORAGE_BUCKET_URL,
         });
 
         this.storage = admin.storage();
@@ -32,8 +31,9 @@ export class FirebaseService {
             /** Upload file lên Firebase Storage từ buffer */
             await bucket.file(firebaseFilePath).save(file.buffer, {
                 metadata: {
-                    contentType: file.mimetype /** Sử dụng contentType từ file được upload */
-                }
+                    contentType:
+                        file.mimetype /** Sử dụng contentType từ file được upload */,
+                },
             });
 
             return `https://firebasestorage.googleapis.com/v0/b/cinema-707d7.appspot.com/o/${firebaseFilePath}?alt=media`;
@@ -44,11 +44,13 @@ export class FirebaseService {
 
     async deleteFileFromFirebaseStorage(fileUrl: string): Promise<void> {
         try {
-
-            const startIndex = fileUrl.indexOf('images/');
+            const startIndex = fileUrl.indexOf("images/");
             if (startIndex !== -1) {
-                const endIndex = fileUrl.indexOf('?alt=media');
-                const extractedString = fileUrl.substring(startIndex, endIndex !== -1 ? endIndex : undefined);
+                const endIndex = fileUrl.indexOf("?alt=media");
+                const extractedString = fileUrl.substring(
+                    startIndex,
+                    endIndex !== -1 ? endIndex : undefined,
+                );
 
                 /** Tạo một đối tượng File từ URL */
                 const file = this.storage.bucket().file(extractedString);
@@ -59,7 +61,6 @@ export class FirebaseService {
                     /** Xóa file từ Firebase Storage */
                     await file.delete();
             }
-
         } catch (error) {
             throw new Error(error);
         }

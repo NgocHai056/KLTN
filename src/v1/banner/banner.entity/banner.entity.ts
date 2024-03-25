@@ -1,7 +1,7 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
-@Schema({ collection: 'banners' })
+@Schema({ collection: "banners" })
 export class Banner extends Document {
     @Prop()
     title: string;
@@ -18,6 +18,6 @@ export class Banner extends Document {
 
 export const BannerSchema = SchemaFactory.createForClass(Banner);
 
-BannerSchema.pre('findOneAndUpdate', function () {
+BannerSchema.pre("findOneAndUpdate", function () {
     this.set({ updated_at: new Date() });
 });

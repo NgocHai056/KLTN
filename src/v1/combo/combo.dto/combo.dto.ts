@@ -1,19 +1,23 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { ArrayNotEmpty, IsArray, Max } from "class-validator";
-import { IsNotEmptyString, Min, ValidateNested } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import {
+    IsNotEmptyString,
+    Min,
+    ValidateNested,
+} from "src/utils.common/utils.decorator.common/utils.decorator.common";
 
 class ComboItemDto {
     @ApiProperty({
         example: "654b5811a952be8027133ef1",
-        description: "Product ID."
+        description: "Product ID.",
     })
     @IsNotEmptyString()
     product_id: string;
 
     @ApiProperty({
         example: 12,
-        description: "Quantity of each element product"
+        description: "Quantity of each element product",
     })
     @Min()
     @Max(3)
@@ -21,10 +25,9 @@ class ComboItemDto {
 }
 
 export class ComboDto {
-
     @ApiProperty({
         example: 56000,
-        description: "Price of combo"
+        description: "Price of combo",
     })
     @Min()
     price: number;
@@ -33,16 +36,14 @@ export class ComboDto {
         example: [
             {
                 product_id: "654b5811a952be8027133ef1",
-                quantity: 2
-            }
+                quantity: 2,
+            },
         ],
-        description: "Combo itmes"
+        description: "Combo itmes",
     })
     @IsArray()
     @ArrayNotEmpty()
     @Type(() => ComboItemDto)
     @ValidateNested(ComboItemDto)
     combo_items: ComboItemDto[];
-
 }
-

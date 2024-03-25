@@ -1,23 +1,34 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { ArrayNotEmpty, IsArray, IsDateString, IsEnum, Max } from "class-validator";
-import { IsInt, IsNotEmptyString, IsValidTimeFormat, Min, ValidateNested } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import {
+    ArrayNotEmpty,
+    IsArray,
+    IsDateString,
+    IsEnum,
+    Max,
+} from "class-validator";
+import {
+    IsNotEmptyString,
+    IsValidTimeFormat,
+    Min,
+    ValidateNested,
+} from "src/utils.common/utils.decorator.common/utils.decorator.common";
 import { ComboType } from "src/utils.common/utils.enum/combo-type.enum";
 import { PaymentMethod } from "src/utils.common/utils.enum/payment-method.enum";
 import { SeatType } from "src/utils.common/utils.enum/seat-type.enum";
 import { UtilsBaseExceptionLangValidator } from "src/utils.common/utils.exception.lang.common/utils.base.exception.lang.validator";
 
 class SeatDto {
-
     @ApiProperty({
         example: "1",
-        description: "Số ghế của trong 1 phòng."
+        description: "Số ghế của trong 1 phòng.",
     })
     @IsNotEmptyString()
     seat_number: string;
 
     @ApiProperty({
         example: 1,
-        description: "Loại vé đặt: /** 0: Ghế bình thường, 1: Ghế đôi, 2: Ghế víp pro, 3: Ghế ưu tiên */"
+        description:
+            "Loại vé đặt: /** 0: Ghế bình thường, 1: Ghế đôi, 2: Ghế víp pro, 3: Ghế ưu tiên */",
     })
     @IsEnum(SeatType, {
         message: "seat_type must be one of the values: 0, 1, 2, 3",
@@ -26,17 +37,16 @@ class SeatDto {
 }
 
 export class BookingComboDto {
-
     @ApiProperty({
         example: "654b8f8617fb16cd5e0da7f9",
-        description: "Combo Id."
+        description: "Combo Id.",
     })
     @IsNotEmptyString()
     combo_id: string;
 
     @ApiProperty({
         example: 1,
-        description: "Loại combo: /** 1: Chỉ nước hoặc đồ ăn, 2: Combo */"
+        description: "Loại combo: /** 1: Chỉ nước hoặc đồ ăn, 2: Combo */",
     })
     @IsEnum(ComboType, {
         message: "combo_type must be one of the values: 1, 2",
@@ -45,7 +55,7 @@ export class BookingComboDto {
 
     @ApiProperty({
         example: 10,
-        description: "Quantity."
+        description: "Quantity.",
     })
     @Min()
     @Max(10)
@@ -53,24 +63,23 @@ export class BookingComboDto {
 }
 
 export class BookingDto {
-
     @ApiProperty({
         example: "Beta",
-        description: "Tên rạp chiếu phim"
+        description: "Tên rạp chiếu phim",
     })
     @IsNotEmptyString()
     theater_name: string;
 
     @ApiProperty({
         example: "652a1a14464026525552677c",
-        description: "Id của phòng chiếu phim"
+        description: "Id của phòng chiếu phim",
     })
     @IsNotEmptyString()
     room_id: string;
 
     @ApiProperty({
         example: "65260f822f91993c64422e07",
-        description: "Id phim"
+        description: "Id phim",
     })
     @IsNotEmptyString()
     movie_id: string;
@@ -79,10 +88,10 @@ export class BookingDto {
         example: [
             {
                 seat_number: "1",
-                seat_type: 1
-            }
+                seat_type: 1,
+            },
         ],
-        description: "Số ghế của phòng chiếu phim"
+        description: "Số ghế của phòng chiếu phim",
     })
     @IsArray()
     @ArrayNotEmpty()
@@ -94,10 +103,10 @@ export class BookingDto {
             {
                 combo_id: "654b8f8617fb16cd5e0da7f9",
                 combo_type: 1,
-                quantity: 2
-            }
+                quantity: 2,
+            },
         ],
-        description: "Loại thức ăn đồ uống đặt kèm."
+        description: "Loại thức ăn đồ uống đặt kèm.",
     })
     @IsArray()
     @ValidateNested(BookingComboDto)
@@ -110,7 +119,7 @@ export class BookingDto {
         description: UtilsBaseExceptionLangValidator.exceptionStringDate(),
     })
     @IsDateString()
-    readonly time: string = '';
+    readonly time: string = "";
 
     @ApiProperty({
         required: false,
@@ -119,16 +128,15 @@ export class BookingDto {
         description: UtilsBaseExceptionLangValidator.exceptionStringDate(),
     })
     @IsValidTimeFormat()
-    readonly showtime: string = '';
+    readonly showtime: string = "";
 
     @ApiProperty({
         example: 1,
-        description: "Phương thức thanh toán 0: Trả tiền mặt, 1: Chuyển khoản, 2: Credit card"
+        description:
+            "Phương thức thanh toán 0: Trả tiền mặt, 1: Chuyển khoản, 2: Credit card",
     })
     @IsEnum(PaymentMethod, {
         message: "payment_method must be one of the values: 0, 1, 2",
     })
     payment_method: number = 1;
-
 }
-

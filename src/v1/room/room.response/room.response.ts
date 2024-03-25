@@ -2,28 +2,27 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Room } from "../room.entity/room.entity";
 
 export class RoomResponse {
-
     @ApiProperty({
         example: "652a1a1b4640265255526784",
-        description: "Id phòng phim"
+        description: "Id phòng phim",
     })
     _id: string;
 
     @ApiProperty({
         example: "65203b82210d84d5c627f8b1",
-        description: "Id rạp chiếu phim"
+        description: "Id rạp chiếu phim",
     })
     theater_id: string;
 
     @ApiProperty({
         example: "123",
-        description: "Số phòng của rạp chiếu phim"
+        description: "Số phòng của rạp chiếu phim",
     })
     room_number: string;
 
     @ApiProperty({
         example: 45,
-        description: "Số ghế trống của 1 phòng"
+        description: "Số ghế trống của 1 phòng",
     })
     seat_capacity: number;
 
@@ -35,9 +34,9 @@ export class RoomResponse {
     }
 
     public static mapToList(entities: Room[]) {
-        let data: RoomResponse[] = [];
+        const data: RoomResponse[] = [];
 
-        entities.forEach(e => {
+        entities.forEach((e) => {
             data.push(new RoomResponse(e));
         });
 

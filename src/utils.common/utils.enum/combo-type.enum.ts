@@ -7,5 +7,5 @@
 export enum ComboType {
     COMBO = 1,
     DRINK = 2,
-    POPCORN = 3
+    POPCORN = 3,
 }

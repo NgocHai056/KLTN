@@ -24,7 +24,7 @@ export class SocketGateway
         this.logger.log("Initialized");
     }
 
-    handleConnection(client: any, ...args: any[]) {
+    handleConnection(client: any) {
         const { sockets } = this.io.sockets;
 
         this.logger.log(`Client id: ${client.id} connected`);

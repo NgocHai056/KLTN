@@ -46,7 +46,7 @@ export class BookingController {
         @Res() res: Response,
         @GetUser() user: UserModel,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         const room = await this.roomService.find(bookingDto.room_id);
 
@@ -123,7 +123,7 @@ export class BookingController {
     @ApiOperation({ summary: "API get booking by user_id" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findAllByUserId(@Param("id") userId: string, @Res() res: Response) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         const bookings = await this.bookingService.findByCondition({
             user_id: userId,
@@ -153,7 +153,7 @@ export class BookingController {
         @Res() res: Response,
         @GetUser() user: UserModel,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         const bookings = await this.bookingService.findAllForPagination(
             +pagination.page,
@@ -182,7 +182,7 @@ export class BookingController {
     @ApiOperation({ summary: "API get booking by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findOne(@Param("id") id: string, @Res() res: Response) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         const booking = await this.bookingService.find(id);
 

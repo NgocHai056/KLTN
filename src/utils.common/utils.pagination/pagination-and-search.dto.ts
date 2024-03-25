@@ -6,7 +6,7 @@ export class PaginationAndSearchDto {
     @ApiProperty({
         example: 1,
         default: 1,
-        description: "Số trang hiện tại cần xem"
+        description: "Số trang hiện tại cần xem",
     })
     @Min()
     @IsInt()
@@ -15,7 +15,7 @@ export class PaginationAndSearchDto {
     @ApiProperty({
         example: 5,
         default: 999,
-        description: "Số lượng record trả về trên 1 request"
+        description: "Số lượng record trả về trên 1 request",
     })
     @Min()
     @IsInt()
@@ -23,9 +23,9 @@ export class PaginationAndSearchDto {
 
     @ApiProperty({
         example: "Muốn search gì thì search thôi",
-        default: '',
-        description: "Key word để search đó."
+        default: "",
+        description: "Key word để search đó.",
     })
     @IsString()
-    key_search: string = '';
+    key_search: string = "";
 }

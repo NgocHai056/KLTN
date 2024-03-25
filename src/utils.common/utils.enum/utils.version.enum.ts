@@ -1,4 +1,3 @@
-
 export enum VersionEnum {
-    V1 = 1
+    V1 = 1,
 }

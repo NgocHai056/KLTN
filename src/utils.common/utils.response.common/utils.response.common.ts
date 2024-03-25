@@ -1,13 +1,19 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { HttpStatus } from "@nestjs/common";
 
 export class ResponseData {
     private status: HttpStatus;
     private message: string;
     private total_record: number;
-    private data: Object
+    private data: Object;
 
-    constructor(status: number = null, message: string = null, data?: Object, totalRecord?: number) {
-        this.status = status ? + status : + HttpStatus.OK;
+    constructor(
+        status: number = null,
+        message: string = null,
+        data?: Object,
+        totalRecord?: number,
+    ) {
+        this.status = status ? +status : +HttpStatus.OK;
         this.message = message ? message : "SUCCESS";
         this.total_record = totalRecord ? +totalRecord : 0;
         this.data = data ? data : null;
@@ -26,7 +32,6 @@ export class ResponseData {
     }
 
     public setMessage(status: HttpStatus, message: string): void {
-
         if (message) {
             this.message = message;
         } else {

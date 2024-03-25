@@ -38,7 +38,7 @@ export class UserController {
     @ApiOperation({ summary: "API create user" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async create(@Body() userDto: UserDto, @Res() res: Response) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         response.setData(
             new UserResponse(await this.userService.createUser(userDto)),
@@ -51,7 +51,7 @@ export class UserController {
     @ApiOperation({ summary: "API delete user by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async delete(@Param("id") userId: string, @Res() res: Response) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
         const user = await this.userService.find(userId);
 
         if (!user)
@@ -77,7 +77,7 @@ export class UserController {
         @Body() updateUserDto: UserUpdateDto,
         @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
         const user = await this.userService.find(userId);
 
         Object.assign(user, updateUserDto);
@@ -96,7 +96,7 @@ export class UserController {
         @GetUser() userModel: UserModel,
         @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         if (updateUserDto.new_password !== updateUserDto.confirm_password)
             UtilsExceptionMessageCommon.showMessageError(
@@ -129,7 +129,7 @@ export class UserController {
         @Query() pagination: PaginationAndSearchDto,
         @Res() res: Response,
     ) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
 
         const result = await this.userService.getAll(pagination, +userDto.role);
         response.setData(result.data);
@@ -142,7 +142,7 @@ export class UserController {
     @ApiOperation({ summary: "API get user by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
     async findOne(@Param("id") id: string, @Res() res: Response) {
-        let response: ResponseData = new ResponseData();
+        const response: ResponseData = new ResponseData();
         const user = await this.userService.find(id);
 
         response.setData(user ? new UserResponse(user) : []);

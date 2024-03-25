@@ -1,13 +1,19 @@
-import { HttpStatus } from "@nestjs/common"
+import { HttpStatus } from "@nestjs/common";
 
 export class ExceptionResponseDetail {
     private status: HttpStatus;
     private message: string;
     private data: object;
 
-    constructor(status: HttpStatus = null, message: string = null, data?: object) {
-        this.status = status ? status : HttpStatus.BAD_REQUEST
-        this.message = message ? this.getMessage(status, message) : "Dữ liệu không hợp lệ!"
+    constructor(
+        status: HttpStatus = null,
+        message: string = null,
+        data?: object,
+    ) {
+        this.status = status ? status : HttpStatus.BAD_REQUEST;
+        this.message = message
+            ? this.getMessage(status, message)
+            : "Dữ liệu không hợp lệ!";
         this.data = data ? data : null;
     }
 
@@ -20,12 +26,10 @@ export class ExceptionResponseDetail {
     }
 
     public getMessage(status: HttpStatus, message: string): string {
-
         if (message) {
             this.message = message;
         } else {
             switch (status) {
-
                 case HttpStatus.BAD_REQUEST:
                     this.message = "Dữ liệu không hợp lệ!";
                     break;
@@ -43,7 +47,6 @@ export class ExceptionResponseDetail {
                     break;
             }
         }
-
 
         return this.message;
     }

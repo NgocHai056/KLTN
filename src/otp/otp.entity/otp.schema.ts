@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
 @Schema()
 export class OTP extends Document {
@@ -9,7 +9,7 @@ export class OTP extends Document {
     @Prop({ required: true })
     email: string;
 
-    @Prop({ required: true, expires: '5m' })
+    @Prop({ required: true, expires: "5m" })
     expireAt: Date;
 }
 

@@ -5,7 +5,7 @@ import { IsNotEmptyString } from "src/utils.common/utils.decorator.common/utils.
 export class TheaterDto {
     @ApiProperty({
         example: "Touch cinema!",
-        description: ""
+        description: "",
     })
     @IsNotEmptyString()
     @IsOptional()
@@ -13,10 +13,9 @@ export class TheaterDto {
 
     @ApiProperty({
         example: "Đây là địa chỉ của rạp chiếu phim",
-        description: ""
+        description: "",
     })
     @IsNotEmptyString()
     @IsOptional()
     readonly address: string;
-
 }
