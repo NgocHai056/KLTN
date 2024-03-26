@@ -78,11 +78,12 @@ export class ComboService extends BaseService<Combo> {
         );
 
         const comboDetails = (combos) =>
-            combos.map(({ id, name, description, price }) => ({
+            combos.map(({ id, name, description, price, exchange_point }) => ({
                 name,
                 description,
                 price,
                 quantity: comboMap.get(id).quantity,
+                exchange_point,
             }));
 
         return [

@@ -12,6 +12,9 @@ export class Combo extends Document {
     @Prop()
     price: number;
 
+    @Prop()
+    exchange_point: number;
+
     @Prop([
         {
             product_id: String,

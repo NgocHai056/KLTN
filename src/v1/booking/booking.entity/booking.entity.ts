@@ -48,6 +48,7 @@ export class Booking extends Document {
             description: String,
             price: Number,
             quantity: Number,
+            exchange_point: Number,
         },
     ])
     combos: {
@@ -55,6 +56,7 @@ export class Booking extends Document {
         description: string;
         price: number;
         quantity: number;
+        exchange_point: number;
     }[];
 
     @Prop()

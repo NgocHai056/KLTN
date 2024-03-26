@@ -30,6 +30,13 @@ export class ProductDto {
     price: number;
 
     @ApiProperty({
+        example: 1000,
+        description: "Exchange point",
+    })
+    @Min()
+    exchange_point: number;
+
+    @ApiProperty({
         example: 1,
         description: "/** 1: Combo, 2: Nước, 3: Bắp*/",
     })

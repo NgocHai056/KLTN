@@ -33,6 +33,13 @@ export class ComboDto {
     price: number;
 
     @ApiProperty({
+        example: 100,
+        description: "Exchange points for seat, item: pobcorn,.. combos",
+    })
+    @Min()
+    exchange_point: number;
+
+    @ApiProperty({
         example: [
             {
                 product_id: "654b5811a952be8027133ef1",
