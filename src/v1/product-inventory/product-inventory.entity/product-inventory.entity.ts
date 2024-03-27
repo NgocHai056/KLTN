@@ -1,7 +1,7 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
-@Schema({ collection: "inventory-products" })
+@Schema({ collection: "inventory_products" })
 export class ProductInventory extends Document {
     @Prop()
     theater_id: string;

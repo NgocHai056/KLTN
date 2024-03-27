@@ -77,6 +77,9 @@ export class Booking extends Document {
     @Prop({ type: Number, default: 0 })
     total_amount: number;
 
+    @Prop({ type: Number, default: 0 })
+    discount_price: number;
+
     @Prop({ required: true, expires: "10m" })
     expireAt: Date;
 

@@ -27,6 +27,8 @@ import { ShowtimeService } from "../showtime/showtime.service";
 import { UserModel } from "../user/user.entity/user.model";
 import { BookingDto } from "./booking.dto/booking.dto";
 import { BookingService } from "./booking.service";
+import { UsePointBookingDto } from "./booking.dto/use-point.booking.dto";
+import { MemberService } from "../member/member.service";
 
 @Controller({ version: VersionEnum.V1.toString(), path: "auth/booking" })
 export class BookingController {
@@ -36,6 +38,7 @@ export class BookingController {
         private readonly seatService: SeatService,
         private readonly roomService: RoomService,
         private readonly movieService: MovieService,
+        private readonly memberService: MemberService,
     ) {}
 
     @Post("")
@@ -119,6 +122,30 @@ export class BookingController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @Post("/use-point")
+    @ApiOperation({ summary: "API update price when used point to exchange" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async useExchangePoint(
+        @Body() bookingDto: UsePointBookingDto,
+        @Res() res: Response,
+    ) {
+        const response: ResponseData = new ResponseData();
+
+        const booking = await this.bookingService.find(bookingDto.booking_id);
+
+        if (!booking || !booking.expireAt)
+            UtilsExceptionMessageCommon.showMessageError(
+                "Booking doesn't exits!",
+            );
+
+        if (!(await this.bookingService.usePoint(booking, bookingDto)))
+            UtilsExceptionMessageCommon.showMessageError(
+                "Point exchange failed",
+            );
+
+        return res.status(HttpStatus.OK).send(response);
+    }
+
     @Get("/:id/user")
     @ApiOperation({ summary: "API get booking by user_id" })
     @UsePipes(new ValidationPipe({ transform: true }))
@@ -197,6 +224,8 @@ export class BookingController {
             ...booking.toObject(),
             movie_age: movie.age,
             movie_poster: movie.poster,
+            exchange_point: (await this.memberService.find(id))
+                .consumption_point,
         });
         return res.status(HttpStatus.OK).send(response);
     }

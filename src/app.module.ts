@@ -35,6 +35,7 @@ import { StatisticalModule } from "./v1/statistical/statistical.module";
 import { MemberModule } from "./v1/member/member.module";
 import { SocketGateway } from "./socket/socket.gateway";
 import { VersionEnum } from "./utils.common/utils.enum/utils.version.enum";
+import { ExchangePointTempModule } from "./v1/exchange-point-temp/exchange-point-temp.module";
 
 @Module({
     imports: [
@@ -74,6 +75,7 @@ import { VersionEnum } from "./utils.common/utils.enum/utils.version.enum";
         FirebaseModule,
         StatisticalModule,
         MemberModule,
+        ExchangePointTempModule,
     ],
     providers: [
         {

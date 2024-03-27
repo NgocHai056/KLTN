@@ -1,7 +1,7 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
-@Schema({ collection: "member-points" })
+@Schema({ collection: "member_points" })
 export class Member extends Document {
     @Prop()
     user_id: string;

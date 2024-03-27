@@ -15,6 +15,7 @@ import { TicketPriceService } from "../ticket-price/ticket-price.service";
 import { UserModel } from "../user/user.entity/user.model";
 import { BookingDto } from "./booking.dto/booking.dto";
 import { Booking } from "./booking.entity/booking.entity";
+import { UsePointBookingDto } from "./booking.dto/use-point.booking.dto";
 
 @Injectable()
 export class BookingService extends BaseService<Booking> {
@@ -28,6 +29,46 @@ export class BookingService extends BaseService<Booking> {
         private readonly bookingModel: Model<Booking>,
     ) {
         super(bookingModel);
+    }
+
+    async usePoint(booking: Booking, bookingDto: UsePointBookingDto) {
+        const seatsMap = {};
+        const combosMap = {};
+
+        booking.seats.forEach((seat) => (seatsMap[seat.seat_number] = seat));
+
+        const seats = bookingDto.seats
+            .map((seat) => seatsMap[seat.seat_number])
+            .filter(Boolean);
+
+        booking.combos.forEach((combo) => (combosMap[combo["id"]] = combo));
+
+        const combos = bookingDto.combos
+            .map((combo) => {
+                const comboObject = combosMap[combo.combo_id];
+
+                if (comboObject) {
+                    if (combo.quantity > comboObject.quantity)
+                        UtilsExceptionMessageCommon.showMessageError(
+                            "Point exchange failed",
+                        );
+                    return {
+                        ...comboObject.toObject(),
+                        quantity: combo.quantity,
+                    };
+                }
+            })
+            .filter(Boolean);
+
+        booking.discount_price = await this.memberService.usePoint(
+            booking,
+            seats,
+            combos,
+        );
+
+        this.update(booking.id, booking);
+
+        return true;
     }
 
     async createBooking(
@@ -142,9 +183,11 @@ export class BookingService extends BaseService<Booking> {
 
         await this.memberService.updatePoint(
             booking.user_id,
-            Math.round(booking.total_amount / 1000),
+            Math.round((booking.total_amount - booking.discount_price) / 1000),
             `${booking.theater_name} - ${booking.movie_name} - ${booking.user_name}`,
         );
+
+        await this.memberService.minusPoint(booking.user_id, booking.movie_id);
 
         return await this.update(booking.id, {
             payment_status: PaymentStatus.PAID,

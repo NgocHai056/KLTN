@@ -58,7 +58,7 @@ export class PaymentController {
         const returnUrl = "https://nh-cinema.vercel.app/payment-detail".concat(
             paymentDto.return_url ? "-no-login" : "",
         );
-        const amount = booking.total_amount;
+        const amount = booking.total_amount - booking.discount_price;
 
         let locale = paymentDto.language;
         if (locale === null || locale === "" || !locale) {
