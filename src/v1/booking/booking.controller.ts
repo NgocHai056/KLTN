@@ -228,7 +228,7 @@ export class BookingController {
             ...booking.toObject(),
             movie_age: movie.age,
             movie_poster: movie.poster,
-            exchange_point: member ? member[0].consumption_point : 0,
+            exchange_point: member.length > 0 ? member[0].consumption_point : 0,
         });
         return res.status(HttpStatus.OK).send(response);
     }
