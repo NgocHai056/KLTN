@@ -220,14 +220,15 @@ export class BookingController {
 
         booking.time = UtilsDate.formatDateVNToString(new Date(booking.time));
 
-        const member = await this.memberService.find(booking.user_id);
-        console.log(member);
+        const member = await this.memberService.findByCondition({
+            user_id: booking.user_id,
+        });
 
         response.setData({
             ...booking.toObject(),
             movie_age: movie.age,
             movie_poster: movie.poster,
-            exchange_point: member ? member.consumption_point : 0,
+            exchange_point: member ? member[0].consumption_point : 0,
         });
         return res.status(HttpStatus.OK).send(response);
     }

@@ -50,7 +50,7 @@ export class BookingService extends BaseService<Booking> {
                 if (comboObject) {
                     if (combo.quantity > comboObject.quantity)
                         UtilsExceptionMessageCommon.showMessageError(
-                            "Point exchange failed",
+                            "The number of combo exchanged is higher than the number placed.",
                         );
                     return {
                         ...comboObject.toObject(),

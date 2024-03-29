@@ -27,7 +27,7 @@ export class MemberService extends BaseService<Member> {
 
         if (!member)
             UtilsExceptionMessageCommon.showMessageError(
-                "Point exchange failed",
+                "You don't have points to redeem yet.",
             );
 
         let totalPoint: number = 0;
