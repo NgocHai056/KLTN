@@ -36,6 +36,7 @@ import { MemberModule } from "./v1/member/member.module";
 import { SocketGateway } from "./socket/socket.gateway";
 import { VersionEnum } from "./utils.common/utils.enum/utils.version.enum";
 import { ExchangePointTempModule } from "./v1/exchange-point-temp/exchange-point-temp.module";
+import { NotificationModule } from "./v1/notification/notification.module";
 
 @Module({
     imports: [
@@ -76,6 +77,7 @@ import { ExchangePointTempModule } from "./v1/exchange-point-temp/exchange-point
         StatisticalModule,
         MemberModule,
         ExchangePointTempModule,
+        NotificationModule,
     ],
     providers: [
         {

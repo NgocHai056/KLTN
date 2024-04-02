@@ -327,6 +327,11 @@ export class ShowtimeService extends BaseService<Showtime> {
         time: string,
         showtime: string,
     ) {
+        // if (new Date(time + "T" + showtime).getTime() < new Date().getTime())
+        //     UtilsExceptionMessageCommon.showMessageError(
+        //         "Can't book tickets because it's pass show time!",
+        //     );
+
         const query = {
             room_id: { $in: roomIds },
             movie_id: movieId,
@@ -345,7 +350,7 @@ export class ShowtimeService extends BaseService<Showtime> {
         return showtimes;
     }
 
-    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    @Cron(CronExpression.EVERY_DAY_AT_9PM)
     async autoCreateShowtime() {
         const nextDate = moment().add(4, "days");
 

@@ -8,14 +8,14 @@ import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.co
 import { ComboService } from "../combo/combo.service";
 import { MemberService } from "../member/member.service";
 import { Movie } from "../movie/movie.entity/movie.entity";
-import { MovieService } from "../movie/movie.service";
+import { NotificationService } from "../notification/notification.service";
 import { SeatService } from "../seat/seat.service";
 import { BookingStatisticDto } from "../statistical/statistic.dto/booking-statistic.dto";
 import { TicketPriceService } from "../ticket-price/ticket-price.service";
 import { UserModel } from "../user/user.entity/user.model";
 import { BookingDto } from "./booking.dto/booking.dto";
-import { Booking } from "./booking.entity/booking.entity";
 import { UsePointBookingDto } from "./booking.dto/use-point.booking.dto";
+import { Booking } from "./booking.entity/booking.entity";
 
 @Injectable()
 export class BookingService extends BaseService<Booking> {
@@ -23,8 +23,8 @@ export class BookingService extends BaseService<Booking> {
         private readonly ticketPriceService: TicketPriceService,
         private readonly seatService: SeatService,
         private readonly comboServie: ComboService,
-        private readonly movieService: MovieService,
         private readonly memberService: MemberService,
+        private readonly notificationService: NotificationService,
         @InjectModel(Booking.name)
         private readonly bookingModel: Model<Booking>,
     ) {
@@ -160,6 +160,15 @@ export class BookingService extends BaseService<Booking> {
             expireAt: new Date(Date.now() + 10 * 60 * 1000),
         });
 
+        this.notificationService.create({
+            user_id: createdItem.user_id,
+            object_id: createdItem.id,
+            title: "Bạn đang đặt vé - " + createdItem.movie_name,
+            description: `Mã vé: ${createdItem.code}`,
+            type: 1, // type of notification 1: booking, 2: movie
+            expireAt: new Date(Date.now() + 10 * 60 * 1000),
+        });
+
         return await createdItem.save();
     }
 
@@ -195,6 +204,14 @@ export class BookingService extends BaseService<Booking> {
         );
 
         await this.memberService.minusPoint(booking.user_id, booking.movie_id);
+
+        this.notificationService.create({
+            user_id: booking.user_id,
+            object_id: booking.id,
+            title: "Bạn đã đặt vé thành công - " + booking.movie_name,
+            description: `Rạp chiếu: ${booking.theater_name}, Phim: ${booking.movie_name}, Ngày chiếu: ${booking.time}, Giờ chiếu: ${booking.showtime}`,
+            type: 1, // type of notification 1: booking, 2: movie
+        });
 
         return await this.update(booking.id, {
             payment_status: PaymentStatus.PAID,

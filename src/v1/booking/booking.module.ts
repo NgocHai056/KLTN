@@ -10,6 +10,7 @@ import { ShowtimeModule } from "../showtime/showtime.module";
 import { MovieModule } from "../movie/movie.module";
 import { ComboModule } from "../combo/combo.module";
 import { MemberModule } from "../member/member.module";
+import { NotificationModule } from "../notification/notification.module";
 
 @Module({
     imports: [
@@ -23,6 +24,7 @@ import { MemberModule } from "../member/member.module";
         MovieModule,
         ComboModule,
         MemberModule,
+        NotificationModule,
     ],
     controllers: [BookingController],
     providers: [BookingService],

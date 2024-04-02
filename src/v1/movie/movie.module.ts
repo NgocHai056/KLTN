@@ -6,6 +6,7 @@ import { GenreModule } from "../genre/genre.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import { FirebaseModule } from "src/firebase/firebase.module";
 import { ShowtimeModule } from "../showtime/showtime.module";
+import { NotificationModule } from "../notification/notification.module";
 
 @Module({
     imports: [
@@ -13,6 +14,7 @@ import { ShowtimeModule } from "../showtime/showtime.module";
         GenreModule,
         forwardRef(() => ShowtimeModule),
         FirebaseModule,
+        NotificationModule,
     ],
     providers: [MovieService],
     controllers: [MovieController],

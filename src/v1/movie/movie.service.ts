@@ -6,10 +6,14 @@ import { MovieStatus } from "src/utils.common/utils.enum/movie-status.enum";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
 import { Movie } from "./movie.entity/movie.entity";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import moment from "moment";
+import { NotificationService } from "../notification/notification.service";
 
 @Injectable()
 export class MovieService extends BaseService<Movie> {
     constructor(
+        private readonly notificationService: NotificationService,
         @InjectModel(Movie.name) private readonly movieModel: Model<Movie>,
     ) {
         super(movieModel);
@@ -183,5 +187,20 @@ export class MovieService extends BaseService<Movie> {
             .sort({ created_at: -1 })
             .limit(10 - objectIds.length)
             .exec();
+    }
+
+    @Cron(CronExpression.EVERY_DAY_AT_9PM)
+    async notificationMovieShowing() {
+        const currentDate = moment();
+        const nextDate = moment().add(1, "days");
+
+        const movies = await this.findByCondition({
+            release: {
+                $gte: currentDate,
+                $lt: nextDate,
+            },
+        });
+
+        if (movies.length === 0) return;
     }
 }
