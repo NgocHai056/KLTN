@@ -136,6 +136,10 @@ export class BookingService extends BaseService<Booking> {
         );
 
         const createdItem = new this.bookingModel({
+            code:
+                "NH" + // Prefix: NH, with timestamp in second and the first char of name user
+                Math.floor(Date.now() / 10000) +
+                user.name.split(" ").pop()[0],
             theater_name: bookingDto.theater_name,
             theater_id: theaterId,
             user_id: user.id,
@@ -183,8 +187,11 @@ export class BookingService extends BaseService<Booking> {
 
         await this.memberService.updatePoint(
             booking.user_id,
+            // Calculate point by total amount user must pay minus for discount and then devide 1000
             Math.round((booking.total_amount - booking.discount_price) / 1000),
-            `${booking.theater_name} - ${booking.movie_name} - ${booking.user_name}`,
+            booking.code,
+            booking.seats,
+            booking.combos,
         );
 
         await this.memberService.minusPoint(booking.user_id, booking.movie_id);

@@ -5,6 +5,7 @@ import {
     HttpStatus,
     Param,
     Post,
+    Query,
     Res,
     UsePipes,
     ValidationPipe,
@@ -19,6 +20,7 @@ import { CreateMemberDto } from "./dto/create-member.dto";
 import { UpdateMemberDto } from "./dto/update-member.dto";
 import { MemberService } from "./member.service";
 import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
+import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
 
 @Controller({ version: VersionEnum.V1.toString(), path: "auth/member" })
 export class MemberController {
@@ -32,7 +34,11 @@ export class MemberController {
     @Get()
     @ApiOperation({ summary: "API get member history by id" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async findOne(@GetUser() user: UserModel, @Res() res: Response) {
+    async findOne(
+        @GetUser() user: UserModel,
+        @Query() pagination: PaginationAndSearchDto,
+        @Res() res: Response,
+    ) {
         const response: ResponseData = new ResponseData();
 
         const member = (
@@ -46,7 +52,12 @@ export class MemberController {
                 "You don't have membership points yet.",
             );
 
-        response.setData(member);
+        const pointHistory = member.point_history.slice(
+            +pagination.page - 1,
+            10,
+        );
+
+        response.setData({ ...member.toJSON(), point_history: pointHistory });
 
         return res.status(HttpStatus.OK).send(response);
     }

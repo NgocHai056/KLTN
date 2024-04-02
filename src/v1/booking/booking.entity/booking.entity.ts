@@ -4,6 +4,9 @@ import { Document } from "mongoose";
 @Schema({ collection: "bookings" })
 export class Booking extends Document {
     @Prop()
+    code: string;
+
+    @Prop()
     theater_name: string;
 
     @Prop()

@@ -36,7 +36,7 @@ export class SocketGateway
     }
 
     @SubscribeMessage("showtime")
-    async handleMessage(client: any, payload: any) {
+    async handleShowtime(client: any, payload: any) {
         const showtime = await this.showtimeService.find(payload.showtime_id);
 
         this.io.emit(showtime.id, showtime);

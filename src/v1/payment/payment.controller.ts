@@ -55,7 +55,7 @@ export class PaymentController {
 
         const tmnCode = process.env.vnp_TmnCode;
         const vnpUrl = process.env.vnp_Url;
-        const returnUrl = "https://nh-cinema.vercel.app/payment-detail".concat(
+        const returnUrl = process.env.vnp_ReturnUrl.concat(
             paymentDto.return_url ? "-no-login" : "",
         );
         const amount = booking.total_amount - booking.discount_price;
@@ -72,7 +72,7 @@ export class PaymentController {
         vnp_Params["vnp_Locale"] = locale;
         vnp_Params["vnp_CurrCode"] = currCode;
         vnp_Params["vnp_TxnRef"] = booking.id;
-        vnp_Params["vnp_OrderInfo"] = "Thanh toan cho ma GD:" + booking.id;
+        vnp_Params["vnp_OrderInfo"] = booking.code;
         vnp_Params["vnp_OrderType"] = "other";
         vnp_Params["vnp_Amount"] = amount * 100;
         vnp_Params["vnp_ReturnUrl"] = returnUrl;

@@ -107,6 +107,13 @@ export class AppModule implements NestModule {
     }
 }
 
+/*
+
+1. Xử lý booking code.
+2. History point.
+3. Notification.
+ */
+
 /**
  * https://github.com/wyaadarsh/Grokking-OOD/blob/master/object-oriented-design-case-studies/design-a-movie-ticket-booking-system.md#system-requirements
  *

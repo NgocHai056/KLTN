@@ -33,27 +33,23 @@ export class MemberService extends BaseService<Member> {
         let totalPoint: number = 0;
         let totalPriceUsed: number = 0;
 
-        const seatData = seats.map((seat) => {
+        seats.forEach((seat) => {
             if (seat.seat_type === SeatType.NORMAL)
                 totalPoint += SeatPoint.NORMAL;
             else if (seat.seat_type === SeatType.DOUBLE)
                 totalPoint += SeatPoint.DOUBLE;
 
             totalPriceUsed += seat.price;
-
-            return { seat_number: seat.seat_number };
         });
 
-        const comboData = combos.map((combo) => {
+        combos.forEach((combo) => {
             totalPoint += combo.exchange_point * combo.quantity;
             totalPriceUsed += combo.price;
-
-            return { name: combo.name, quantity: combo.quantity };
         });
 
         if (totalPoint > member.consumption_point)
             UtilsExceptionMessageCommon.showMessageError(
-                "Point exchange failed",
+                "The number of converted points is less than your number of points!",
             );
 
         if (booking.total_amount - totalPriceUsed < 5000)
@@ -66,7 +62,9 @@ export class MemberService extends BaseService<Member> {
             theater_name: booking.theater_name,
             movie_id: booking.movie_id,
             used_point: totalPoint,
-            point_history: JSON.stringify([...seatData, ...comboData]),
+            point_history_name: booking.code,
+            seats: seats,
+            combos: combos,
             expireAt: new Date(Date.now() + 10 * 60 * 1000),
         });
 
@@ -86,13 +84,21 @@ export class MemberService extends BaseService<Member> {
         this.updatePoint(
             userId,
             -exchangePoint.used_point,
-            exchangePoint.point_history,
+            exchangePoint.point_history_name,
+            exchangePoint.seats,
+            exchangePoint.combos,
         );
 
         this.exchangePointService.delete(exchangePoint.id);
     }
 
-    async updatePoint(userId: string, point: number, nameHistory: string) {
+    async updatePoint(
+        userId: string,
+        point: number,
+        nameHistory: string,
+        seats,
+        combos,
+    ) {
         let member = (await this.findByCondition({ user_id: userId })).pop();
 
         if (!member) {
@@ -103,6 +109,8 @@ export class MemberService extends BaseService<Member> {
                 point_history: [
                     {
                         name: nameHistory,
+                        seats,
+                        combos,
                         used_point: point,
                         day_trading: new Date(),
                     },
@@ -115,6 +123,8 @@ export class MemberService extends BaseService<Member> {
         member.consumption_point += point;
         member.point_history.push({
             name: nameHistory,
+            seats,
+            combos,
             used_point: point,
             day_trading: new Date(),
         });

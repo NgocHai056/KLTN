@@ -13,7 +13,33 @@ export class ExchangePoint extends Document {
     movie_id: string;
 
     @Prop()
-    point_history: string;
+    point_history_name: string;
+
+    @Prop([
+        {
+            seat_number: String,
+            seat_type: Number,
+            price: Number,
+        },
+    ])
+    seats: { seat_number: string; seat_type: number; price: number }[];
+
+    @Prop([
+        {
+            name: String,
+            description: String,
+            price: Number,
+            quantity: Number,
+            exchange_point: Number,
+        },
+    ])
+    combos: {
+        name: string;
+        description: string;
+        price: number;
+        quantity: number;
+        exchange_point: number;
+    }[];
 
     @Prop()
     used_point: number;

@@ -21,11 +21,19 @@ export class Member extends Document {
     @Prop([
         {
             name: String,
+            seats: Object,
+            combos: Object,
             used_point: Number,
             day_trading: Date,
         },
     ])
-    point_history: { name: string; used_point: number; day_trading: Date }[];
+    point_history: {
+        name: string;
+        seats;
+        combos;
+        used_point: number;
+        day_trading: Date;
+    }[];
 
     @Prop({ type: Date, default: Date.now })
     created_at: Date;
