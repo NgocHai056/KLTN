@@ -81,7 +81,7 @@ export class MemberService extends BaseService<Member> {
 
         if (!exchangePoint) return;
 
-        this.updatePoint(
+        await this.updatePoint(
             userId,
             -exchangePoint.used_point,
             exchangePoint.point_history_name,
@@ -89,7 +89,12 @@ export class MemberService extends BaseService<Member> {
             exchangePoint.combos,
         );
 
+        const seats = exchangePoint.seats;
+        const combos = exchangePoint.combos;
+
         this.exchangePointService.delete(exchangePoint.id);
+
+        return { seats, combos };
     }
 
     async updatePoint(

@@ -1,4 +1,4 @@
 export enum SeatPoint {
     NORMAL = 1000,
-    DOUBLE = 1500,
+    DOUBLE = 2000,
 }

@@ -327,10 +327,10 @@ export class ShowtimeService extends BaseService<Showtime> {
         time: string,
         showtime: string,
     ) {
-        // if (new Date(time + "T" + showtime).getTime() < new Date().getTime())
-        //     UtilsExceptionMessageCommon.showMessageError(
-        //         "Can't book tickets because it's pass show time!",
-        //     );
+        if (new Date(time + "T" + showtime).getTime() < new Date().getTime())
+            UtilsExceptionMessageCommon.showMessageError(
+                "Can't book tickets because it's pass show time!",
+            );
 
         const query = {
             room_id: { $in: roomIds },

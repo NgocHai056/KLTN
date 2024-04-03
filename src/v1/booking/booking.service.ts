@@ -32,6 +32,56 @@ export class BookingService extends BaseService<Booking> {
     }
 
     async usePoint(booking: Booking, bookingDto: UsePointBookingDto) {
+        const { seats, combos } = this.getSeatAndComboFromBooking(
+            booking,
+            bookingDto,
+        );
+
+        booking.discount_price = await this.memberService.usePoint(
+            booking,
+            seats,
+            combos,
+        );
+
+        this.update(booking.id, booking);
+
+        return true;
+    }
+
+    private getRemainSeatAndComboWhenUsePoint(booking: Booking, bookingDto) {
+        const combosMap = {};
+
+        bookingDto.combos.forEach(
+            (combo) => (combosMap[combo.combo_id] = combo),
+        );
+
+        const seats = booking.seats.filter((seat) => {
+            return !bookingDto.seats.some(
+                (s) => s.seat_number === seat.seat_number,
+            );
+        });
+
+        const combos = booking.combos
+            .map((combo) => {
+                const comboObject = combosMap[combo["id"]];
+
+                if (!comboObject) return combo;
+                else {
+                    if (comboObject.quantity !== combo.quantity) {
+                        combo.quantity -= comboObject.quantity;
+                        return combo;
+                    }
+                }
+            })
+            .filter(Boolean);
+
+        return { seats, combos };
+    }
+
+    private getSeatAndComboFromBooking(
+        booking: Booking,
+        bookingDto: UsePointBookingDto,
+    ) {
         const seatsMap = {};
         const combosMap = {};
 
@@ -59,16 +109,7 @@ export class BookingService extends BaseService<Booking> {
                 }
             })
             .filter(Boolean);
-
-        booking.discount_price = await this.memberService.usePoint(
-            booking,
-            seats,
-            combos,
-        );
-
-        this.update(booking.id, booking);
-
-        return true;
+        return { seats, combos };
     }
 
     async createBooking(
@@ -194,16 +235,24 @@ export class BookingService extends BaseService<Booking> {
             booking.seats.map((seat) => seat.seat_number).flat(),
         );
 
+        const data = await this.memberService.minusPoint(
+            booking.user_id,
+            booking.movie_id,
+        );
+
+        const { seats, combos } = this.getRemainSeatAndComboWhenUsePoint(
+            booking,
+            data,
+        );
+
         await this.memberService.updatePoint(
             booking.user_id,
             // Calculate point by total amount user must pay minus for discount and then devide 1000
             Math.round((booking.total_amount - booking.discount_price) / 1000),
             booking.code,
-            booking.seats,
-            booking.combos,
+            seats,
+            combos,
         );
-
-        await this.memberService.minusPoint(booking.user_id, booking.movie_id);
 
         this.notificationService.create({
             user_id: booking.user_id,
