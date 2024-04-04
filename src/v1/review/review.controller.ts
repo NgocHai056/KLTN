@@ -4,7 +4,6 @@ import {
     Get,
     HttpStatus,
     Param,
-    ParseIntPipe,
     Post,
     Res,
     UsePipes,
@@ -95,10 +94,7 @@ export class ReviewController {
     @Get("/:id/movie")
     @ApiOperation({ summary: "API lấy các đánh giá theo mỗi bộ phim" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async getByMovieId(
-        @Param("id", ParseIntPipe) id: number,
-        @Res() res: Response,
-    ) {
+    async getByMovieId(@Param("id") id: string, @Res() res: Response) {
         const response: ResponseData = new ResponseData();
 
         const reviews = new ReviewResponse().mapToList(
