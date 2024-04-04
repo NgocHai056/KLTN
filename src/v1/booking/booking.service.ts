@@ -51,6 +51,9 @@ export class BookingService extends BaseService<Booking> {
     private getRemainSeatAndComboWhenUsePoint(booking: Booking, bookingDto) {
         const combosMap = {};
 
+        if (!bookingDto)
+            return { seats: booking.seats, combos: booking.combos };
+
         bookingDto.combos.forEach(
             (combo) => (combosMap[combo.combo_id] = combo),
         );
