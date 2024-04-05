@@ -57,12 +57,17 @@ export class UserController {
         if (!user)
             UtilsExceptionMessageCommon.showMessageError("User not exist.");
 
+        const status =
+            user.status === UserStatus.ACTIVATED
+                ? UserStatus.STOP_WORKING
+                : UserStatus.ACTIVATED;
+
         response.setData(
             new UserResponse(
                 await this.userService.update(user.id, {
                     access_token: "",
                     refresh_token: "",
-                    status: UserStatus.STOP_WORKING,
+                    status: status,
                 }),
             ),
         );

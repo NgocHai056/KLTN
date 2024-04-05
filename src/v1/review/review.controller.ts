@@ -48,14 +48,14 @@ export class ReviewController {
     ) {
         const response: ResponseData = new ResponseData();
 
-        if (
-            (
-                await this.bookingService.findByCondition({
-                    user_id: user.id,
-                    movie_id: reviewDto.movie_id,
-                })
-            ).length === 0
-        ) {
+        const booking = (
+            await this.bookingService.findByCondition({
+                user_id: user.id,
+                movie_id: reviewDto.movie_id,
+            })
+        ).pop();
+
+        if (!booking) {
             UtilsExceptionMessageCommon.showMessageError(
                 "You haven't seen this movie yet so you can't rate it!",
             );
@@ -78,7 +78,10 @@ export class ReviewController {
         movie.rating =
             (movie.rating * countReview + reviewDto.rating) / (countReview + 1);
 
-        await this.movieService.update(movie.id, movie);
+        booking.reviewed = 1; // 1 đã reivewed phim
+
+        this.movieService.update(movie.id, movie);
+        this.bookingService.update(booking.id, booking);
 
         const reviewBuilder = new ReviewBuilder()
             .withMovieId(reviewDto.movie_id)
