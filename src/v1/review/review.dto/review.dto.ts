@@ -7,6 +7,13 @@ import {
 export class ReviewDto {
     @ApiProperty({
         example: "1",
+        description: "Id booking",
+    })
+    @IsNotEmptyString()
+    booking_id: string;
+
+    @ApiProperty({
+        example: "1",
         description: "Id phim",
     })
     @IsNotEmptyString()

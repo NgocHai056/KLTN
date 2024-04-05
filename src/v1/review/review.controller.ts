@@ -48,12 +48,7 @@ export class ReviewController {
     ) {
         const response: ResponseData = new ResponseData();
 
-        const booking = (
-            await this.bookingService.findByCondition({
-                user_id: user.id,
-                movie_id: reviewDto.movie_id,
-            })
-        ).pop();
+        const booking = await this.bookingService.find(reviewDto.booking_id);
 
         if (!booking) {
             UtilsExceptionMessageCommon.showMessageError(
