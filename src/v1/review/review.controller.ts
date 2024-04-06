@@ -5,6 +5,7 @@ import {
     HttpStatus,
     Param,
     Post,
+    Query,
     Res,
     UsePipes,
     ValidationPipe,
@@ -27,6 +28,7 @@ import { ReviewBuilder } from "./review.builder/review.builder";
 import { ReviewDto } from "./review.dto/review.dto";
 import { ReviewResponse } from "./review.response/review.response";
 import { ReviewService } from "./review.service";
+import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
 
 @Controller({ version: VersionEnum.V1.toString(), path: "auth/review" })
 export class ReviewController {
@@ -92,7 +94,11 @@ export class ReviewController {
     @Get("/:id/movie")
     @ApiOperation({ summary: "API lấy các đánh giá theo mỗi bộ phim" })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async getByMovieId(@Param("id") id: string, @Res() res: Response) {
+    async getByMovieId(
+        @Param("id") id: string,
+        @Query() pagination: PaginationAndSearchDto,
+        @Res() res: Response,
+    ) {
         const response: ResponseData = new ResponseData();
 
         const reviews = new ReviewResponse().mapToList(
@@ -107,12 +113,19 @@ export class ReviewController {
 
         users.map((user) => (usersMap[user.id] = user));
 
-        reviews.map((review) => {
+        let totalReview = 0;
+        reviews.forEach((review) => {
             const user = usersMap[review.user_id];
             review.user_name = user.name;
+
+            totalReview += review.rating;
         });
 
-        response.setData(reviews);
+        response.setTotalRecord(reviews.length);
+        response.setData({
+            reviews: reviews,
+            total_review: (totalReview / reviews.length).toFixed(2),
+        });
         return res.status(HttpStatus.OK).send(response);
     }
 }
