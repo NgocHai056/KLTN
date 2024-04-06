@@ -122,10 +122,11 @@ export class ReviewController {
         });
 
         response.setTotalRecord(reviews.length);
-        response.setData({
-            reviews: reviews,
+        response.setData(reviews);
+
+        return res.status(HttpStatus.OK).send({
+            ...response,
             total_review: (totalReview / reviews.length).toFixed(2),
         });
-        return res.status(HttpStatus.OK).send(response);
     }
 }
