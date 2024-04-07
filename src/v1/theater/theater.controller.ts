@@ -38,10 +38,12 @@ export class TheaterController {
         if (theaters.length === 0)
             UtilsExceptionMessageCommon.showMessageError("Theater not exist.");
 
+        const status = theaters[0].status == 0 ? 1 : 0; // Trang thai 0: tat, 1: bat
+
         response.setData(
             (await this.theaterService.updateMany(
                 { _id: { $in: theaters.flatMap((x) => x.id) } },
-                { $set: { status: 0 } },
+                { $set: { status: status } },
             ))
                 ? { msg: "Update successful." }
                 : { msg: "Update failed." },

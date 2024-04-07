@@ -245,10 +245,15 @@ export class MovieController {
                     )} Cannot delete because this movie is already scheduled`,
             );
 
+        const status =
+            movies.pop().status === MovieStatus.STOP_SHOWING
+                ? MovieStatus.NOW_SHOWING
+                : MovieStatus.STOP_SHOWING;
+
         response.setData(
             (await this.movieService.updateMany(
                 { _id: { $in: ids } },
-                { $set: { status: MovieStatus.STOP_SHOWING } },
+                { $set: { status: status } },
             ))
                 ? { msg: "Update successful." }
                 : { msg: "Update failed." },
