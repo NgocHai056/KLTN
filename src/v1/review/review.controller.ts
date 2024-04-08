@@ -122,7 +122,13 @@ export class ReviewController {
         });
 
         response.setTotalRecord(reviews.length);
-        response.setData(reviews);
+
+        response.setData(
+            reviews.slice(
+                (+pagination.page - 1) * pagination.page_size,
+                +pagination.page * pagination.page_size,
+            ),
+        );
 
         return res.status(HttpStatus.OK).send({
             ...response,

@@ -53,8 +53,8 @@ export class MemberController {
             );
 
         const pointHistory = member.point_history.slice(
-            +pagination.page - 1,
-            10,
+            (+pagination.page - 1) * pagination.page_size,
+            +pagination.page * pagination.page_size,
         );
 
         response.setData({ ...member.toJSON(), point_history: pointHistory });
