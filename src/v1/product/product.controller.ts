@@ -3,6 +3,7 @@ import {
     Controller,
     Get,
     HttpStatus,
+    Param,
     Post,
     Query,
     Res,
@@ -20,6 +21,7 @@ import { ResponseData } from "src/utils.common/utils.response.common/utils.respo
 import { GetProductDto } from "./product.dto/get-product.dto";
 import { ProductDto } from "./product.dto/product.dto";
 import { ProductService } from "./product.service";
+import { UpdateProductDto } from "./product.dto/update-product.dto";
 
 @Controller({ version: VersionEnum.V1.toString(), path: "unauth/product" })
 export class ProductController {
@@ -47,6 +49,25 @@ export class ProductController {
         }
 
         response.setData(await this.productService.create(productDto));
+
+        return res.status(HttpStatus.OK).send(response);
+    }
+
+    @Post("/:id/update")
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: "API update product" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async update(
+        @Param("id") id: string,
+        @Body() productDto: UpdateProductDto,
+        @Res() res: Response,
+    ) {
+        const response: ResponseData = new ResponseData();
+
+        const product = await this.productService.find(id);
+        Object.assign(product, productDto);
+
+        response.setData(await this.productService.update(product.id, product));
 
         return res.status(HttpStatus.OK).send(response);
     }
