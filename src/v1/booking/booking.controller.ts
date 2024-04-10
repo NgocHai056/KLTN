@@ -167,8 +167,15 @@ export class BookingController {
             );
         });
 
+        const member = await this.memberService.findByCondition({
+            user_id: userId,
+        });
+
         response.setData(bookings);
-        return res.status(HttpStatus.OK).send(response);
+        return res.status(HttpStatus.OK).send({
+            ...response,
+            exchange_point: member.length > 0 ? member[0].consumption_point : 0,
+        });
     }
 
     @Get()
