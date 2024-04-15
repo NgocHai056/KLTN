@@ -41,8 +41,6 @@ export class SocketGateway
 
         if (!showtime) return;
 
-        showtime.seat_array = payload.seat_array;
-
         this.io.emit(showtime.id, showtime);
     }
 }
