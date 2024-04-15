@@ -8,6 +8,7 @@ import {
     WebSocketServer,
 } from "@nestjs/websockets";
 import { Server } from "socket.io";
+import { ShowtimeResponse } from "src/v1/showtime/showtime.response/showtime.response";
 import { ShowtimeService } from "src/v1/showtime/showtime.service";
 
 @WebSocketGateway()
@@ -41,6 +42,10 @@ export class SocketGateway
 
         if (!showtime) return;
 
-        this.io.emit(showtime.id, showtime);
+        const showtimeResponse = new ShowtimeResponse(showtime);
+
+        showtimeResponse.mapArraySeat(showtime.seat_array);
+
+        this.io.emit(showtime.id, showtimeResponse);
     }
 }
