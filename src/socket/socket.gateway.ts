@@ -39,6 +39,10 @@ export class SocketGateway
     async handleShowtime(client: any, payload: any) {
         const showtime = await this.showtimeService.find(payload.showtime_id);
 
+        if (!showtime) return;
+
+        showtime.seat_array = payload.seat_array;
+
         this.io.emit(showtime.id, showtime);
     }
 }
