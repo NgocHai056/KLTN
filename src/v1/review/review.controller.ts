@@ -30,7 +30,7 @@ import { ReviewResponse } from "./review.response/review.response";
 import { ReviewService } from "./review.service";
 import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
 
-@Controller({ version: VersionEnum.V1.toString(), path: "auth/review" })
+@Controller({ version: VersionEnum.V1.toString(), path: "unauth/review" })
 export class ReviewController {
     constructor(
         private readonly reviewService: ReviewService,
