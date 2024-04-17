@@ -138,12 +138,14 @@ export class ShowtimeService extends BaseService<Showtime> {
                 .map((id) => genreMap[id])
                 .join(", ");
 
-            showtimeResponse.times = showtimes
+            const times = showtimes
                 .filter((showtime) => showtime.movie_id === movie.id)
                 .map((showtime) => ({
                     time: showtime.showtime,
                     showtime_id: showtime.id,
                 }));
+
+            showtimeResponse.times = this.sortByTime(times);
 
             return showtimeResponse;
         });
@@ -272,6 +274,8 @@ export class ShowtimeService extends BaseService<Showtime> {
         );
 
         showtimeResponse.times = showtimeResponse.times.map((item) => {
+            item.showtimes = this.sortByTime(item.showtimes);
+
             return {
                 time: UtilsDate.formatDateVN(new Date(item.time)),
                 showtimes: item.showtimes,
@@ -279,6 +283,22 @@ export class ShowtimeService extends BaseService<Showtime> {
         });
 
         return [showtimeResponse];
+    }
+
+    private sortByTime(list) {
+        list.sort((a, b) => {
+            const timeA = moment(a.showtime || a.time, "HH:mm").toDate();
+            const timeB = moment(b.showtime || b.time, "HH:mm").toDate();
+
+            if (timeA < timeB) {
+                return -1;
+            } else if (timeA > timeB) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        return list;
     }
 
     async checkSeatStatus(showtimeId: string) {
