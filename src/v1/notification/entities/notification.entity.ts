@@ -18,8 +18,17 @@ export class Notification extends Document {
     @Prop()
     type: number;
 
+    @Prop()
+    announcement_date: Date;
+
     @Prop({ expires: "10m" })
     expireAt: Date;
+
+    @Prop({ type: Date, default: Date.now })
+    created_at: Date;
+
+    @Prop({ type: Date, default: Date.now })
+    updated_at: Date;
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);

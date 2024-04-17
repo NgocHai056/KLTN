@@ -10,16 +10,16 @@ import {
     UsePipes,
     ValidationPipe,
 } from "@nestjs/common";
+import { ApiOperation } from "@nestjs/swagger";
+import { Response } from "express";
+import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
+import { NotifyType } from "src/utils.common/utils.enum/notify.enum";
+import { VersionEnum } from "src/utils.common/utils.enum/utils.version.enum";
+import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
+import { UserModel } from "../user/user.entity/user.model";
 import { CreateNotificationDto } from "./dto/create-notification.dto";
 import { UpdateNotificationDto } from "./dto/update-notification.dto";
 import { NotificationService } from "./notification.service";
-import { VersionEnum } from "src/utils.common/utils.enum/utils.version.enum";
-import { UserModel } from "../user/user.entity/user.model";
-import { GetUser } from "src/utils.common/utils.decorator.common/utils.decorator.common";
-import { ApiOperation } from "@nestjs/swagger";
-import { Response } from "express";
-import { ResponseData } from "src/utils.common/utils.response.common/utils.response.common";
-import { UtilsExceptionMessageCommon } from "src/utils.common/utils.exception.common/utils.exception.message.common";
 
 @Controller({ version: VersionEnum.V1.toString(), path: "auth/notification" })
 export class NotificationController {
@@ -41,16 +41,27 @@ export class NotificationController {
     async findByUser(@GetUser() user: UserModel, @Res() res: Response) {
         const response: ResponseData = new ResponseData();
 
-        const notification = await this.notificationService.findByCondition({
+        const notifyBooking = await this.notificationService.findByCondition({
             user_id: user.id,
+            type: NotifyType.BOOKING,
         });
 
-        if (notification.length === 0)
-            UtilsExceptionMessageCommon.showMessageError(
-                "User haven't received any notification yet!",
-            );
+        const notifyMovie = await this.notificationService.findByCondition({
+            type: NotifyType.MOVIE,
+            announcement_date: { $lte: new Date() },
+        });
 
-        response.setData(notification);
+        response.setData(
+            [...notifyBooking, ...notifyMovie].sort((a, b) => {
+                if (a.created_at > b.created_at) {
+                    return -1;
+                } else if (a.created_at < b.created_at) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }),
+        );
 
         return res.status(HttpStatus.OK).send(response);
     }

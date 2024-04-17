@@ -31,6 +31,7 @@ import { MovieService } from "./movie.service";
 import { ShowtimeService } from "../showtime/showtime.service";
 import { Movie } from "./movie.entity/movie.entity";
 import { UtilsDate } from "src/utils.common/utils.format-time.common/utils.format-time.common";
+import { NotificationService } from "../notification/notification.service";
 
 @Controller({ version: VersionEnum.V1.toString(), path: "unauth/movie" })
 export class MovieController {
@@ -39,6 +40,7 @@ export class MovieController {
         private readonly genreService: GenreService,
         private readonly showtimeService: ShowtimeService,
         private readonly firebaseService: FirebaseService,
+        private readonly notificationService: NotificationService,
     ) {}
 
     @Get()
@@ -139,14 +141,26 @@ export class MovieController {
             files["thumbnail"][0],
         );
 
-        response.setData(
-            await this.movieService.create({
-                ...movieDto,
-                genres: genreDto,
-                poster: posterUrl,
-                thumbnail: thumbnailUrl,
-            }),
-        );
+        const movie = await this.movieService.create({
+            ...movieDto,
+            genres: genreDto,
+            poster: posterUrl,
+            thumbnail: thumbnailUrl,
+        });
+
+        if (!movie)
+            UtilsExceptionMessageCommon.showMessageError(
+                "Create a failed movie!",
+            );
+
+        this.notificationService.create({
+            object_id: movie.id,
+            title: "Phim đang chiếu - " + movie.name,
+            description: `Đến NHCinema "book" ngay ${movie.name}. ${movie.title}`,
+            type: 2, // type of notification 1: booking, 2: movie
+            announcement_date: movie.release,
+        });
+        response.setData(movie);
 
         return res.status(HttpStatus.OK).send(response);
     }
