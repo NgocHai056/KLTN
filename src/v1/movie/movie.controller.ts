@@ -74,7 +74,6 @@ export class MovieController {
             const showtimeSet = new Set();
 
             movieHasShowtime.forEach((x) => showtimeSet.add(x.movie_id));
-            console.log(showtimeSet);
 
             const data = movies.data.filter((movie) =>
                 showtimeSet.has(movie._id.toString()),
@@ -265,7 +264,9 @@ export class MovieController {
                 "Delete movie failed!",
             );
 
-        if (movies.pop().status === MovieStatus.NOW_SHOWING) {
+        const movie = movies.pop();
+
+        if (movie.status === MovieStatus.NOW_SHOWING) {
             /** Get the list of showtimes to check if the movie is in that showtime  */
             const showtimes = await this.showtimeService.getFutureShowtime();
 
@@ -286,7 +287,7 @@ export class MovieController {
         }
 
         const status =
-            movies.pop().status === MovieStatus.STOP_SHOWING
+            movie.status === MovieStatus.STOP_SHOWING
                 ? MovieStatus.NOW_SHOWING
                 : MovieStatus.STOP_SHOWING;
 
