@@ -132,26 +132,28 @@ export class ShowtimeService extends BaseService<Showtime> {
         });
 
         /** Map showtime and showtime_id follow each movie */
-        return movies.map((movie) => {
-            if (movie.status != MovieStatus.STOP_SHOWING) {
-                const showtimeResponse = new ShowtimeByDayResponse(movie);
+        return movies
+            .map((movie) => {
+                if (movie.status != MovieStatus.STOP_SHOWING) {
+                    const showtimeResponse = new ShowtimeByDayResponse(movie);
 
-                showtimeResponse.genres = movie.genres
-                    .map((id) => genreMap[id])
-                    .join(", ");
+                    showtimeResponse.genres = movie.genres
+                        .map((id) => genreMap[id])
+                        .join(", ");
 
-                const times = showtimes
-                    .filter((showtime) => showtime.movie_id === movie.id)
-                    .map((showtime) => ({
-                        time: showtime.showtime,
-                        showtime_id: showtime.id,
-                    }));
+                    const times = showtimes
+                        .filter((showtime) => showtime.movie_id === movie.id)
+                        .map((showtime) => ({
+                            time: showtime.showtime,
+                            showtime_id: showtime.id,
+                        }));
 
-                showtimeResponse.times = this.sortByTime(times);
+                    showtimeResponse.times = this.sortByTime(times);
 
-                return showtimeResponse;
-            }
-        });
+                    return showtimeResponse;
+                }
+            })
+            .filter((x) => x);
     }
 
     async findAllByTheater(
