@@ -32,6 +32,7 @@ import { ShowtimeService } from "../showtime/showtime.service";
 import { Movie } from "./movie.entity/movie.entity";
 import { UtilsDate } from "src/utils.common/utils.format-time.common/utils.format-time.common";
 import { NotificationService } from "../notification/notification.service";
+import * as moment from "moment-timezone";
 
 @Controller({ version: VersionEnum.V1.toString(), path: "unauth/movie" })
 export class MovieController {
@@ -59,8 +60,31 @@ export class MovieController {
             pagination,
         );
 
-        response.setData(movies.data);
-        response.setTotalRecord(movies.total_record);
+        // If movies are showing then filter movie by showtime
+        if (+movieDto.status == MovieStatus.NOW_SHOWING) {
+            const movieIds: string[] = movies.data.map((movie) => movie._id);
+
+            const movieHasShowtime = await this.showtimeService.findByCondition(
+                {
+                    movie_id: { $in: movieIds },
+                    time: moment().format("YYYY-MM-DD"),
+                },
+            );
+
+            const showtimeSet = new Set();
+
+            movieHasShowtime.forEach((x) => showtimeSet.add(x.movie_id));
+            console.log(showtimeSet);
+
+            const data = movies.data.filter((movie) =>
+                showtimeSet.has(movie._id.toString()),
+            );
+            response.setData(data);
+            response.setTotalRecord(data.length);
+        } else {
+            response.setData(movies.data);
+            response.setTotalRecord(movies.total_record);
+        }
 
         return res.status(HttpStatus.OK).send(response);
     }
@@ -241,23 +265,25 @@ export class MovieController {
                 "Delete movie failed!",
             );
 
-        /** Get the list of showtimes to check if the movie is in that showtime  */
-        const showtimes = await this.showtimeService.getFutureShowtime();
+        if (movies.pop().status === MovieStatus.NOW_SHOWING) {
+            /** Get the list of showtimes to check if the movie is in that showtime  */
+            const showtimes = await this.showtimeService.getFutureShowtime();
 
-        const movieShowtimes = showtimes.flatMap(
-            (showtime) => showtime.movie_id,
-        );
-
-        const exist = ids.filter((id) => movieShowtimes.includes(id));
-
-        if (exist.length !== 0)
-            UtilsExceptionMessageCommon.showMessageError(
-                `${movies
-                    .filter((movie) => exist.includes(movie.id))
-                    .map(
-                        (movie) => movie.name,
-                    )} Cannot delete because this movie is already scheduled`,
+            const movieShowtimes = showtimes.flatMap(
+                (showtime) => showtime.movie_id,
             );
+
+            const exist = ids.filter((id) => movieShowtimes.includes(id));
+
+            if (exist.length !== 0)
+                UtilsExceptionMessageCommon.showMessageError(
+                    `${movies
+                        .filter((movie) => exist.includes(movie.id))
+                        .map(
+                            (movie) => movie.name,
+                        )} Cannot delete because this movie is already scheduled`,
+                );
+        }
 
         const status =
             movies.pop().status === MovieStatus.STOP_SHOWING

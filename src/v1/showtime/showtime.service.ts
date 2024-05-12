@@ -14,6 +14,7 @@ import { MovieService } from "../movie/movie.service";
 import { RoomService } from "../room/room.service";
 import { Showtime } from "./showtime.entity/showtime.entity";
 import { ShowtimeByDayResponse } from "./showtime.response/showtime-by-day.response";
+import { MovieStatus } from "src/utils.common/utils.enum/movie-status.enum";
 
 @Injectable()
 export class ShowtimeService extends BaseService<Showtime> {
@@ -132,22 +133,24 @@ export class ShowtimeService extends BaseService<Showtime> {
 
         /** Map showtime and showtime_id follow each movie */
         return movies.map((movie) => {
-            const showtimeResponse = new ShowtimeByDayResponse(movie);
+            if (movie.status != MovieStatus.STOP_SHOWING) {
+                const showtimeResponse = new ShowtimeByDayResponse(movie);
 
-            showtimeResponse.genres = movie.genres
-                .map((id) => genreMap[id])
-                .join(", ");
+                showtimeResponse.genres = movie.genres
+                    .map((id) => genreMap[id])
+                    .join(", ");
 
-            const times = showtimes
-                .filter((showtime) => showtime.movie_id === movie.id)
-                .map((showtime) => ({
-                    time: showtime.showtime,
-                    showtime_id: showtime.id,
-                }));
+                const times = showtimes
+                    .filter((showtime) => showtime.movie_id === movie.id)
+                    .map((showtime) => ({
+                        time: showtime.showtime,
+                        showtime_id: showtime.id,
+                    }));
 
-            showtimeResponse.times = this.sortByTime(times);
+                showtimeResponse.times = this.sortByTime(times);
 
-            return showtimeResponse;
+                return showtimeResponse;
+            }
         });
     }
 

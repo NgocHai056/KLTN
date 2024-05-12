@@ -209,7 +209,7 @@ export class BookingService extends BaseService<Booking> {
             object_id: createdItem.id,
             title: "Bạn đang đặt vé - " + createdItem.movie_name,
             description: `Mã vé: ${createdItem.code}`,
-            type: 1, // type of notification 1: booking, 2: movie
+            type: 0, // type of notification 0: booking, 2: movie
             expireAt: new Date(Date.now() + 10 * 60 * 1000),
         });
 
@@ -262,7 +262,7 @@ export class BookingService extends BaseService<Booking> {
             object_id: booking.id,
             title: "Bạn đã đặt vé thành công - " + booking.movie_name,
             description: `Rạp chiếu: ${booking.theater_name}, Phim: ${booking.movie_name}, Ngày chiếu: ${booking.time}, Giờ chiếu: ${booking.showtime}`,
-            type: 1, // type of notification 1: booking, 2: movie
+            type: 1, // type of notification 1: booked, 2: movie
         });
 
         return await this.update(booking.id, {
