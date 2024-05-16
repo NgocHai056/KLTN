@@ -200,7 +200,7 @@ export class BookingService extends BaseService<Booking> {
             showtime: bookingDto.showtime,
             payment_method: bookingDto.payment_method,
             payment_status: PaymentStatus.PENDING,
-            total_amount: totalAmount,
+            total_amount: totalAmount + totalAmount * 0.1,
             expireAt: new Date(Date.now() + 10 * 60 * 1000),
         });
 
