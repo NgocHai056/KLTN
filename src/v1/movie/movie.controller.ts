@@ -113,7 +113,11 @@ export class MovieController {
             true,
         );
 
-        response.setData(result.data);
+        response.setData(
+            result.data.sort(
+                (a, b) => b.release.getTime() - a.release.getTime(),
+            ),
+        );
         response.setTotalRecord(result.total_record);
 
         return res.status(HttpStatus.OK).send(response);
