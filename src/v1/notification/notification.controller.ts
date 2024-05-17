@@ -43,7 +43,7 @@ export class NotificationController {
 
         const notifyBooking = await this.notificationService.findByCondition({
             user_id: user.id,
-            type: NotifyType.BOOKING,
+            type: { $in: [NotifyType.BOOKING, NotifyType.BOOKED] },
         });
 
         // Get notify for movie from 20 days previous to now
