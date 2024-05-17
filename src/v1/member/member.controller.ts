@@ -57,7 +57,7 @@ export class MemberController {
                 (+pagination.page - 1) * pagination.page_size,
                 +pagination.page * pagination.page_size,
             )
-            .sort((a, b) => a.day_trading.getTime() - b.day_trading.getTime());
+            .sort((a, b) => b.day_trading.getTime() - a.day_trading.getTime());
 
         response.setData({ ...member.toJSON(), point_history: pointHistory });
 

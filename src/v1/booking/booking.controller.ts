@@ -208,7 +208,7 @@ export class BookingController {
 
         response.setData(
             bookings.data.sort(
-                (a, b) => a.created_at.getTime() - b.created_at.getTime(),
+                (a, b) => b.created_at.getTime() - a.created_at.getTime(),
             ),
         );
         response.setTotalRecord(bookings.total_record);

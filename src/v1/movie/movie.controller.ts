@@ -64,10 +64,17 @@ export class MovieController {
         if (+movieDto.status == MovieStatus.NOW_SHOWING) {
             const movieIds: string[] = movies.data.map((movie) => movie._id);
 
+            const currentDate = moment();
+
+            const nextDate = moment().add(4, "days");
+
             const movieHasShowtime = await this.showtimeService.findByCondition(
                 {
                     movie_id: { $in: movieIds },
-                    time: moment().format("YYYY-MM-DD"),
+                    time: {
+                        $gte: currentDate.format("YYYY-MM-DD"),
+                        $lte: nextDate.format("YYYY-MM-DD"),
+                    },
                 },
             );
 
