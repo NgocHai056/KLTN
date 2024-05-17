@@ -167,6 +167,10 @@ export class BookingController {
             );
         });
 
+        bookings.sort(
+            (a, b) => b.created_at.getTime() - a.created_at.getTime(),
+        );
+
         const member = await this.memberService.findByCondition({
             user_id: userId,
         });

@@ -46,21 +46,19 @@ export class NotificationController {
             type: NotifyType.BOOKING,
         });
 
+        // Get notify for movie from 20 days previous to now
+        const previousDate = new Date();
+        previousDate.setDate(previousDate.getDate() - 20);
+
         const notifyMovie = await this.notificationService.findByCondition({
             type: NotifyType.MOVIE,
-            announcement_date: { $lte: new Date() },
+            announcement_date: { $gte: previousDate, $lt: new Date() },
         });
 
         response.setData(
-            [...notifyBooking, ...notifyMovie].sort((a, b) => {
-                if (a.created_at > b.created_at) {
-                    return -1;
-                } else if (a.created_at < b.created_at) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }),
+            [...notifyBooking, ...notifyMovie].sort(
+                (a, b) => b.created_at.getTime() - a.created_at.getTime(),
+            ),
         );
 
         return res.status(HttpStatus.OK).send(response);
