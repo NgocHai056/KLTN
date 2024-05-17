@@ -113,11 +113,15 @@ export class MovieController {
             true,
         );
 
-        response.setData(
-            result.data.sort(
-                (a, b) => b.release.getTime() - a.release.getTime(),
-            ),
-        );
+        const data = result.data.map((movie) => {
+            const date = UtilsDate.formatDateVNToString(
+                new Date(movie.release),
+            );
+
+            return { ...movie, release: date };
+        });
+
+        response.setData(data);
         response.setTotalRecord(result.total_record);
 
         return res.status(HttpStatus.OK).send(response);

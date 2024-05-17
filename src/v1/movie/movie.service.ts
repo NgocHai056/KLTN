@@ -110,16 +110,16 @@ export class MovieService extends BaseService<Movie> {
                 $unwind:
                     "$genre_info" /** Tách các kết quả thành từng dòng riêng biệt*/,
             },
-            {
-                $addFields: {
-                    release: {
-                        $dateToString: {
-                            format: "%d/%m/%Y", // Định dạng ngày/tháng/năm theo ý muốn
-                            date: "$release", // Trường ngày tháng cần định dạng
-                        },
-                    },
-                },
-            },
+            // {
+            //     $addFields: {
+            //         release: {
+            //             $dateToString: {
+            //                 format: "%d/%m/%Y", // Định dạng ngày/tháng/năm theo ý muốn
+            //                 date: "$release", // Trường ngày tháng cần định dạng
+            //             },
+            //         },
+            //     },
+            // },
             {
                 $group: {
                     _id: "$_id",
@@ -167,7 +167,8 @@ export class MovieService extends BaseService<Movie> {
             },
             {
                 $sort: {
-                    name: 1,
+                    // name: 1,
+                    release: -1,
                 },
             },
         ];
