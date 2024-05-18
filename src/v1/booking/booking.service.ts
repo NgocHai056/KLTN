@@ -274,7 +274,7 @@ export class BookingService extends BaseService<Booking> {
             })
         ).pop();
 
-        if (!notifyBooking) this.notificationService.delete(notifyBooking.id);
+        if (notifyBooking) this.notificationService.delete(notifyBooking.id);
 
         return await this.update(booking.id, {
             payment_status: PaymentStatus.PAID,

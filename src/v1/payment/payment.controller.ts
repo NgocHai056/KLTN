@@ -42,8 +42,13 @@ export class PaymentController {
 
         const booking = await this.bookingService.find(paymentDto.booking_id);
 
-        if (!booking || booking.payment_status === PaymentStatus.PAID)
-            UtilsExceptionMessageCommon.showMessageError("Payment failed!");
+        if (!booking)
+            UtilsExceptionMessageCommon.showMessageError("Booking not exist!");
+
+        if (booking.payment_status === PaymentStatus.PAID)
+            UtilsExceptionMessageCommon.showMessageError(
+                "Booking have been complete!",
+            );
 
         const date = new Date();
         const createDate = moment(date).format("YYYYMMDDHHmmss");
