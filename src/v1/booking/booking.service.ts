@@ -16,6 +16,7 @@ import { UserModel } from "../user/user.entity/user.model";
 import { BookingDto } from "./booking.dto/booking.dto";
 import { UsePointBookingDto } from "./booking.dto/use-point.booking.dto";
 import { Booking } from "./booking.entity/booking.entity";
+import { NotifyType } from "src/utils.common/utils.enum/notify.enum";
 
 @Injectable()
 export class BookingService extends BaseService<Booking> {
@@ -264,6 +265,16 @@ export class BookingService extends BaseService<Booking> {
             description: `Rạp chiếu: ${booking.theater_name}, Phim: ${booking.movie_name}, Ngày chiếu: ${booking.time}, Giờ chiếu: ${booking.showtime}`,
             type: 1, // type of notification 1: booked, 2: movie
         });
+
+        // if booking is complete then delete notify for booking
+        const notifyBooking = (
+            await this.notificationService.findByCondition({
+                object_id: booking.id,
+                type: NotifyType.BOOKING,
+            })
+        ).pop();
+
+        if (!notifyBooking) this.notificationService.delete(notifyBooking.id);
 
         return await this.update(booking.id, {
             payment_status: PaymentStatus.PAID,
