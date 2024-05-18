@@ -193,9 +193,27 @@ export class BookingController {
     ) {
         const response: ResponseData = new ResponseData();
 
+        const query: any = {};
+
+        if (pagination.key_search)
+            query.$or = [
+                {
+                    code: {
+                        $regex: new RegExp(pagination.key_search, "i"),
+                    },
+                    movie_name: {
+                        $regex: new RegExp(pagination.key_search, "i"),
+                    },
+                    user_name: {
+                        $regex: new RegExp(pagination.key_search, "i"),
+                    },
+                },
+            ];
+
         const bookings = await this.bookingService.findAllForPagination(
             +pagination.page,
             +pagination.page_size,
+            [{ $match: query }],
         );
 
         if (user.role === Role.MANAGER)
