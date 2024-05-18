@@ -217,7 +217,7 @@ export class BookingController {
         );
 
         if (user.role === Role.MANAGER)
-            bookings.data.filter(
+            bookings.data = bookings.data.filter(
                 (booking) => booking.theater_id === user.theater_id,
             );
 
