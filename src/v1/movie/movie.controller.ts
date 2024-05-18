@@ -113,15 +113,7 @@ export class MovieController {
             true,
         );
 
-        const data = result.data.map((movie) => {
-            const date = UtilsDate.formatDateVNToString(
-                new Date(movie.release),
-            );
-
-            return { ...movie, release: date };
-        });
-
-        response.setData(data);
+        response.setData(result.data);
         response.setTotalRecord(result.total_record);
 
         return res.status(HttpStatus.OK).send(response);

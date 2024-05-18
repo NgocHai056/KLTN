@@ -9,6 +9,7 @@ import { Movie } from "./movie.entity/movie.entity";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import moment from "moment";
 import { NotificationService } from "../notification/notification.service";
+import { UtilsDate } from "src/utils.common/utils.format-time.common/utils.format-time.common";
 
 @Injectable()
 export class MovieService extends BaseService<Movie> {
@@ -173,11 +174,21 @@ export class MovieService extends BaseService<Movie> {
             },
         ];
 
-        return await this.findAllForPagination(
+        const result = await this.findAllForPagination(
             +pagination.page,
             +pagination.page_size,
             aggregationPipeline,
         );
+
+        const data = result.data.map((movie) => {
+            const date = UtilsDate.formatDateVNToString(
+                new Date(movie.release),
+            );
+
+            return { ...movie, release: date };
+        });
+
+        return { data, total_record: result.total_record };
     }
 
     async findDocumentsExceptIds(ids: string[]): Promise<any[]> {
