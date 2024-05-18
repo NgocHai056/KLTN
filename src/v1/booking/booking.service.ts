@@ -535,6 +535,12 @@ export class BookingService extends BaseService<Booking> {
                     total_booking: 1,
                 },
             },
+            {
+                $limit: 10, // Limit to 10 records
+            },
+            {
+                $sort: { total_revenue: -1 }, // Sort by total_revenue descending
+            },
         ]);
     }
 }
