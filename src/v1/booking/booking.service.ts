@@ -462,10 +462,25 @@ export class BookingService extends BaseService<Booking> {
         });
     }
 
-    async getOverallStatistics(theaterId?: string) {
-        const query: any = {};
+    async getOverallStatistics(theaterId: string, reportType: number) {
+        const query: any = { payment_status: PaymentStatus.PAID };
 
         if (theaterId) query.theater_id = theaterId;
+
+        const date = new Date();
+        if (reportType === 0) {
+            const firstDayOfMonth = new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                1,
+            );
+
+            query.created_at = { $gte: firstDayOfMonth, $lte: new Date() };
+        } else if (reportType === 1) {
+            const firstDayOfMonth = new Date(date.getFullYear(), 1, 1);
+
+            query.created_at = { $gte: firstDayOfMonth, $lte: new Date() };
+        }
 
         return await this.bookingModel.aggregate([
             {
@@ -480,10 +495,25 @@ export class BookingService extends BaseService<Booking> {
         ]);
     }
 
-    async getStatisticByMovie(theaterId?: string) {
-        const query: any = {};
+    async getStatisticByMovie(theaterId: string, reportType: number) {
+        const query: any = { payment_status: PaymentStatus.PAID };
 
         if (theaterId) query.theater_id = theaterId;
+
+        const date = new Date();
+        if (reportType === 0) {
+            const firstDayOfMonth = new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                1,
+            );
+
+            query.created_at = { $gte: firstDayOfMonth, $lte: new Date() };
+        } else if (reportType === 1) {
+            const firstDayOfMonth = new Date(date.getFullYear(), 1, 1);
+
+            query.created_at = { $gte: firstDayOfMonth, $lte: new Date() };
+        }
 
         return await this.bookingModel.aggregate([
             {

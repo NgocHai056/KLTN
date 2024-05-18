@@ -195,15 +195,15 @@ export class BookingController {
 
         const query: any = {};
 
-        if (pagination.key_search)
+        if (pagination.key_search !== "")
             query.$or = [
+                { code: { $regex: new RegExp(pagination.key_search, "i") } },
                 {
-                    code: {
-                        $regex: new RegExp(pagination.key_search, "i"),
-                    },
                     movie_name: {
                         $regex: new RegExp(pagination.key_search, "i"),
                     },
+                },
+                {
                     user_name: {
                         $regex: new RegExp(pagination.key_search, "i"),
                     },

@@ -67,6 +67,7 @@ export class StatisticalController {
     @ApiOperation({ summary: "API doanh thu." })
     @UsePipes(new ValidationPipe({ transform: true }))
     async getOverallStatistics(
+        @Query("report_type") reportType: number = 0,
         @Res() res: Response,
         @GetUser() user: UserModel,
     ) {
@@ -74,10 +75,12 @@ export class StatisticalController {
 
         const booking = await this.bookingService.getOverallStatistics(
             user.theater_id,
+            +reportType,
         );
 
         const statisticByMovie = await this.bookingService.getStatisticByMovie(
             user.theater_id,
+            reportType,
         );
 
         const movies = await this.movieService.findAll();
