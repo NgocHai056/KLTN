@@ -120,7 +120,7 @@ export class PaymentController {
 
         booking.time = UtilsDate.formatDateVNToString(new Date(booking.time));
 
-        this.mailService.sendConfirmation(
+        this.mailService.sendEmailWithQRCode(
             booking.email,
             "Thank you for booking with NHCinema!",
             "./booking-confirm",
@@ -132,6 +132,8 @@ export class PaymentController {
                     .map((seat) => seatArray[parseInt(seat.seat_number) - 1])
                     .join(", "),
             },
+            booking.id,
+            booking.code,
         );
 
         return res.status(HttpStatus.OK).send(response);
