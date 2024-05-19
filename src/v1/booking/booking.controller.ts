@@ -210,16 +210,13 @@ export class BookingController {
                 },
             ];
 
+        if (user.role === Role.MANAGER) query.theater_id = user.theater_id;
+
         const bookings = await this.bookingService.findAllForPagination(
             +pagination.page,
             +pagination.page_size,
             [{ $match: query }],
         );
-
-        if (user.role === Role.MANAGER)
-            bookings.data = bookings.data.filter(
-                (booking) => booking.theater_id === user.theater_id,
-            );
 
         bookings.data.forEach(
             (booking) =>
