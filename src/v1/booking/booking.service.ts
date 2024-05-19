@@ -55,9 +55,7 @@ export class BookingService extends BaseService<Booking> {
         if (!bookingDto)
             return { seats: booking.seats, combos: booking.combos };
 
-        bookingDto.combos.forEach(
-            (combo) => (combosMap[combo.combo_id] = combo),
-        );
+        bookingDto.combos.forEach((combo) => (combosMap[combo._id] = combo));
 
         const seats = booking.seats.filter((seat) => {
             return !bookingDto.seats.some(
