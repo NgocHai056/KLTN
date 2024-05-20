@@ -215,7 +215,7 @@ export class BookingController {
         const bookings = await this.bookingService.findAllForPagination(
             +pagination.page,
             +pagination.page_size,
-            [{ $match: query }],
+            [{ $match: query }, { $sort: { created_at: -1 } }],
         );
 
         bookings.data.forEach(
@@ -225,11 +225,7 @@ export class BookingController {
                 )),
         );
 
-        response.setData(
-            bookings.data.sort(
-                (a, b) => b.created_at.getTime() - a.created_at.getTime(),
-            ),
-        );
+        response.setData(bookings.data);
         response.setTotalRecord(bookings.total_record);
 
         return res.status(HttpStatus.OK).send(response);

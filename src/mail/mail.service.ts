@@ -36,7 +36,7 @@ export class MailService {
 
         await QRCode.toFile(
             qrCodePath,
-            `https://admin-nh-cinema.vercel.app/confirm-ticket/${bookingId}?code=${bookingCode}`,
+            `https://nh-cinema.vercel.app/confirm-ticket/${bookingId}?code=${bookingCode}`,
             {
                 errorCorrectionLevel: "H",
             },

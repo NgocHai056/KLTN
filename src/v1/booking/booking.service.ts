@@ -250,7 +250,9 @@ export class BookingService extends BaseService<Booking> {
         await this.memberService.updatePoint(
             booking.user_id,
             // Calculate point by total amount user must pay minus for discount and then devide 1000
-            Math.round((booking.total_amount - booking.discount_price) / 100),
+            Math.round(
+                (booking.total_amount / 1.1 - booking.discount_price) / 100,
+            ),
             booking.code,
             seats,
             combos,

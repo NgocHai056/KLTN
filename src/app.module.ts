@@ -99,6 +99,11 @@ export class AppModule implements NestModule {
                     method: RequestMethod.GET,
                     version: VersionEnum.V1.toString(),
                 },
+                {
+                    path: "/auth/booking/:id",
+                    method: RequestMethod.GET,
+                    version: VersionEnum.V1.toString(),
+                },
             )
             .forRoutes(
                 { path: "/v1/oauth/*", method: RequestMethod.GET },
