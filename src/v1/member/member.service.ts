@@ -44,7 +44,7 @@ export class MemberService extends BaseService<Member> {
 
         combos.forEach((combo) => {
             totalPoint += combo.exchange_point * combo.quantity;
-            totalPriceUsed += combo.price;
+            totalPriceUsed += combo.price * combo.quantity;
         });
 
         if (totalPoint > member.consumption_point)
