@@ -145,7 +145,7 @@ export class MemberService extends BaseService<Member> {
 
         member = await this.updateLevelMember(member);
 
-        this.update(member.id, member);
+        await this.update(member.id, member);
     }
 
     async updateLevelMember(member: Member) {
