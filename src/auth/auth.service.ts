@@ -48,7 +48,7 @@ export class AuthService {
             phone: user.phone,
             password: hashedPassword,
             status: UserStatus.NOT_ACTIVATED,
-            expireAt: new Date(Date.now() + 10 * 60 * 1000),
+            expireAt: new Date(),
         });
     }
 
@@ -137,7 +137,7 @@ export class AuthService {
         await this.otpService.create({
             code,
             email: email,
-            expireAt: new Date(Date.now() + 5 * 60 * 1000),
+            expireAt: new Date(),
         });
     }
 

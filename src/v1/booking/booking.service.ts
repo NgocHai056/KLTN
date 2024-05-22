@@ -200,7 +200,7 @@ export class BookingService extends BaseService<Booking> {
             payment_method: bookingDto.payment_method,
             payment_status: PaymentStatus.PENDING,
             total_amount: totalAmount + totalAmount * 0.1, // VAT 10%
-            expireAt: new Date(Date.now() + 10 * 60 * 1000),
+            expireAt: new Date(),
         });
 
         this.notificationService.create({
@@ -209,7 +209,7 @@ export class BookingService extends BaseService<Booking> {
             title: "Bạn đang đặt vé - " + createdItem.movie_name,
             description: `Mã vé: ${createdItem.code}`,
             type: 0, // type of notification 0: booking, 2: movie
-            expireAt: new Date(Date.now() + 10 * 60 * 1000),
+            expireAt: new Date(),
         });
 
         return await createdItem.save();

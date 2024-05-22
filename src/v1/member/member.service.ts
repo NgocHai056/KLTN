@@ -65,7 +65,7 @@ export class MemberService extends BaseService<Member> {
             point_history_name: booking.code,
             seats: seats,
             combos: combos,
-            expireAt: new Date(Date.now() + 10 * 60 * 1000),
+            expireAt: new Date(),
         });
 
         return totalPriceUsed;
