@@ -29,6 +29,7 @@ import { ReviewDto } from "./review.dto/review.dto";
 import { ReviewResponse } from "./review.response/review.response";
 import { ReviewService } from "./review.service";
 import { PaginationAndSearchDto } from "src/utils.common/utils.pagination/pagination-and-search.dto";
+import { MemberService } from "../member/member.service";
 
 @Controller({ version: VersionEnum.V1.toString(), path: "unauth/review" })
 export class ReviewController {
@@ -37,6 +38,7 @@ export class ReviewController {
         private readonly movieService: MovieService,
         private readonly bookingService: BookingService,
         private readonly userService: UserService,
+        private readonly memberService: MemberService,
     ) {}
 
     @Post("")
@@ -79,6 +81,17 @@ export class ReviewController {
 
         this.movieService.update(movie.id, movie);
         this.bookingService.update(booking.id, booking);
+
+        const member = (
+            await this.memberService.findByCondition({
+                user_id: user.id,
+            })
+        ).pop();
+
+        if (member) {
+            member.consumption_point += 10;
+            this.memberService.update(member.id, member);
+        }
 
         const reviewBuilder = new ReviewBuilder()
             .withMovieId(reviewDto.movie_id)

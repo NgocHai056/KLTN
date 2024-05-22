@@ -6,6 +6,7 @@ import { MovieModule } from "../movie/movie.module";
 import { BookingModule } from "../booking/booking.module";
 import { UserModule } from "../user/user.module";
 import { MongooseModule } from "@nestjs/mongoose";
+import { MemberModule } from "../member/member.module";
 
 @Module({
     imports: [
@@ -15,6 +16,7 @@ import { MongooseModule } from "@nestjs/mongoose";
         MovieModule,
         BookingModule,
         UserModule,
+        MemberModule,
     ],
     controllers: [ReviewController],
     providers: [ReviewService],

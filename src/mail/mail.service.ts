@@ -29,7 +29,6 @@ export class MailService {
         template: string,
         context: any,
         bookingId: string,
-        bookingCode: string,
     ) {
         // Tạo file ảnh mã QR code
         const qrCodePath = path.join(__dirname, "qrcode.png");

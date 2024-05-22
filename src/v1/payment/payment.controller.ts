@@ -133,7 +133,6 @@ export class PaymentController {
                     .join(", "),
             },
             booking.id,
-            booking.code,
         );
 
         return res.status(HttpStatus.OK).send(response);

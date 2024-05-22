@@ -66,7 +66,7 @@ export class MovieController {
 
             const currentDate = moment();
 
-            const nextDate = moment().add(4, "days");
+            const nextDate = moment().add(3, "days");
 
             const movieHasShowtime = await this.showtimeService.findByCondition(
                 {
