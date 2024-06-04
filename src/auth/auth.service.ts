@@ -109,6 +109,16 @@ export class AuthService {
     }
 
     async forgotConfirm(userId: string, updateUserDto: ForgotPasswordDto) {
+        /** Kiểm tra xem tên người dùng đã tồn tại hay chưa */
+        const user = await this.userService.find(userId);
+
+        if (!user)
+            UtilsExceptionMessageCommon.showMessageError(
+                "This account does not exist.",
+            );
+
+        await this.otpService.checkExisting(user.email, updateUserDto.otp);
+
         if (updateUserDto.password !== updateUserDto.confirm_password)
             UtilsExceptionMessageCommon.showMessageError(
                 "Confirmation password does not match.",
