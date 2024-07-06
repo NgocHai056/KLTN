@@ -169,7 +169,7 @@ export class MovieService extends BaseService<Movie> {
             {
                 $sort: {
                     // name: 1,
-                    release: isAdmin ? -1 : -1,
+                    release: isAdmin ? -1 : 1,
                 },
             },
         ];
