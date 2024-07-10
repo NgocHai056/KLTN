@@ -106,15 +106,6 @@ export class MemberService extends BaseService<Member> {
     ) {
         let member = (await this.findByCondition({ user_id: userId })).pop();
 
-        if (point > 0) {
-            if (member.level === MemberLevel.MEMBER)
-                point = Math.round(point * 0.05);
-            else if (member.level === MemberLevel.VIP)
-                point = Math.round(point * 0.07);
-            else if (member.level === MemberLevel.DIAMOND)
-                point = Math.round(point * 0.1);
-        }
-
         if (!member) {
             await this.create({
                 user_id: userId,
@@ -131,6 +122,15 @@ export class MemberService extends BaseService<Member> {
                 ],
             });
             return;
+        }
+
+        if (point > 0) {
+            if (member.level === MemberLevel.MEMBER)
+                point = Math.round(point * 0.05);
+            else if (member.level === MemberLevel.VIP)
+                point = Math.round(point * 0.07);
+            else if (member.level === MemberLevel.DIAMOND)
+                point = Math.round(point * 0.1);
         }
 
         member.rating_point += point > 0 ? point : 0;
