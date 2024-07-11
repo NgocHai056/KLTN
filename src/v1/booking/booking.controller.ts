@@ -29,6 +29,7 @@ import { BookingDto } from "./booking.dto/booking.dto";
 import { BookingService } from "./booking.service";
 import { UsePointBookingDto } from "./booking.dto/use-point.booking.dto";
 import { MemberService } from "../member/member.service";
+import { GetBookingDto } from "./booking.dto/get-booking.dto";
 
 @Controller({ version: VersionEnum.V1.toString(), path: "auth/booking" })
 export class BookingController {
@@ -188,12 +189,17 @@ export class BookingController {
     @UsePipes(new ValidationPipe({ transform: true }))
     async findAll(
         @Query() pagination: PaginationAndSearchDto,
+        @Query() bookintDto: GetBookingDto,
         @Res() res: Response,
         @GetUser() user: UserModel,
     ) {
         const response: ResponseData = new ResponseData();
 
         const query: any = {};
+
+        if (bookintDto.movie_id) query.movie_id = bookintDto.movie_id;
+
+        if (bookintDto.time) query.time = bookintDto.time;
 
         if (pagination.key_search !== "")
             query.$or = [
