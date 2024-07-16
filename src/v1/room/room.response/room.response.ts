@@ -26,11 +26,18 @@ export class RoomResponse {
     })
     seat_capacity: number;
 
+    @ApiProperty({
+        example: 45,
+        description: "Số ghế trống của 1 phòng",
+    })
+    status: number;
+
     constructor(entity?: Room) {
         this._id = entity ? entity.id : "";
         this.theater_id = entity ? entity.theater_id : "";
         this.room_number = entity ? entity.room_number : "";
         this.seat_capacity = entity ? entity.seat_capacity : 0;
+        this.status = entity ? entity.status : 0;
     }
 
     public static mapToList(entities: Room[]) {
