@@ -32,6 +32,19 @@ export class MovieService extends BaseService<Movie> {
         return movie;
     }
 
+    async findMovieDateRelease(): Promise<Movie[]> {
+        const date = new Date();
+        date.setDate(date.getDate() + 4);
+
+        return await this.movieModel
+            .find({
+                status: { $ne: MovieStatus.STOP_SHOWING },
+                release: { $lte: date },
+            })
+            .sort({ release: -1, created_at: -1 })
+            .exec();
+    }
+
     async findMovieBeforeDateRelease(): Promise<Movie[]> {
         const date = new Date();
         date.setDate(date.getDate() + 4);

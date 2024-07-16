@@ -95,6 +95,21 @@ export class MovieController {
         return res.status(HttpStatus.OK).send(response);
     }
 
+    @Get("/manager")
+    @ApiOperation({ summary: "API lấy danh sách phim" })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async get_movie_name(
+        @Query() movieDto: GetMoviesDto,
+        @Query() pagination: PaginationAndSearchDto,
+        @Res() res: Response,
+    ) {
+        const response: ResponseData = new ResponseData();
+
+        response.setData(await this.movieService.findMovieDateRelease());
+
+        return res.status(HttpStatus.OK).send(response);
+    }
+
     @Get("/admin")
     @Roles(Role.ADMIN, Role.MANAGER)
     @ApiOperation({ summary: "API lấy danh sách phim cho admin" })
