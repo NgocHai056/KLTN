@@ -123,7 +123,7 @@ export class RoomController {
         if (rooms.length === 0)
             UtilsExceptionMessageCommon.showMessageError("Rooms not exist.");
 
-        const status = rooms.pop().status === 0 ? 1 : 0;
+        const status = rooms[0].status === 0 ? 1 : 0;
 
         response.setData(
             (await this.roomService.updateMany(
