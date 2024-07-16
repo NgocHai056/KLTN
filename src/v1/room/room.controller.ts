@@ -123,10 +123,12 @@ export class RoomController {
         if (rooms.length === 0)
             UtilsExceptionMessageCommon.showMessageError("Rooms not exist.");
 
+        const status = rooms.pop().status === 0 ? 1 : 0;
+
         response.setData(
             (await this.roomService.updateMany(
                 { _id: { $in: rooms.flatMap((x) => x.id) } },
-                { $set: { status: 0 } },
+                { $set: { status: status } },
             ))
                 ? { msg: "Update successful." }
                 : { msg: "Update failed." },
