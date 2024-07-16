@@ -76,11 +76,11 @@ export class MovieService extends BaseService<Movie> {
         if (keySearch !== "") {
             query.$or = [
                 { name: { $regex: new RegExp(keySearch, "i") } },
+                { english_name: { $regex: new RegExp(keySearch, "i") } },
                 { title: { $regex: new RegExp(keySearch, "i") } },
                 { duration: { $regex: new RegExp(keySearch, "i") } },
                 { director: { $regex: new RegExp(keySearch, "i") } },
                 { performer: { $regex: new RegExp(keySearch, "i") } },
-                { description: { $regex: new RegExp(keySearch, "i") } },
             ];
         }
 
