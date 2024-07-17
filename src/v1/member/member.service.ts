@@ -109,14 +109,14 @@ export class MemberService extends BaseService<Member> {
         if (!member) {
             await this.create({
                 user_id: userId,
-                rating_point: Math.abs(point),
-                consumption_point: point,
+                rating_point: Math.round(point * 0.05),
+                consumption_point: Math.round(point * 0.05),
                 point_history: [
                     {
                         name: nameHistory,
                         seats,
                         combos,
-                        used_point: point,
+                        used_point: Math.round(point * 0.05),
                         day_trading: new Date(),
                     },
                 ],
